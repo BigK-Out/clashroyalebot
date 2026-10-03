@@ -1,0 +1,585 @@
+[
+ {
+  "name": "Skeletons",
+  "slug": "skeletons",
+  "elixir": 1,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Damage": "130",
+   "Damage/Sec": "018",
+   "Hitpoints": "130",
+   "Hit Speed": "1sec",
+   "#l1sec": "Speed",
+   "Targets": "Ground",
+   "Speed": "Fast",
+   "Range": "Meleg: Etrt",
+   "Count": "3"
+  },
+  "dir": "000"
+ },
+ {
+  "name": "Fire Spirit",
+  "slug": "fire_spirit",
+  "elixir": 1,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Area Damage": "337",
+   "Hitpoints": "343",
+   "Targets": "Air & Ground",
+   "Speed": "Very Fast",
+   "Range": "25"
+  },
+  "dir": "001"
+ },
+ {
+  "name": "Electro Spirit",
+  "slug": "electro_spirit",
+  "elixir": 1,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Hitpoints": "343",
+   "Ranged Damage": "159",
+   "Chained Attacks": "8",
+   "Stun Duration": "@Ssec",
+   "@Ssec": "Speed",
+   "Targets": "Aib & Ground",
+   "Speed": "VVery Fast",
+   "Range": "25"
+  },
+  "dir": "002"
+ },
+ {
+  "name": "Ice Spirit",
+  "slug": "ice_spirit",
+  "elixir": 1,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Area Damage": "125",
+   "Hitpoints": "343",
+   "Freeze Duration": "1sec",
+   "Targets": "Air & Ground",
+   "#1sec": "Speed",
+   "Ai & Ground": "Range",
+   "Speed": "VVery Fast",
+   "Range": "25"
+  },
+  "dir": "003"
+ },
+ {
+  "name": "Goblins",
+  "slug": "goblins",
+  "elixir": 2,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Damage": "200",
+   "Damage/Sec": "187",
+   "Hitpoints": "323",
+   "Hit Speed": "1sec",
+   "#l1sec": "Speed",
+   "Targets": "Ground",
+   "Speed": "(Veny Fast",
+   "Range": "Meleg: Etrt"
+  },
+  "dir": "004"
+ },
+ {
+  "name": "Heal Spirit",
+  "slug": "heal_spirit",
+  "elixir": 1,
+  "rarity": "Rare",
+  "type": "Troop",
+  "stats": {
+   "Area Damage": "125",
+   "Hitpoints": "343",
+   "Duration": "[sec",
+   "Healing": "640",
+   "Targets": "Aib & Ground",
+   "Speed": "VVery Fast",
+   "Range": "25"
+  },
+  "dir": "005"
+ },
+ {
+  "name": "Mirror",
+  "slug": "mirror",
+  "elixir": null,
+  "rarity": "Epic",
+  "type": "Spell",
+  "stats": {},
+  "dir": "006"
+ },
+ {
+  "name": "Spear Goblins",
+  "slug": "spear_goblins",
+  "elixir": 2,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Hitpoints": "212",
+   "Ranged Damage": "130",
+   "Hit Speed": "16sec",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Range",
+   "Speed": "VVery Fast",
+   "Range": "5",
+   "Count": "3"
+  },
+  "dir": "008"
+ },
+ {
+  "name": "Giant Snowball",
+  "slug": "giant_snowball",
+  "elixir": 2,
+  "rarity": "Common",
+  "type": "Spell",
+  "stats": {
+   "Area Damage": "286",
+   "Crown Tower Damage": "172",
+   "Slowdown Duration": "Bsec",
+   "Radius": "25"
+  },
+  "dir": "010"
+ },
+ {
+  "name": "Bomber",
+  "slug": "bomber",
+  "elixir": 2,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Area Damage": "359",
+   "Hitpoints": "486",
+   "Hit Speed": "118sec",
+   "Targets": "Ground",
+   "Speed": "Mediu",
+   "Range": "455"
+  },
+  "dir": "011"
+ },
+ {
+  "name": "Bats",
+  "slug": "bats",
+  "elixir": 2,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Damage": "130",
+   "Damage/Sec": "108",
+   "Hitpoints": "130",
+   "Hit Speed": "112sec",
+   "Targets": "Aib & Ground",
+   "Speed": "(Veny Fast",
+   "Range": "Mellee: Medium",
+   "Count": "5"
+  },
+  "dir": "012"
+ },
+ {
+  "name": "Zap",
+  "slug": "zap",
+  "elixir": 2,
+  "rarity": "Common",
+  "type": "Spell",
+  "stats": {
+   "Area Damage": "306",
+   "Stun Duration": "@Ssec",
+   "Radius": "25"
+  },
+  "dir": "013"
+ },
+ {
+  "name": "The Log",
+  "slug": "the_log",
+  "elixir": 2,
+  "rarity": "Legendary",
+  "type": "Spell",
+  "stats": {
+   "Area Damage": "429",
+   "Crown Tower Damage": "56",
+   "Targets": "Ground",
+   "Width": "39",
+   "Range": "10517"
+  },
+  "dir": "017"
+ },
+ {
+  "name": "Berserker",
+  "slug": "berserker",
+  "elixir": 2,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Damage": "163",
+   "Damage/Sec": "221",
+   "Hitpoints": "11437",
+   "Hit Speed": "65",
+   "Targets": "Ground",
+   "Speed": "Fast",
+   "Range": "Meleg: Etrt"
+  },
+  "dir": "018"
+ },
+ {
+  "name": "Barbarian Barrel",
+  "slug": "barbarian_barrel",
+  "elixir": 2,
+  "rarity": "Epic",
+  "type": "Spell",
+  "stats": {
+   "Area Damage": "372",
+   "Targets": "Ground",
+   "Widbh": "26",
+   "Range": "455",
+   "Barbarian Level": "16"
+  },
+  "dir": "019"
+ },
+ {
+  "name": "Ice Golem",
+  "slug": "ice_golem",
+  "elixir": 2,
+  "rarity": "Rare",
+  "type": "Troop",
+  "stats": {
+   "Damage": "14",
+   "Death Damage": "14",
+   "Damage/Sec": "53",
+   "Hitpoints": "2102",
+   "Hit Speed": "25sec",
+   "Targets": "Bufldings",
+   "Speed": "Elow",
+   "Range": "Meleea Stpont"
+  },
+  "dir": "020"
+ },
+ {
+  "name": "Wall Breakers",
+  "slug": "wall_breakers",
+  "elixir": 2,
+  "rarity": "Epic",
+  "type": "Troop",
+  "stats": {
+   "Area Damage": "449",
+   "Hitpoints": "527",
+   "Targets": "Buildigs",
+   "Speed": "Very Fast",
+   "Range": "Meleg: Etrt",
+   "Count": "2"
+  },
+  "dir": "025"
+ },
+ {
+  "name": "Suspicious Bush",
+  "slug": "suspicious_bush",
+  "elixir": 2,
+  "rarity": "Rare",
+  "type": "Troop",
+  "stats": {
+   "Hitpoints": "130",
+   "Bush Goblin Count": "2",
+   "Targets": "Buildigs",
+   "Bush Goblin Level": "16",
+   "Speed": "Mediu"
+  },
+  "dir": "026"
+ },
+ {
+  "name": "Rage",
+  "slug": "rage",
+  "elixir": 2,
+  "rarity": "Epic",
+  "type": "Spell",
+  "stats": {
+   "Area Damage": "286",
+   "Crown Tower Damage": "72",
+   "Deploy Time": "@Sse",
+   "Duration": "5sec",
+   "Q5sec": "Radius",
+   "Boost": "4303",
+   "Radius": "3"
+  },
+  "dir": "027"
+ },
+ {
+  "name": "Goblin Curse",
+  "slug": "goblin_curse",
+  "elixir": 2,
+  "rarity": "Epic",
+  "type": "Spell",
+  "stats": {
+   "Damage": "5",
+   "Crown Tower Damage": "16",
+   "Slowdown Enemies": "41593",
+   "Goblin Level": "16",
+   "Duration": "Esec",
+   "Radius": "3"
+  },
+  "dir": "028"
+ },
+ {
+  "name": "Knight",
+  "slug": "knight",
+  "elixir": 3,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Damage": "323",
+   "Damage/Sec": "269",
+   "Hitpoints": "2822",
+   "Hit Speed": "112sec",
+   "Targets": "Ground",
+   "Speed": "Mediu",
+   "Range": "Mlelleg: Medim"
+  },
+  "dir": "034"
+ },
+ {
+  "name": "Archers",
+  "slug": "archers",
+  "elixir": 3,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Hitpoints": "486",
+   "Ranged Damage": "179",
+   "Hit Speed": "@Isec",
+   "Targets": "Air & Ground",
+   "@Isec": "Speed",
+   "Ai & Ground": "Range",
+   "Speed": "Mlediu",
+   "Range": "5",
+   "Count": "2"
+  },
+  "dir": "035"
+ },
+ {
+  "name": "Minions",
+  "slug": "minions",
+  "elixir": 3,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Hitpoints": "368",
+   "Ranged Damage": "171",
+   "Hit Speed": "112sec",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Range",
+   "Speed": "Fast",
+   "Range": "25",
+   "Count": "3"
+  },
+  "dir": "036"
+ },
+ {
+  "name": "Arrows",
+  "slug": "arrows",
+  "elixir": 3,
+  "rarity": "Common",
+  "type": "Spell",
+  "stats": {
+   "Area Damage": "196x",
+   "Crown Tower Damage": "40x",
+   "Radius": "35"
+  },
+  "dir": "037"
+ },
+ {
+  "name": "Tombstone",
+  "slug": "tombstone",
+  "elixir": 3,
+  "rarity": "Rare",
+  "type": "Building",
+  "stats": {
+   "Hitpoints": "846",
+   "Spawn on Death": "Ekellto x4",
+   "Skeleton Level": "16",
+   "Spawn Speed": "4sec",
+   "Lifetime": "30sec"
+  },
+  "dir": "038"
+ },
+ {
+  "name": "Cannon",
+  "slug": "cannon",
+  "elixir": 3,
+  "rarity": "Common",
+  "type": "Building",
+  "stats": {
+   "Hitpoints": "1316",
+   "Ranged Damage": "323",
+   "Hit Speed": "[sec",
+   "Targets": "Ground",
+   "[sec": "Range",
+   "Groud": "Lifetime",
+   "Range": "55",
+   "Lifetime": "30sec"
+  },
+  "dir": "039"
+ },
+ {
+  "name": "Mega Minion",
+  "slug": "mega_minion",
+  "elixir": 3,
+  "rarity": "Rare",
+  "type": "Troop",
+  "stats": {
+   "Hitpoints": "1337",
+   "Ranged Damage": "498",
+   "Hit Speed": "15sec",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Range",
+   "Speed": "Mediu",
+   "Range": "Melee: [ong"
+  },
+  "dir": "040"
+ },
+ {
+  "name": "Skeleton Army",
+  "slug": "skeleton_army",
+  "elixir": 3,
+  "rarity": "Epic",
+  "type": "Troop",
+  "stats": {
+   "Skeleton Level": "16",
+   "Skeleton Count": "15"
+  },
+  "dir": "041"
+ },
+ {
+  "name": "Guards",
+  "slug": "guards",
+  "elixir": 3,
+  "rarity": "Epic",
+  "type": "Troop",
+  "stats": {
+   "Damage": "188",
+   "Damage/Sec": "188",
+   "Hitpoints": "130",
+   "Shield Hitpoints": "409",
+   "Hit Speed": "Isec",
+   "Targets": "Ground",
+   "Groud": "Range",
+   "Speed": "Fast",
+   "Range": "Meiee: [ongg"
+  },
+  "dir": "042"
+ },
+ {
+  "name": "Goblin Barrel",
+  "slug": "goblin_barrel",
+  "elixir": 3,
+  "rarity": "Epic",
+  "type": "Spell",
+  "stats": {
+   "Radius": "1155",
+   "Goblin Level": "16",
+   "Goblin Counb": "3"
+  },
+  "dir": "043"
+ },
+ {
+  "name": "Vines",
+  "slug": "vines",
+  "elixir": 3,
+  "rarity": "Epic",
+  "type": "Spell",
+  "stats": {
+   "Damage/Sec": "245",
+   "Crown Tower Damage": "5",
+   "Count": "3",
+   "Duration": "Zse",
+   "Radius": "25"
+  },
+  "dir": "044"
+ },
+ {
+  "name": "Goblin Gang",
+  "slug": "goblin_gang",
+  "elixir": 3,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Goblin Level": "16",
+   "Goblin Counb": "3",
+   "Spear Goblin Level": "16",
+   "Spear Goblin Count": "3"
+  },
+  "dir": "045"
+ },
+ {
+  "name": "Dart Goblin",
+  "slug": "dart_goblin",
+  "elixir": 3,
+  "rarity": "Rare",
+  "type": "Troop",
+  "stats": {
+   "Hitpoints": "417",
+   "Ranged Damage": "2417",
+   "Hit Speed": "08sec",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Range",
+   "Speed": "VVery Fast",
+   "Range": "655"
+  },
+  "dir": "055"
+ },
+ {
+  "name": "Princess",
+  "slug": "princess",
+  "elixir": 3,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "stats": {
+   "Area Damage": "269",
+   "Hitpoints": "417",
+   "Hit Speed": "Bsec",
+   "Targets": "Air & Ground",
+   "Bsec": "Speed",
+   "Ai & Ground": "Range",
+   "Speed": "Mediu",
+   "Range": "0",
+   "Mediu": "Deploy Time",
+   "Deploy Time": "1123"
+  },
+  "dir": "056"
+ },
+ {
+  "name": "Miner",
+  "slug": "miner",
+  "elixir": 3,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "stats": {
+   "Damage": "310",
+   "Crown Tower Damage": "62",
+   "Damage/Sec": "238",
+   "Hitpoints": "1934",
+   "Hit Speed": "13sec",
+   "Targets": "Growd",
+   "Speed": "Fast",
+   "Range": "Mellee: Medium"
+  },
+  "dir": "057"
+ },
+ {
+  "name": "Skeleton Barrel",
+  "slug": "skeleton_barrel",
+  "elixir": 3,
+  "rarity": "Common",
+  "type": "Troop",
+  "stats": {
+   "Death Damage": "233",
+   "Hitpoints": "850",
+   "Skeleton Counb": "U",
+   "Targets": "Buildings",
+   "Skeleton Level": "16",
+   "Speed": "Fast"
+  },
+  "dir": "059"
+ }
+]

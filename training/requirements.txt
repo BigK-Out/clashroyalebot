@@ -4,3 +4,4 @@ onnx
 onnxslim
 onnxruntime
 onnxscript
+easyocr
