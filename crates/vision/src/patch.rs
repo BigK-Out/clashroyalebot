@@ -7,9 +7,14 @@ use capture::Frame;
 pub const PATCH_W: usize = 24;
 pub const PATCH_H: usize = 24;
 
-/// Zero-mean, unit-variance RGB patch (PATCH_W x PATCH_H x 3).
+/// Zero-mean, unit-variance patch: RGB (PATCH_W x PATCH_H x 3) plus a grayscale copy.
 #[derive(Clone, Debug)]
-pub struct Patch(Vec<f32>);
+pub struct Patch {
+    rgb: Vec<f32>,
+    gray: Vec<f32>,
+    /// Mean HSV-style saturation of the raw patch, 0..1. Unaffordable cards are drawn ~grey.
+    saturation: f32,
+}
 
 impl Patch {
     /// Crops [x0,x1) x [y0,y1) (pixels, clamped to the frame) and box-resamples it.
@@ -42,7 +47,7 @@ impl Patch {
                 out.extend(acc.iter().map(|&a| a as f32 / n));
             }
         }
-        Some(Self::normalized(out))
+        Some(Self::new(out))
     }
 
     /// Whole frame as a patch (used for template images, which are pre-cropped).
@@ -50,30 +55,59 @@ impl Patch {
         Self::from_region(frame, 0.0, 0.0, frame.width as f64, frame.height as f64)
     }
 
-    fn normalized(mut v: Vec<f32>) -> Self {
+    fn new(raw: Vec<f32>) -> Self {
+        let saturation = raw
+            .chunks_exact(3)
+            .map(|p| {
+                let max = p[0].max(p[1]).max(p[2]);
+                let min = p[0].min(p[1]).min(p[2]);
+                if max > 0.0 { (max - min) / max } else { 0.0 }
+            })
+            .sum::<f32>()
+            / (raw.len() / 3) as f32;
+        let mut gray: Vec<f32> = raw.chunks_exact(3).map(|p| 0.299 * p[0] + 0.587 * p[1] + 0.114 * p[2]).collect();
+        let mut rgb = raw;
         // Per channel, so a uniform brightness/tint shift (selection glow, compression) cancels out.
         for c in 0..3 {
-            let n = (v.len() / 3) as f32;
-            let mean = v.iter().skip(c).step_by(3).sum::<f32>() / n;
-            let var = v.iter().skip(c).step_by(3).map(|x| (x - mean).powi(2)).sum::<f32>() / n;
-            let std = var.sqrt().max(1.0); // flat patches (empty slot) stay flat instead of exploding
-            for x in v.iter_mut().skip(c).step_by(3) {
-                *x = (*x - mean) / std;
-            }
+            normalize_strided(&mut rgb, c, 3);
         }
-        Self(v)
+        normalize_strided(&mut gray, 0, 1);
+        Self { rgb, gray, saturation }
     }
 
     /// Normalized cross-correlation in [-1, 1]; 1 = identical up to per-channel gain/offset.
     pub fn ncc(&self, other: &Patch) -> f32 {
-        let dot: f32 = self.0.iter().zip(&other.0).map(|(a, b)| a * b).sum();
-        dot / self.0.len() as f32
+        dot_mean(&self.rgb, &other.rgb)
+    }
+
+    /// Grayscale NCC: for greyed-out (unaffordable) cards, where color is gone.
+    pub fn ncc_gray(&self, other: &Patch) -> f32 {
+        dot_mean(&self.gray, &other.gray)
+    }
+
+    /// True when the patch has almost no color (greyed-out card).
+    pub fn is_desaturated(&self) -> bool {
+        self.saturation < 0.12
     }
 
     /// Mean absolute normalized value: ~0 for a flat patch, ~0.8 for textured art.
     pub fn texture(&self) -> f32 {
-        self.0.iter().map(|x| x.abs()).sum::<f32>() / self.0.len() as f32
+        self.rgb.iter().map(|x| x.abs()).sum::<f32>() / self.rgb.len() as f32
     }
+}
+
+fn normalize_strided(v: &mut [f32], offset: usize, stride: usize) {
+    let n = (v.len() / stride) as f32;
+    let mean = v.iter().skip(offset).step_by(stride).sum::<f32>() / n;
+    let var = v.iter().skip(offset).step_by(stride).map(|x| (x - mean).powi(2)).sum::<f32>() / n;
+    let std = var.sqrt().max(1.0); // flat patches (empty slot) stay flat instead of exploding
+    for x in v.iter_mut().skip(offset).step_by(stride) {
+        *x = (*x - mean) / std;
+    }
+}
+
+fn dot_mean(a: &[f32], b: &[f32]) -> f32 {
+    a.iter().zip(b).map(|(x, y)| x * y).sum::<f32>() / a.len() as f32
 }
 
 #[cfg(test)]
@@ -107,6 +141,19 @@ mod tests {
         let b = frame(48, 48, |_, y| if y < 24 { [255; 3] } else { [0; 3] });
         let s = Patch::from_frame(&a).unwrap().ncc(&Patch::from_frame(&b).unwrap());
         assert!(s.abs() < 0.1, "{s}");
+    }
+
+    #[test]
+    fn greyed_copy_matches_in_gray() {
+        let color = frame(48, 48, |x, y| [(x * 5) as u8, (y * 4) as u8, ((x * y) % 200) as u8]);
+        let grey = frame(48, 48, |x, y| {
+            let [r, g, b] = [(x * 5) as f32, (y * 4) as f32, ((x * y) % 200) as f32];
+            let l = (0.299 * r + 0.587 * g + 0.114 * b) as u8 / 2 + 100; // washed out
+            [l, l, l]
+        });
+        let (pc, pg) = (Patch::from_frame(&color).unwrap(), Patch::from_frame(&grey).unwrap());
+        assert!(pg.is_desaturated() && !pc.is_desaturated());
+        assert!(pg.ncc_gray(&pc) > 0.98, "{}", pg.ncc_gray(&pc));
     }
 
     #[test]

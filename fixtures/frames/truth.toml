@@ -38,3 +38,23 @@ next = "mini_pekka"
 
 [[frame]]
 file = "training_end.jpg"
+
+# Live scrcpy frames (576x1280), Hog 2.6.
+[[frame]]
+file = "live_hog_e10.jpg"
+elixir = 10
+hand = ["ice_spirit", "fireball", "hog_rider", "the_log"]
+next = "musketeer"
+
+[[frame]]
+file = "live_hog_e10_b.jpg"
+elixir = 10
+hand = ["ice_spirit", "fireball", "hog_rider", "the_log"]
+next = "musketeer"
+
+# Cannon and Fireball greyed out (unaffordable), Ice Golem selected.
+[[frame]]
+file = "live_hog_e2_grey_selected.jpg"
+elixir = 2
+hand = ["cannon", "ice_spirit", "ice_golem", "fireball"]
+next = "hog_rider"

@@ -102,7 +102,14 @@ impl CardLibrary {
     }
 
     fn best(&self, patch: &Patch) -> Option<(usize, f32)> {
-        self.templates.iter().enumerate().map(|(i, t)| (i, t.patch.ncc(patch))).max_by(|a, b| a.1.total_cmp(&b.1))
+        let grey = patch.is_desaturated();
+        self.templates
+            .iter()
+            .enumerate()
+            // An empty slot is never "greyed out"; skip it for grey slots so washed-out art can't match it.
+            .filter(|(_, t)| !(grey && t.name == EMPTY_TEMPLATE))
+            .map(|(i, t)| (i, if grey { t.patch.ncc_gray(patch) } else { t.patch.ncc(patch) }))
+            .max_by(|a, b| a.1.total_cmp(&b.1))
     }
 
     /// Classifies one slot, trying the normal and the raised position.
