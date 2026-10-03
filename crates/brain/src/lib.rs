@@ -158,9 +158,70 @@ const COUNTER_HOG_AT: u8 = 4;
 /// Double elixir starts at 2:00.
 const DOUBLE_ELIXIR: Duration = Duration::from_secs(120);
 
-/// Elixir allowed on defense in one lane per window: bigger pushes get more, never everything.
-fn defense_budget(attackers: usize) -> u8 {
-    (3.0 + 1.5 * attackers as f32).min(7.0) as u8
+/// Elixir allowed on defense in one lane per window: about what the enemy spent, plus 1.
+fn defense_budget(push_value: f32) -> u8 {
+    (push_value + 1.0).clamp(0.0, 7.0) as u8
+}
+
+/// Pushes worth this much or less are left to the towers (Skeletons, Ice Spirit, few Goblins).
+const TOWER_HANDLES: f32 = 2.0;
+
+/// Enemy card cost for a classified unit type, and whether the card spawns several units
+/// (then a whole group of that type counts as one card).
+fn enemy_card(kind: &str) -> Option<(f32, bool)> {
+    Some(match kind {
+        "skeletons" => (1.0, true),
+        "goblins" => (2.0, true),
+        "barbarians" => (5.0, true),
+        "archers" => (3.0, true),
+        "hog_rider" | "musketeer" | "baby_dragon" | "magic_archer" => (4.0, false),
+        "elixir_golem" => (3.0, false),
+        "ice_golem" => (2.0, false),
+        "cannon" => (3.0, false),
+        "goblin_hut" => (5.0, false),
+        "elixir_collector" => (6.0, false),
+        _ => return None,
+    })
+}
+
+/// Estimated elixir value of a group of enemy units (one lane).
+///
+/// Known swarm types count once per group (a 15-unit Skeleton Army is one card; more than
+/// four skeletons together = Skeleton Army, 3 elixir). Unknown units are grouped by
+/// proximity: a lone unit ~3.5, a clump of 2+ ~4 (one swarm card or a pair).
+pub fn push_value(threats: &[((u32, u32), Option<&str>)]) -> f32 {
+    let mut value = 0.0;
+    let mut swarm_groups: Vec<(&str, Vec<(u32, u32)>)> = Vec::new();
+    let mut unknown: Vec<(u32, u32)> = Vec::new();
+    for &(t, k) in threats {
+        match k.and_then(|k| enemy_card(k).map(|c| (k, c))) {
+            Some((k, (_, true))) => match swarm_groups.iter_mut().find(|(gk, g)| *gk == k && g.iter().any(|&u| near(u, t, 3.0))) {
+                Some((_, g)) => g.push(t),
+                None => swarm_groups.push((k, vec![t])),
+            },
+            Some((_, (c, false))) => value += c,
+            None => unknown.push(t),
+        }
+    }
+    for (k, g) in &swarm_groups {
+        let (c, _) = enemy_card(k).unwrap();
+        value += if *k == "skeletons" && g.len() > 4 { 3.0 } else { c };
+    }
+    // Unknown units: cluster greedily.
+    while let Some(first) = unknown.pop() {
+        let mut n = 1;
+        unknown.retain(|&u| {
+            let close = near(u, first, 2.5);
+            n += close as usize;
+            !close
+        });
+        value += if n == 1 { 3.5 } else { 4.0 };
+    }
+    value
+}
+
+fn near(a: (u32, u32), b: (u32, u32), r: f32) -> bool {
+    ((a.0 as f32 - b.0 as f32).powi(2) + (a.1 as f32 - b.1 as f32).powi(2)).sqrt() <= r
 }
 
 fn lane_idx(l: Lane) -> usize {
@@ -186,25 +247,37 @@ impl HogCycle {
 
     fn defend(&self, s: &GameState, lane: Lane) -> Option<Action> {
         let threats = s.threats(lane);
+        let kinds = s.threat_kinds(lane);
         // Most advanced attacker (closest to my towers).
         let &(fc, fr) = threats.iter().max_by_key(|t| t.1)?;
+        let value = push_value(&kinds);
+        // Cheap pushes: the towers win that trade for free.
+        if value <= TOWER_HANDLES {
+            return None;
+        }
 
-        // Swarm: 3+ units together, or 2+ known swarm units (classifier) together.
-        let swarmy: Vec<(u32, u32)> = s
-            .threat_kinds(lane)
-            .into_iter()
+        // Swarm: 3+ units together, or 2+ known swarm units together; only spell it when the
+        // swarm is worth more than the spell (positive trade).
+        let swarmy: Vec<(u32, u32)> = kinds
+            .iter()
             .filter(|(_, k)| k.is_some_and(|k| SWARM_KINDS.contains(&k)))
-            .map(|(t, _)| t)
+            .map(|(t, _)| *t)
             .collect();
         let group = densest(&threats, SWARM_RADIUS)
             .filter(|g| g.2 >= SWARM_MIN)
             .or_else(|| densest(&swarmy, SWARM_RADIUS).filter(|g| g.2 >= 2));
         if let Some((gc, gr, _)) = group {
+            let in_group: Vec<_> = kinds.iter().copied().filter(|(t, _)| near(*t, (gc, gr), SWARM_RADIUS)).collect();
+            let group_value = push_value(&in_group);
             // The Log rolls up the arena from where it lands: drop it just behind the group.
-            if let Some(a) = Self::deploy(s, "the_log", my_side(gc, gr + 2), false, Why::Swarm) {
+            if group_value >= 3.0
+                && let Some(a) = Self::deploy(s, "the_log", my_side(gc, gr + 2), false, Why::Swarm)
+            {
                 return Some(a);
             }
-            if let Some(a) = Self::deploy(s, "fireball", (gc, gr), gr < MY_FIRST_ROW_HINT, Why::Swarm) {
+            if group_value >= 5.0
+                && let Some(a) = Self::deploy(s, "fireball", (gc, gr), gr < MY_FIRST_ROW_HINT, Why::Swarm)
+            {
                 return Some(a);
             }
         }
@@ -214,16 +287,17 @@ impl HogCycle {
         if recent {
             return None;
         }
-        let left = defense_budget(threats.len()).saturating_sub(self.spent_recently(s, lane));
+        let left = defense_budget(value).saturating_sub(self.spent_recently(s, lane));
         // Toward the center from the attacker, so it gets pulled between both towers.
         let toward_center = if lane == Lane::Left { fc + 1 } else { fc.saturating_sub(1) };
-        let options: [(&str, (u32, u32)); 5] = [
-            ("cannon", center_pull(lane)),
-            ("ice_golem", my_side(toward_center, fr + 2)),
-            ("skeletons", my_side(fc, fr + 1)),
-            ("musketeer", behind_tower(lane)),
-            ("ice_spirit", my_side(fc, fr + 1)),
-        ];
+        let (golem, skel, spirit) =
+            (my_side(toward_center, fr + 2), my_side(fc, fr + 1), my_side(fc, fr + 1));
+        // Big pushes get the real defenders; medium ones the cheapest card that does the job.
+        let options: Vec<(&str, (u32, u32))> = if value >= 4.0 {
+            vec![("cannon", center_pull(lane)), ("ice_golem", golem), ("musketeer", behind_tower(lane)), ("skeletons", skel)]
+        } else {
+            vec![("ice_golem", golem), ("skeletons", skel), ("ice_spirit", spirit), ("cannon", center_pull(lane))]
+        };
         options
             .iter()
             .filter(|(card, _)| cost(card).is_some_and(|c| c <= left))
@@ -413,10 +487,10 @@ mod tests {
 
     #[test]
     fn defense_budget_caps_spending() {
-        assert_eq!(defense_budget(1), 4);
-        assert_eq!(defense_budget(4), 7);
+        assert_eq!(defense_budget(3.5), 4);
+        assert_eq!(defense_budget(9.0), 7);
         let mut p = HogCycle::default();
-        // One attacker: budget 4, Cannon (3) fits, Musketeer (4) only if nothing spent.
+        // One unknown attacker (~3.5): budget 4, Cannon (3) fits, Musketeer (4) only if nothing spent.
         // Cannon spent at 34.5 s; at 38 s the 3 s cooldown is over but the 4 s budget window isn't.
         let mut earlier = state(9, ["cannon", "", "", ""], 34, &[]);
         earlier.battle_time += Duration::from_millis(500);
@@ -451,11 +525,41 @@ mod tests {
     fn two_known_swarm_units_get_logged() {
         let mut p = HogCycle::default();
         let mut s = state(5, ["the_log", "cannon", "hog_rider", "musketeer"], 40, &[(14, 20), (15, 21)]);
-        s.enemy_kinds = vec![Some("goblins".into()), Some("goblins".into())];
+        // Two Barbarians (one 5-elixir card) together: Log them.
+        s.enemy_kinds = vec![Some("barbarians".into()), Some("barbarians".into())];
         assert_eq!(act(p.decide(&s)).map(|a| (a.0, a.3)), Some(("the_log".to_string(), Why::Swarm)));
+        // Two Goblins (2 elixir): the towers handle it, no card.
+        s.enemy_kinds = vec![Some("goblins".into()), Some("goblins".into())];
+        assert_eq!(p.decide(&s), None);
         // Same two units, unknown type: a troop defends instead.
         s.enemy_kinds = vec![None, None];
         assert_eq!(act(p.decide(&s)).map(|a| a.0).as_deref(), Some("cannon"));
+    }
+
+    #[test]
+    fn towers_handle_cheap_pushes() {
+        let mut p = HogCycle::default();
+        let mut s = state(6, ["cannon", "skeletons", "ice_golem", "the_log"], 40, &[(14, 20), (14, 21), (15, 20)]);
+        s.enemy_kinds = vec![Some("skeletons".into()); 3];
+        assert_eq!(p.decide(&s), None, "3 skeletons (1 elixir) die to the tower");
+    }
+
+    #[test]
+    fn push_values() {
+        let sk = |n: usize| (0..n).map(|i| ((10 + i as u32 % 3, 20 + i as u32 / 3), Some("skeletons"))).collect::<Vec<_>>();
+        assert_eq!(push_value(&sk(3)), 1.0);
+        assert_eq!(push_value(&sk(12)), 3.0, "skeleton army");
+        assert_eq!(push_value(&[((14, 20), Some("hog_rider"))]), 4.0);
+        assert_eq!(push_value(&[((14, 20), None)]), 3.5);
+        assert_eq!(push_value(&[((14, 20), None), ((14, 21), None), ((3, 25), None)]), 7.5, "a pair + a single");
+    }
+
+    #[test]
+    fn medium_push_gets_a_cheap_answer() {
+        let mut p = HogCycle::default();
+        let mut s = state(8, ["cannon", "musketeer", "ice_golem", "skeletons"], 40, &[(14, 20)]);
+        s.enemy_kinds = vec![Some("elixir_golem".into())];
+        assert_eq!(act(p.decide(&s)).map(|a| a.0).as_deref(), Some("ice_golem"));
     }
 
     #[test]
