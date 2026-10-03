@@ -36,6 +36,22 @@ struct Args {
     /// Card template directory.
     #[arg(long, default_value = "assets/cards")]
     cards: PathBuf,
+    /// In battle, auto-save frames where a card slot is unknown or weakly matched
+    /// (at most one per second) into <save-dir>/unsure/.
+    #[arg(long)]
+    auto_save: bool,
+}
+
+/// Score below which a recognized card still counts as "unsure" for --auto-save.
+const UNSURE_SCORE: f32 = 0.8;
+
+fn is_unsure(p: &Perceived) -> bool {
+    let Some(h) = &p.hand else { return false };
+    h.slots.iter().chain([&h.next]).any(|s| match s {
+        Slot::Card(m) => m.score < UNSURE_SCORE,
+        Slot::Empty => false,
+        Slot::Unknown { .. } => true,
+    })
 }
 
 /// Calibration + card library; perception is skipped if either is missing.
@@ -139,6 +155,8 @@ fn open_source(args: &Args) -> anyhow::Result<Box<dyn FrameSource>> {
 /// Capture loop on its own thread; reopens the source if it fails (e.g. scrcpy restarted).
 fn spawn_capture(args: Args, shared: Arc<Mutex<Shared>>, on_frame: impl Fn() + Send + 'static) {
     let perceiver = Perceiver::load(&args);
+    let unsure_dir = args.auto_save.then(|| args.save_dir.join("unsure"));
+    let mut last_auto_save: Option<Instant> = None;
     std::thread::spawn(move || {
         loop {
             let mut src = match open_source(&args) {
@@ -163,6 +181,16 @@ fn spawn_capture(args: Args, shared: Arc<Mutex<Shared>>, on_frame: impl Fn() + S
                         let convert_ms = frame.captured_at.elapsed().as_secs_f64() * 1e3;
                         fps.tick();
                         let perceived = perceiver.as_ref().map(|p| p.perceive(&frame));
+                        if let (Some(dir), Some(p)) = (&unsure_dir, &perceived)
+                            && is_unsure(p)
+                            && last_auto_save.is_none_or(|t| t.elapsed() >= Duration::from_secs(1))
+                        {
+                            last_auto_save = Some(Instant::now());
+                            match save_frame(&frame, dir) {
+                                Ok(path) => tracing::info!("unsure, saved {} ({})", path.display(), perceived_text(p)),
+                                Err(e) => tracing::warn!("auto-save: {e:#}"),
+                            }
+                        }
                         let mut s = shared.lock().unwrap();
                         if perceived.is_some() {
                             s.perceived = perceived;
