@@ -1,6 +1,7 @@
 //! Bounding-box labeler for the detector dataset (YOLO format).
 //!
 //!   label                       # dataset/raw images, labels in dataset/labels
+//!   label --stride 5            # every 5th frame (recordings are near-duplicates at 2/s)
 //!   label --dataset other/
 //!
 //! Drag = new box (current class) · click = select · 1-9 = class (selected box, or for new
@@ -18,6 +19,9 @@ use eframe::egui::{self, Color32, Pos2, Rect, Sense, Stroke, StrokeKind, Vec2};
 struct Args {
     #[arg(long, default_value = "dataset")]
     dataset: PathBuf,
+    /// Only show every Nth image (consecutive recordings are 0.5 s apart, near-duplicates).
+    #[arg(long, default_value_t = 1)]
+    stride: usize,
 }
 
 const DEFAULT_CLASSES: [&str; 6] =
@@ -326,6 +330,7 @@ fn main() -> anyhow::Result<()> {
         .filter(|p| p.extension().is_some_and(|e| e == "jpg" || e == "png"))
         .collect();
     images.sort();
+    let images: Vec<PathBuf> = images.into_iter().step_by(args.stride.max(1)).collect();
     anyhow::ensure!(!images.is_empty(), "no images in {}", raw.display());
 
     let mut app = App {
