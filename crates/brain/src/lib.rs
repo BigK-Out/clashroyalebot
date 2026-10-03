@@ -123,18 +123,21 @@ pub struct HogCycle {
     last_hog: Option<(Duration, Lane)>,
     last_defense: [Option<Duration>; 2],
     last_defense_lane: Option<(Duration, Lane)>,
+    /// Defensive spending per lane: (battle time, elixir).
+    spent: [Vec<(Duration, u8)>; 2],
 }
 
 impl Default for HogCycle {
     fn default() -> Self {
         Self {
-            hog_at: 7,
+            hog_at: 6,
             leak_at: 9,
             default_lane: Lane::Right,
             opening_wait: Duration::from_secs(8),
             last_hog: None,
             last_defense: [None; 2],
             last_defense_lane: None,
+            spent: [Vec::new(), Vec::new()],
         }
     }
 }
@@ -146,6 +149,17 @@ const DEFENSE_COOLDOWN: Duration = Duration::from_millis(3000);
 const COUNTER_WINDOW: Duration = Duration::from_secs(8);
 const SWARM_RADIUS: f32 = 2.5;
 const SWARM_MIN: usize = 3;
+/// Defensive elixir per lane within this window is capped by `defense_budget`.
+const BUDGET_WINDOW: Duration = Duration::from_secs(4);
+/// Counter-push Hog Rider needs only this much elixir right after a defense.
+const COUNTER_HOG_AT: u8 = 4;
+/// Double elixir starts at 2:00.
+const DOUBLE_ELIXIR: Duration = Duration::from_secs(120);
+
+/// Elixir allowed on defense in one lane per window: bigger pushes get more, never everything.
+fn defense_budget(attackers: usize) -> u8 {
+    (3.0 + 1.5 * attackers as f32).min(7.0) as u8
+}
 
 fn lane_idx(l: Lane) -> usize {
     match l {
@@ -158,6 +172,14 @@ impl HogCycle {
     fn deploy(s: &GameState, card: &str, (col, row): (u32, u32), enemy_half: bool, why: Why) -> Option<Action> {
         let slot = s.slot_of(card)?;
         (s.elixir >= cost(card)?).then(|| Action::Deploy { slot, card: card.into(), col, row, enemy_half, why })
+    }
+
+    fn spent_recently(&self, s: &GameState, lane: Lane) -> u8 {
+        self.spent[lane_idx(lane)]
+            .iter()
+            .filter(|(t, _)| s.battle_time.saturating_sub(*t) < BUDGET_WINDOW)
+            .map(|(_, c)| c)
+            .sum()
     }
 
     fn defend(&self, s: &GameState, lane: Lane) -> Option<Action> {
@@ -177,10 +199,12 @@ impl HogCycle {
             }
         }
 
+        // Troops: one per lane per cooldown, and within the lane's elixir budget.
         let recent = self.last_defense[lane_idx(lane)].is_some_and(|t| s.battle_time.saturating_sub(t) < DEFENSE_COOLDOWN);
-        if recent && threats.len() < SWARM_MIN {
+        if recent {
             return None;
         }
+        let left = defense_budget(threats.len()).saturating_sub(self.spent_recently(s, lane));
         // Toward the center from the attacker, so it gets pulled between both towers.
         let toward_center = if lane == Lane::Left { fc + 1 } else { fc.saturating_sub(1) };
         let options: [(&str, (u32, u32)); 5] = [
@@ -190,7 +214,10 @@ impl HogCycle {
             ("musketeer", behind_tower(lane)),
             ("ice_spirit", my_side(fc, fr + 1)),
         ];
-        options.iter().find_map(|&(card, tile)| Self::deploy(s, card, tile, false, Why::Defend(lane)))
+        options
+            .iter()
+            .filter(|(card, _)| cost(card).is_some_and(|c| c <= left))
+            .find_map(|&(card, tile)| Self::deploy(s, card, tile, false, Why::Defend(lane)))
     }
 }
 
@@ -217,11 +244,16 @@ impl Policy for HogCycle {
         if s.battle_time < self.opening_wait && s.elixir < 10 {
             return None;
         }
-        if s.elixir >= self.hog_at {
-            let lane = match self.last_defense_lane {
-                Some((t, l)) if s.battle_time.saturating_sub(t) < COUNTER_WINDOW => l,
-                _ => self.default_lane,
-            };
+        // Counter-push right after a defense (the opponent just spent elixir there), else
+        // a normal push; double elixir pushes earlier.
+        let counter = self.last_defense_lane.filter(|(t, _)| s.battle_time.saturating_sub(*t) < COUNTER_WINDOW);
+        let hog_at = match counter {
+            Some(_) => COUNTER_HOG_AT,
+            None if s.battle_time >= DOUBLE_ELIXIR => self.hog_at.saturating_sub(1),
+            None => self.hog_at,
+        };
+        if s.elixir >= hog_at {
+            let lane = counter.map_or(self.default_lane, |(_, l)| l);
             if let Some(a) = Self::deploy(s, "hog_rider", bridge(lane), false, Why::Push(lane)) {
                 return Some(a);
             }
@@ -233,12 +265,14 @@ impl Policy for HogCycle {
         }
         if s.elixir >= self.leak_at {
             let lane = self.default_lane;
+            // Cycle cheap cards first to get Hog Rider back sooner; Musketeer behind the push
+            // lane supports the next push; Cannon only as a last resort.
             let options: [(&str, (u32, u32)); 5] = [
-                ("cannon", center_pull(lane)),
-                ("musketeer", behind_tower(lane)),
-                ("ice_golem", (9, 24)),
-                ("skeletons", (8, 24)),
                 ("ice_spirit", (9, 24)),
+                ("skeletons", (8, 24)),
+                ("ice_golem", (9, 24)),
+                ("musketeer", behind_tower(lane)),
+                ("cannon", center_pull(lane)),
             ];
             return options.iter().find_map(|&(card, tile)| Self::deploy(s, card, tile, false, Why::Leak));
         }
@@ -254,6 +288,17 @@ impl Policy for HogCycle {
                 self.last_defense[lane_idx(lane)] = Some(s.battle_time);
                 self.last_defense_lane = Some((s.battle_time, lane));
             }
+            Why::Swarm => {}
+            _ => {}
+        }
+        // Track defensive spending per lane (troops and spells on my side).
+        let Action::Deploy { card, col, why, .. } = action;
+        if matches!(why, Why::Defend(_) | Why::Swarm) {
+            let lane = Lane::of_col(*col);
+            self.spent[lane_idx(lane)].push((s.battle_time, cost(card).unwrap_or(0)));
+            self.spent[lane_idx(lane)].retain(|(t, _)| s.battle_time.saturating_sub(*t) < BUDGET_WINDOW);
+        }
+        match *why {
             _ => {}
         }
     }
@@ -340,6 +385,55 @@ mod tests {
         let mut p = HogCycle::default();
         assert_eq!(p.decide(&state(8, ["hog_rider", "cannon", "", ""], 3, &[])), None);
         assert_eq!(act(p.decide(&state(10, ["hog_rider", "cannon", "", ""], 3, &[]))).map(|a| a.0).as_deref(), Some("hog_rider"));
+    }
+
+    #[test]
+    fn troops_respect_cooldown_even_against_a_swarm() {
+        let mut p = HogCycle::default();
+        let swarm = [(13, 20), (14, 20), (14, 21), (15, 21)];
+        // No spell in hand: first troop goes in...
+        let s = state(9, ["cannon", "ice_golem", "skeletons", "musketeer"], 40, &swarm);
+        let a = p.decide(&s).unwrap();
+        p.on_action(&a, &s);
+        // ...but not a second one half a second later.
+        let s = state(6, ["ice_spirit", "ice_golem", "skeletons", "musketeer"], 40, &swarm);
+        assert_eq!(p.decide(&s), None);
+    }
+
+    #[test]
+    fn defense_budget_caps_spending() {
+        assert_eq!(defense_budget(1), 4);
+        assert_eq!(defense_budget(4), 7);
+        let mut p = HogCycle::default();
+        // One attacker: budget 4, Cannon (3) fits, Musketeer (4) only if nothing spent.
+        // Cannon spent at 34.5 s; at 38 s the 3 s cooldown is over but the 4 s budget window isn't.
+        let mut earlier = state(9, ["cannon", "", "", ""], 34, &[]);
+        earlier.battle_time += Duration::from_millis(500);
+        p.on_action(
+            &Action::Deploy { slot: 0, card: "cannon".into(), col: 9, row: 21, enemy_half: false, why: Why::Defend(Lane::Right) },
+            &earlier,
+        );
+        let s = state(9, ["musketeer", "", "", ""], 38, &[(14, 20)]);
+        assert_eq!(p.decide(&s), None, "3 of 4 already spent in the window");
+        let s = state(9, ["skeletons", "", "", ""], 38, &[(14, 20)]);
+        assert_eq!(act(p.decide(&s)).map(|a| a.0).as_deref(), Some("skeletons"), "1 elixir still fits");
+    }
+
+    #[test]
+    fn counter_push_at_low_elixir_after_defense() {
+        let mut p = HogCycle::default();
+        let s = state(5, ["cannon", "hog_rider", "", ""], 30, &[(3, 20)]);
+        let a = p.decide(&s).unwrap();
+        p.on_action(&a, &s);
+        let s = state(4, ["skeletons", "hog_rider", "", ""], 35, &[]);
+        assert_eq!(act(p.decide(&s)), Some(("hog_rider".to_string(), 3, 17, Why::Push(Lane::Left))));
+    }
+
+    #[test]
+    fn leak_cycles_cheap_cards_first() {
+        let mut p = HogCycle::default();
+        let s = state(9, ["cannon", "musketeer", "ice_spirit", "the_log"], 40, &[]);
+        assert_eq!(act(p.decide(&s)).map(|a| a.0).as_deref(), Some("ice_spirit"));
     }
 
     #[test]
