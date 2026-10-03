@@ -61,15 +61,10 @@ impl FrameSource for DirSource {
         }
         let path = &self.files[self.idx];
         self.idx = (self.idx + 1) % self.files.len();
-        let img = image::open(path).with_context(|| format!("decode {}", path.display()))?.into_rgb8();
+        let mut frame = crate::load_rgb(path)?;
         self.seq += 1;
-        Ok(Frame {
-            seq: self.seq,
-            width: img.width(),
-            height: img.height(),
-            rgb: img.into_raw(),
-            captured_at: Instant::now(),
-        })
+        frame.seq = self.seq;
+        Ok(frame)
     }
 
     fn describe(&self) -> String {

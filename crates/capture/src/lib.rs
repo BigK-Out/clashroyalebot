@@ -28,6 +28,14 @@ impl Frame {
     }
 }
 
+/// Decodes a PNG/JPEG file into a `Frame` (seq 0, timestamped now).
+pub fn load_rgb(path: impl AsRef<std::path::Path>) -> anyhow::Result<Frame> {
+    use anyhow::Context;
+    let path = path.as_ref();
+    let img = image::open(path).with_context(|| format!("decode {}", path.display()))?.into_rgb8();
+    Ok(Frame { seq: 0, width: img.width(), height: img.height(), rgb: img.into_raw(), captured_at: Instant::now() })
+}
+
 pub trait FrameSource: Send {
     /// Blocks until the next frame is available.
     fn next_frame(&mut self) -> anyhow::Result<Frame>;

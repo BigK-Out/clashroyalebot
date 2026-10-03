@@ -250,3 +250,16 @@ mod tests {
         std::fs::remove_file(path).unwrap();
     }
 }
+
+#[cfg(test)]
+mod repo_calibration {
+    /// The checked-in calibration must parse and give a usable arena mapping.
+    #[test]
+    fn repo_calibration_loads() {
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../calibration.toml");
+        let c = super::Calibration::load(path).unwrap();
+        let m = c.arena_mapping().unwrap();
+        let p = m.tile_center(0, 0);
+        assert!(p.x > 0.0 && p.x < 0.1 && p.y > 0.1 && p.y < 0.2, "{p:?}");
+    }
+}

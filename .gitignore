@@ -23,3 +23,5 @@ __pycache__/
 # Local secrets / tool scratch
 .env
 .firecrawl/
+
+# Local frame dumps live in frames/ (ignored); test fixtures go in fixtures/.
