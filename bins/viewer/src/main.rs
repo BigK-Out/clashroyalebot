@@ -55,6 +55,7 @@ fn is_unsure(p: &Perceived) -> bool {
 /// Calibration + card library; perception is skipped if either is missing.
 struct Perceiver {
     calib: Calibration,
+    mapping: calib::ArenaMapping,
     cards: CardLibrary,
 }
 
@@ -63,13 +64,16 @@ struct Perceiver {
 struct Perceived {
     elixir: Option<Elixir>,
     hand: Option<Hand>,
+    units: Vec<vision::units::Unit>,
     ms: f64,
 }
 
 impl Perceiver {
     fn load(args: &Args) -> Option<Self> {
         let load = || -> anyhow::Result<Self> {
-            Ok(Self { calib: Calibration::load(&args.calibration)?, cards: CardLibrary::load(&args.cards)? })
+            let calib = Calibration::load(&args.calibration)?;
+            let mapping = calib.arena_mapping()?;
+            Ok(Self { calib, mapping, cards: CardLibrary::load(&args.cards)? })
         };
         load().inspect_err(|e| tracing::warn!("perception disabled: {e:#}")).ok()
     }
@@ -79,7 +83,9 @@ impl Perceiver {
         let elixir = vision::read_elixir(f, &self.calib);
         // Hand only means something in battle; the elixir bar is the battle signal.
         let hand = elixir.is_some().then(|| self.cards.read_hand(f, &self.calib));
-        Perceived { elixir, hand, ms: t0.elapsed().as_secs_f64() * 1e3 }
+        let units =
+            if elixir.is_some() { vision::units::detect_units(f, &self.calib, &self.mapping) } else { Vec::new() };
+        Perceived { elixir, hand, units, ms: t0.elapsed().as_secs_f64() * 1e3 }
     }
 }
 
@@ -94,14 +100,19 @@ fn slot_text(s: &Slot) -> String {
 
 fn perceived_text(p: &Perceived) -> String {
     match (&p.elixir, &p.hand) {
-        (Some(e), Some(h)) => format!(
-            "elixir {} ({:.1}) | {} | next {} | {:.1} ms",
-            e.value,
-            e.fill,
-            h.slots.iter().map(slot_text).collect::<Vec<_>>().join(", "),
-            slot_text(&h.next),
-            p.ms
-        ),
+        (Some(e), Some(h)) => {
+            let enemy = p.units.iter().filter(|u| u.team == vision::units::Team::Enemy).count();
+            format!(
+                "elixir {} ({:.1}) | {} | next {} | units {} ally {} enemy | {:.1} ms",
+                e.value,
+                e.fill,
+                h.slots.iter().map(slot_text).collect::<Vec<_>>().join(", "),
+                slot_text(&h.next),
+                p.units.len() - enemy,
+                enemy,
+                p.ms
+            )
+        }
         _ => format!("not in battle | {:.1} ms", p.ms),
     }
 }
@@ -298,9 +309,26 @@ impl eframe::App for ViewerApp {
                 let avail = ui.available_size();
                 let size = tex.size_vec2();
                 let scale = (avail.x / size.x).min(avail.y / size.y);
-                ui.centered_and_justified(|ui| {
-                    ui.add(egui::Image::from_texture(egui::load::SizedTexture::new(tex.id(), size * scale)));
-                });
+                let resp = ui
+                    .centered_and_justified(|ui| {
+                        ui.add(egui::Image::from_texture(egui::load::SizedTexture::new(tex.id(), size * scale)))
+                    })
+                    .inner;
+                // Unit overlay: tag box + feet dot (blue = mine, red = enemy).
+                if let Some(p) = &perceived {
+                    let r = resp.rect;
+                    let painter = ui.painter_at(r);
+                    let at = |x: f32, y: f32| egui::pos2(r.min.x + x * r.width(), r.min.y + y * r.height());
+                    for u in &p.units {
+                        let c = match u.team {
+                            vision::units::Team::Ally => egui::Color32::from_rgb(60, 160, 255),
+                            vision::units::Team::Enemy => egui::Color32::from_rgb(255, 50, 50),
+                        };
+                        let tag = egui::Rect::from_min_max(at(u.tag[0], u.tag[1]), at(u.tag[2], u.tag[3])).expand(3.0);
+                        painter.rect_stroke(tag, 1.0, egui::Stroke::new(2.0, c), egui::StrokeKind::Outside);
+                        painter.circle_filled(at(u.feet.x as f32, u.feet.y as f32), 4.0, c);
+                    }
+                }
             } else {
                 ui.centered_and_justified(|ui| ui.label("waiting for frames…"));
             }
