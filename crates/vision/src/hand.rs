@@ -15,6 +15,13 @@ const ART: (f64, f64, f64, f64) = (0.06, 0.05, 0.94, 0.72);
 /// A selected card is drawn raised by this fraction of the slot height (66 px of 230).
 const RAISED_DY: f64 = -0.287;
 
+/// Vertical search for card slots, as fractions of slot height: cards animate between the
+/// normal and raised position (and slide in from slightly below), so match at every step.
+const SEARCH_DY: (f64, f64, f64) = (-0.32, 0.08, 0.02);
+
+/// A match this far up counts as raised (selected).
+const RAISED_THRESHOLD: f64 = -0.2;
+
 /// Below this score a slot is reported as Unknown.
 const MIN_SCORE: f32 = 0.6;
 
@@ -113,14 +120,21 @@ impl CardLibrary {
     }
 
     /// Classifies one slot, trying the normal and the raised position.
-    fn read_slot(&self, frame: &Frame, slot: NRect, try_raised: bool) -> Slot {
-        let offsets: &[(f64, bool)] = if try_raised { &[(0.0, false), (RAISED_DY, true)] } else { &[(0.0, false)] };
+    fn read_slot(&self, frame: &Frame, slot: NRect, search: bool) -> Slot {
+        let offsets: Vec<f64> = if search {
+            let (lo, hi, step) = SEARCH_DY;
+            let n = ((hi - lo) / step).round() as usize;
+            (0..=n).map(|k| lo + k as f64 * step).collect()
+        } else {
+            vec![0.0]
+        };
         let mut best: Option<CardMatch> = None;
         let mut flat = true;
-        for &(dy, raised) in offsets {
+        for dy in offsets {
+            let raised = dy <= RAISED_THRESHOLD;
             let (x0, y0, x1, y1) = art_region(slot, frame, dy);
             let Some(patch) = Patch::from_region(frame, x0, y0, x1, y1) else { continue };
-            if !raised {
+            if dy.abs() < 1e-9 {
                 flat = patch.texture() < EMPTY_TEXTURE;
             }
             if let Some((i, score)) = self.best(&patch)

@@ -58,3 +58,23 @@ file = "live_hog_e2_grey_selected.jpg"
 elixir = 2
 hand = ["cannon", "ice_spirit", "ice_golem", "fireball"]
 next = "hog_rider"
+
+# Auto-saved live frames: Skeletons + colored Ice Golem, greyed and selected cards.
+[[frame]]
+file = "live_skeletons_golem_e2.jpg"
+elixir = 2
+hand = ["the_log", "cannon", "skeletons", "ice_golem"]
+next = "hog_rider"
+
+[[frame]]
+file = "live_grey_selected_e3.jpg"
+elixir = 3
+hand = ["fireball", "cannon", "skeletons", "ice_golem"]
+next = "the_log"
+
+# Three greyed cards and an empty slot; the elixir number is half hidden (fill ~1.2).
+[[frame]]
+file = "live_all_grey_e1.jpg"
+elixir = 1
+hand = ["fireball", "cannon", "_empty", "musketeer"]
+next = "skeletons"

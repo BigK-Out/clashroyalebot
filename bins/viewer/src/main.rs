@@ -36,22 +36,17 @@ struct Args {
     /// Card template directory.
     #[arg(long, default_value = "assets/cards")]
     cards: PathBuf,
-    /// Disable auto-saving frames where a card slot is unknown or weakly matched.
+    /// Disable auto-saving frames where a card slot matches no known card.
     /// (By default, in battle, at most one such frame per second goes to <save-dir>/unsure/.)
     #[arg(long)]
     no_auto_save: bool,
 }
 
-/// Score below which a recognized card still counts as "unsure" for --auto-save.
-const UNSURE_SCORE: f32 = 0.8;
-
+/// Auto-save trigger: some slot matched no card. (Weak matches are mostly greyed-out cards,
+/// which are read correctly, so they don't count.)
 fn is_unsure(p: &Perceived) -> bool {
     let Some(h) = &p.hand else { return false };
-    h.slots.iter().chain([&h.next]).any(|s| match s {
-        Slot::Card(m) => m.score < UNSURE_SCORE,
-        Slot::Empty => false,
-        Slot::Unknown { .. } => true,
-    })
+    h.slots.iter().chain([&h.next]).any(|s| matches!(s, Slot::Unknown { .. }))
 }
 
 /// Calibration + card library; perception is skipped if either is missing.
