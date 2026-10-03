@@ -1,7 +1,7 @@
 //! The bot: capture → perceive → state → policy → tap, with per-action latency logging.
 //!
 //!   bot                    # play battles as they come (start them yourself), Ctrl+C to stop
-//!   bot --start --matches 1    # tap "Battle" in the main menu, play one match, exit
+//!   bot --start --matches 3    # tap "Battle", play 3 matches (OK + Battle between), exit
 //!   bot --dry-run          # decide and log, never tap
 
 use std::path::PathBuf;
@@ -36,6 +36,9 @@ struct Args {
     /// Exit after this many battles have ended.
     #[arg(long)]
     matches: Option<u32>,
+    /// Record arena crops (2 per second, battle only) into this directory for the detector dataset.
+    #[arg(long)]
+    record: Option<PathBuf>,
     /// Debug frames: saved on battle start/end and every 10 s.
     #[arg(long, default_value = "frames/bot")]
     debug_dir: PathBuf,
@@ -57,6 +60,8 @@ fn save_debug(f: &Frame, dir: &std::path::Path, tag: &str) {
 
 /// Main-menu "Battle" button (normalized; measured on the 1080x2400 menu).
 const BATTLE_BUTTON: (f64, f64) = (0.5, 0.822);
+/// "OK" on the result screen.
+const RESULT_OK: (f64, f64) = (0.5, 0.847);
 
 /// After a deploy, ignore frames until the game has shown it (elixir drop takes ~160 ms).
 const SETTLE: Duration = Duration::from_millis(450);
@@ -102,30 +107,56 @@ fn main() -> anyhow::Result<()> {
     let mut tracker = Tracker::default();
     let mut policy = HogCycle::default();
 
+    let to_px = |(x, y): (f64, f64)| ((x * w as f64) as u32, (y * h as f64) as u32);
+
+    // Never start a match blind: require live frames first.
+    let t_wait = Instant::now();
+    while latest.lock().unwrap().is_none() {
+        anyhow::ensure!(
+            t_wait.elapsed() < Duration::from_secs(10),
+            "no frames from {} after 10 s: start scrcpy --v4l2-sink first",
+            args.device.display()
+        );
+        std::thread::sleep(Duration::from_millis(50));
+    }
     if args.start {
-        let p = ((BATTLE_BUTTON.0 * w as f64) as u32, (BATTLE_BUTTON.1 * h as f64) as u32);
-        tracing::info!("tapping Battle at {p:?}");
-        deployer.backend().taps(&[p])?;
+        tracing::info!("tapping Battle");
+        deployer.backend().taps(&[to_px(BATTLE_BUTTON)])?;
     }
 
     let mut last_seq = 0;
+    let mut last_frame_at = Instant::now();
+    let mut stall_warned = false;
     let mut settle_until = Instant::now();
     let mut was_in_battle = false;
     let mut battles_done = 0;
     let mut actions = 0u32;
     let mut last_status = Instant::now();
+    let mut recorder = args.record.clone().map(|d| vision::arena::Recorder::new(d, Duration::from_millis(500)));
     let mut last_debug = Instant::now();
     loop {
         let Some(frame) = latest.lock().unwrap().take_if(|f| f.seq != last_seq) else {
+            // In battle the screen always animates; seconds without frames = capture is dead.
+            if was_in_battle && !stall_warned && last_frame_at.elapsed() > Duration::from_secs(3) {
+                tracing::error!("no frames for 3 s during battle: capture stalled (scrcpy died?)");
+                stall_warned = true;
+            }
             std::thread::sleep(Duration::from_millis(2));
             continue;
         };
+        last_frame_at = Instant::now();
+        stall_warned = false;
         last_seq = frame.seq;
         let t_perceive = Instant::now();
         let elixir = vision::read_elixir(&frame, &calib);
         let hand = elixir.is_some().then(|| cards.read_hand(&frame, &calib));
         let state = tracker.update(frame.captured_at, elixir, hand.as_ref()).clone();
         let perceive_ms = t_perceive.elapsed().as_secs_f64() * 1e3;
+        if let Some(rec) = recorder.as_mut()
+            && let Err(e) = rec.maybe_save(&frame, &calib, state.in_battle)
+        {
+            tracing::warn!("record: {e:#}");
+        }
 
         if last_status.elapsed() >= Duration::from_secs(5) {
             last_status = Instant::now();
@@ -151,9 +182,20 @@ fn main() -> anyhow::Result<()> {
                 actions = 0;
             } else {
                 battles_done += 1;
-                tracing::info!("battle over after {:.0} s, {actions} actions", state.battle_time.as_secs_f64());
+                tracing::info!(
+                    "battle over after {:.0} s, {actions} actions, {} frames recorded",
+                    state.battle_time.as_secs_f64(),
+                    recorder.as_ref().map_or(0, |r| r.saved)
+                );
                 if args.matches.is_some_and(|m| battles_done >= m) {
                     return Ok(());
+                }
+                if args.start {
+                    // Result screen → OK → main menu → Battle. The end grace already waited 10 s.
+                    tracing::info!("requeue: OK, then Battle");
+                    deployer.backend().taps(&[to_px(RESULT_OK)])?;
+                    std::thread::sleep(Duration::from_secs(5));
+                    deployer.backend().taps(&[to_px(BATTLE_BUTTON)])?;
                 }
             }
         }

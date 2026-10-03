@@ -40,6 +40,9 @@ struct Args {
     /// (By default, in battle, at most one such frame per second goes to <save-dir>/unsure/.)
     #[arg(long)]
     no_auto_save: bool,
+    /// Record arena crops (2 per second, battle only) into this directory for the detector dataset.
+    #[arg(long)]
+    record: Option<PathBuf>,
 }
 
 /// Auto-save trigger: some slot matched no card. (Weak matches are mostly greyed-out cards,
@@ -152,6 +155,7 @@ fn spawn_capture(args: Args, shared: Arc<Mutex<Shared>>, on_frame: impl Fn() + S
     let perceiver = Perceiver::load(&args);
     let unsure_dir = (!args.no_auto_save).then(|| args.save_dir.join("unsure"));
     let mut last_auto_save: Option<Instant> = None;
+    let mut recorder = args.record.clone().map(|d| vision::arena::Recorder::new(d, Duration::from_millis(500)));
     std::thread::spawn(move || {
         loop {
             let mut src = match open_source(&args) {
@@ -176,6 +180,11 @@ fn spawn_capture(args: Args, shared: Arc<Mutex<Shared>>, on_frame: impl Fn() + S
                         let convert_ms = frame.captured_at.elapsed().as_secs_f64() * 1e3;
                         fps.tick();
                         let perceived = perceiver.as_ref().map(|p| p.perceive(&frame));
+                        if let (Some(rec), Some(p), Some(per)) = (recorder.as_mut(), &perceived, &perceiver)
+                            && let Err(e) = rec.maybe_save(&frame, &per.calib, p.elixir.is_some())
+                        {
+                            tracing::warn!("record: {e:#}");
+                        }
                         if let (Some(dir), Some(p)) = (&unsure_dir, &perceived)
                             && is_unsure(p)
                             && last_auto_save.is_none_or(|t| t.elapsed() >= Duration::from_secs(1))

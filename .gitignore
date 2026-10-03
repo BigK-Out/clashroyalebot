@@ -6,6 +6,7 @@
 /dumps/
 /recordings/
 /datasets/
+/dataset/
 *.mp4
 
 # Training outputs and model weights

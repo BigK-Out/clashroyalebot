@@ -1,0 +1,5 @@
+# Training + export only; runtime inference is Rust (ort).
+ultralytics>=8.3
+onnx
+onnxslim
+onnxruntime

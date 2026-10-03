@@ -1,0 +1,12 @@
+[package]
+name = "detect"
+edition.workspace = true
+version.workspace = true
+publish.workspace = true
+
+[dependencies]
+anyhow = "1.0.104"
+calib = { version = "0.1.0", path = "../calib" }
+capture = { version = "0.1.0", path = "../capture" }
+ort = "2.0.0-rc.13"
+vision = { version = "0.1.0", path = "../vision" }

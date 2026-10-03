@@ -1,5 +1,6 @@
 //! Perception: turn a frame into game facts (elixir, hand).
 
+pub mod arena;
 pub mod elixir;
 pub mod hand;
 mod patch;
