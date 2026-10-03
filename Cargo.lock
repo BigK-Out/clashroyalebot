@@ -3644,12 +3644,26 @@ name = "viewer"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "calib",
  "capture",
  "clap",
  "eframe",
  "image",
  "tracing",
  "tracing-subscriber",
+ "vision",
+]
+
+[[package]]
+name = "vision"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "calib",
+ "capture",
+ "image",
+ "serde",
+ "toml",
 ]
 
 [[package]]

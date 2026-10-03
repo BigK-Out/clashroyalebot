@@ -1,4 +1,4 @@
-//! Debug viewer: live frames + capture stats. Later milestones add the perception overlay.
+//! Debug viewer: live frames, capture stats, perception overlay (elixir, hand).
 //!
 //!   viewer                          # /dev/video10 (scrcpy --v4l2-sink)
 //!   viewer --dir frames/ --fps 30   # replay saved frames
@@ -8,7 +8,9 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use calib::Calibration;
 use capture::{DirSource, Frame, FrameSource, V4lSource};
+use vision::{CardLibrary, Elixir, Hand, Slot};
 use clap::Parser;
 use eframe::egui;
 
@@ -29,6 +31,65 @@ struct Args {
     /// Where the S key saves frames.
     #[arg(long, default_value = "frames")]
     save_dir: PathBuf,
+    #[arg(long, default_value = "calibration.toml")]
+    calibration: PathBuf,
+    /// Card template directory.
+    #[arg(long, default_value = "assets/cards")]
+    cards: PathBuf,
+}
+
+/// Calibration + card library; perception is skipped if either is missing.
+struct Perceiver {
+    calib: Calibration,
+    cards: CardLibrary,
+}
+
+/// Perception result for one frame.
+#[derive(Clone)]
+struct Perceived {
+    elixir: Option<Elixir>,
+    hand: Option<Hand>,
+    ms: f64,
+}
+
+impl Perceiver {
+    fn load(args: &Args) -> Option<Self> {
+        let load = || -> anyhow::Result<Self> {
+            Ok(Self { calib: Calibration::load(&args.calibration)?, cards: CardLibrary::load(&args.cards)? })
+        };
+        load().inspect_err(|e| tracing::warn!("perception disabled: {e:#}")).ok()
+    }
+
+    fn perceive(&self, f: &Frame) -> Perceived {
+        let t0 = Instant::now();
+        let elixir = vision::read_elixir(f, &self.calib);
+        // Hand only means something in battle; the elixir bar is the battle signal.
+        let hand = elixir.is_some().then(|| self.cards.read_hand(f, &self.calib));
+        Perceived { elixir, hand, ms: t0.elapsed().as_secs_f64() * 1e3 }
+    }
+}
+
+fn slot_text(s: &Slot) -> String {
+    match s {
+        Slot::Card(m) => format!("{}{} {:.2}", m.name, if m.raised { "^" } else { "" }, m.score),
+        Slot::Empty => "(empty)".into(),
+        Slot::Unknown { best: Some(b) } => format!("?{} {:.2}", b.name, b.score),
+        Slot::Unknown { best: None } => "?".into(),
+    }
+}
+
+fn perceived_text(p: &Perceived) -> String {
+    match (&p.elixir, &p.hand) {
+        (Some(e), Some(h)) => format!(
+            "elixir {} ({:.1}) | {} | next {} | {:.1} ms",
+            e.value,
+            e.fill,
+            h.slots.iter().map(slot_text).collect::<Vec<_>>().join(", "),
+            slot_text(&h.next),
+            p.ms
+        ),
+        _ => format!("not in battle | {:.1} ms", p.ms),
+    }
 }
 
 /// Frames per second over a sliding one-second window.
@@ -64,6 +125,7 @@ struct Shared {
     capture_fps: f64,
     /// Dequeue → RGB ready (YUV conversion cost), last frame.
     convert_ms: f64,
+    perceived: Option<Perceived>,
     error: Option<String>,
 }
 
@@ -76,6 +138,7 @@ fn open_source(args: &Args) -> anyhow::Result<Box<dyn FrameSource>> {
 
 /// Capture loop on its own thread; reopens the source if it fails (e.g. scrcpy restarted).
 fn spawn_capture(args: Args, shared: Arc<Mutex<Shared>>, on_frame: impl Fn() + Send + 'static) {
+    let perceiver = Perceiver::load(&args);
     std::thread::spawn(move || {
         loop {
             let mut src = match open_source(&args) {
@@ -99,7 +162,11 @@ fn spawn_capture(args: Args, shared: Arc<Mutex<Shared>>, on_frame: impl Fn() + S
                     Ok(frame) => {
                         let convert_ms = frame.captured_at.elapsed().as_secs_f64() * 1e3;
                         fps.tick();
+                        let perceived = perceiver.as_ref().map(|p| p.perceive(&frame));
                         let mut s = shared.lock().unwrap();
+                        if perceived.is_some() {
+                            s.perceived = perceived;
+                        }
                         s.latest = Some(frame);
                         s.capture_fps = fps.fps;
                         s.convert_ms = convert_ms;
@@ -142,10 +209,10 @@ fn save_frame(f: &Frame, dir: &std::path::Path) -> anyhow::Result<PathBuf> {
 
 impl eframe::App for ViewerApp {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-        let (desc, capture_fps, convert_ms, error, new_frame) = {
+        let (desc, capture_fps, convert_ms, error, perceived, new_frame) = {
             let mut s = self.shared.lock().unwrap();
             let new_frame = s.latest.take_if(|f| f.seq != self.shown_seq);
-            (s.source_desc.clone(), s.capture_fps, s.convert_ms, s.error.clone(), new_frame)
+            (s.source_desc.clone(), s.capture_fps, s.convert_ms, s.error.clone(), s.perceived.clone(), new_frame)
         };
 
         if let Some(f) = new_frame {
@@ -179,7 +246,11 @@ impl eframe::App for ViewerApp {
                     self.display_fps.fps, self.frame_age_ms, self.shown_seq
                 ));
             });
-            ui.small(format!("{desc}   [S] save frame → {}   {}", self.save_dir.display(), self.status));
+            if let Some(p) = &perceived {
+                let color = if p.elixir.is_some() { egui::Color32::LIGHT_GREEN } else { egui::Color32::GRAY };
+                ui.add(egui::Label::new(egui::RichText::new(perceived_text(p)).monospace().color(color)).wrap());
+            }
+            ui.small(format!("{desc}   [S] save frame to {}/   {}", self.save_dir.display(), self.status));
             if let Some(e) = error {
                 ui.colored_label(egui::Color32::LIGHT_RED, e);
             }
@@ -214,6 +285,9 @@ fn run_headless(args: Args) -> anyhow::Result<()> {
                     "capture {:5.1} fps | convert {:4.1} ms | {}x{} | #{} | {}",
                     s.capture_fps, s.convert_ms, f.width, f.height, f.seq, s.source_desc
                 );
+                if let Some(p) = &s.perceived {
+                    println!("  {}", perceived_text(p));
+                }
                 last_seq = f.seq;
             }
             (_, Some(e)) => println!("error: {e}"),

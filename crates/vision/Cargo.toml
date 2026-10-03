@@ -1,0 +1,15 @@
+[package]
+name = "vision"
+edition.workspace = true
+version.workspace = true
+publish.workspace = true
+
+[dependencies]
+anyhow = "1.0.104"
+calib = { version = "0.1.0", path = "../calib" }
+capture = { version = "0.1.0", path = "../capture" }
+image = { version = "0.25.10", default-features = false, features = ["png", "jpeg"] }
+
+[dev-dependencies]
+serde = { version = "1.0.229", features = ["derive"] }
+toml = "1.1.6"

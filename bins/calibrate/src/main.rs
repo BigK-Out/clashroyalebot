@@ -173,7 +173,7 @@ impl App {
 
     fn side_panel(&mut self, ui: &mut egui::Ui) {
         ui.heading("Calibrate");
-        ui.label(format!("→ {}", self.output.display()));
+        ui.label(format!("file: {}", self.output.display()));
         ui.separator();
         for (i, t) in TARGETS.iter().enumerate() {
             let mark = if self.done[i] { "✔" } else { "  " };
@@ -189,7 +189,7 @@ impl App {
         }
         ui.separator();
         match &self.source {
-            Source::Files { .. } => ui.label("←/→ previous/next frame"),
+            Source::Files { .. } => ui.label("Left/Right arrow: previous/next frame"),
             Source::Live { frozen, .. } => ui.label(if *frozen { "FROZEN — Space to resume" } else { "live — Space to freeze" }),
         };
         ui.label("Mouse over the arena shows the tile.");

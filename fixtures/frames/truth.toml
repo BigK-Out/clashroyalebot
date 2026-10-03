@@ -1,0 +1,40 @@
+# Ground truth for fixtures/frames (labeled by hand). No elixir = not in battle.
+
+[[frame]]
+file = "battle_e10_selected.jpg"
+elixir = 10
+hand = ["archers", "giant", "mini_pekka", "arrows"]
+next = "minions"
+
+[[frame]]
+file = "battle_e6_empty3.jpg"
+elixir = 6
+hand = ["archers", "giant", "_empty", "arrows"]
+next = "minions"
+
+[[frame]]
+file = "battle_e7_empty4.jpg"
+elixir = 7
+hand = ["archers", "giant", "minions", "_empty"]
+next = "fireball"
+
+[[frame]]
+file = "end_screen.jpg"
+
+[[frame]]
+file = "menu.jpg"
+
+[[frame]]
+file = "training_e8.jpg"
+elixir = 8
+hand = ["fireball", "archers", "arrows", "minions"]
+next = "knight"
+
+[[frame]]
+file = "training_e5.jpg"
+elixir = 5
+hand = ["fireball", "knight", "arrows", "musketeer"]
+next = "mini_pekka"
+
+[[frame]]
+file = "training_end.jpg"
