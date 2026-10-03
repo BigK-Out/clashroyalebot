@@ -136,7 +136,7 @@ pub fn detect_units(frame: &Frame, calib: &Calibration, mapping: &ArenaMapping) 
     let mut digits: Vec<(Team, usize, usize, usize, usize)> = Vec::new(); // team, x0, y0, x1, y1
     for (x0, y0, x1, y1, area) in components(&white, w, h) {
         let (bw, bh) = (x1 - x0, y1 - y0);
-        if bh < px(5.0) || bh > px(12.0) || bw > px(10.0) || area < px(2.0).pow(2) {
+        if bh < px(7.0) || bh > px(12.0) || bw > px(10.0) || area < px(2.0).pow(2) {
             continue;
         }
         let (fx0, fx1) = (x0.saturating_sub(1), x1 + 1);
