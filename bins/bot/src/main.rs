@@ -103,6 +103,7 @@ fn main() -> anyhow::Result<()> {
     let shell = AdbShell::open(&adb_path(), args.serial.as_deref()).context("adb")?;
     let (w, h) = shell.screen_size();
     let mut deployer = Deployer::new(shell, calib.clone())?;
+    let mapping = calib.arena_mapping()?;
     let latest = spawn_capture(args.device.clone());
     let mut tracker = Tracker::default();
     let mut policy = HogCycle::default();
@@ -150,7 +151,12 @@ fn main() -> anyhow::Result<()> {
         let t_perceive = Instant::now();
         let elixir = vision::read_elixir(&frame, &calib);
         let hand = elixir.is_some().then(|| cards.read_hand(&frame, &calib));
-        let state = tracker.update(frame.captured_at, elixir, hand.as_ref()).clone();
+        tracker.update(frame.captured_at, elixir, hand.as_ref());
+        if elixir.is_some() {
+            let units = vision::units::detect_units(&frame, &calib, &mapping);
+            tracker.update_units(frame.captured_at, &units);
+        }
+        let state = tracker.state().clone();
         let perceive_ms = t_perceive.elapsed().as_secs_f64() * 1e3;
         if let Some(rec) = recorder.as_mut()
             && let Err(e) = rec.maybe_save(&frame, &calib, state.in_battle)
@@ -161,12 +167,13 @@ fn main() -> anyhow::Result<()> {
         if last_status.elapsed() >= Duration::from_secs(5) {
             last_status = Instant::now();
             tracing::info!(
-                "status: in_battle {} t={:.0}s | read elixir {:?} | hand {:?} next {:?}",
+                "status: in_battle {} t={:.0}s | read elixir {:?} | hand {:?} next {:?} | enemies {:?}",
                 state.in_battle,
                 state.battle_time.as_secs_f64(),
                 elixir.map(|e| e.value),
                 state.hand.iter().map(|c| c.as_deref().unwrap_or("-")).collect::<Vec<_>>(),
                 state.next.as_deref().unwrap_or("-"),
+                state.enemies,
             );
         }
         if last_debug.elapsed() >= Duration::from_secs(10) {
@@ -204,7 +211,7 @@ fn main() -> anyhow::Result<()> {
         }
         let Some(action) = policy.decide(&state) else { continue };
         let t_decided = Instant::now();
-        let Action::Deploy { slot, ref card, col, row, enemy_half } = action;
+        let Action::Deploy { slot, ref card, col, row, enemy_half, why } = action;
         let taps_ms = if args.dry_run {
             0.0
         } else {
@@ -221,11 +228,12 @@ fn main() -> anyhow::Result<()> {
         policy.on_action(&action, &state);
         settle_until = Instant::now() + SETTLE;
         tracing::info!(
-            "t={:5.1}s {:<10} slot {} -> ({col},{row}) | elixir {} | capture->decide {:.0} ms (perceive {:.1}) | taps {:.0} ms | capture->tapped {:.0} ms | hand {:?}",
+            "t={:5.1}s {:<10} slot {} -> ({col},{row}) {why:?} | elixir {} | enemies {:?} | capture->decide {:.0} ms (perceive {:.1}) | taps {:.0} ms | capture->tapped {:.0} ms | hand {:?}",
             state.battle_time.as_secs_f64(),
             card,
             slot + 1,
             state.elixir,
+            state.enemies,
             (t_decided - frame.captured_at).as_secs_f64() * 1e3,
             perceive_ms,
             taps_ms,

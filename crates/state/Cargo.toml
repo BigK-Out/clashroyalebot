@@ -6,3 +6,6 @@ publish.workspace = true
 
 [dependencies]
 vision = { version = "0.1.0", path = "../vision" }
+
+[dev-dependencies]
+calib = { path = "../calib" }

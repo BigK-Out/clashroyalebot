@@ -2,7 +2,36 @@
 
 use std::time::{Duration, Instant};
 
+use vision::units::{Team, Unit};
 use vision::{Elixir, Hand, Slot};
+
+/// Arena half split: columns 0..9 are the left lane, 9..18 the right lane.
+pub const LANE_SPLIT_COL: u32 = 9;
+/// First row of my half (17..32 are mine; 15–16 are the river).
+pub const MY_FIRST_ROW_HINT: u32 = 17;
+/// Rows from here down count as "my side" for threats (river is 15–16; 14 = about to cross).
+pub const THREAT_ROW: u32 = 14;
+/// Detections flicker frame to frame; keep the last seen enemies this long.
+pub const ENEMY_HOLD: Duration = Duration::from_millis(400);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Lane {
+    Left,
+    Right,
+}
+
+impl Lane {
+    pub fn of_col(col: u32) -> Self {
+        if col < LANE_SPLIT_COL { Lane::Left } else { Lane::Right }
+    }
+
+    pub fn other(self) -> Self {
+        match self {
+            Lane::Left => Lane::Right,
+            Lane::Right => Lane::Left,
+        }
+    }
+}
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct GameState {
@@ -16,9 +45,26 @@ pub struct GameState {
     pub next: Option<String>,
     /// Time since the battle started (first frame with an elixir bar).
     pub battle_time: Duration,
+    /// Enemy unit tiles (col, row), held briefly across detection flicker.
+    pub enemies: Vec<(u32, u32)>,
 }
 
 impl GameState {
+    /// Enemy units on (or about to cross onto) my side, in `lane`.
+    pub fn threats(&self, lane: Lane) -> Vec<(u32, u32)> {
+        self.enemies.iter().copied().filter(|&(c, r)| r >= THREAT_ROW && Lane::of_col(c) == lane).collect()
+    }
+
+    /// Lane with the most threats (None if my side is clear).
+    pub fn main_threat(&self) -> Option<Lane> {
+        let (l, r) = (self.threats(Lane::Left).len(), self.threats(Lane::Right).len());
+        match (l, r) {
+            (0, 0) => None,
+            (l, r) if l > r => Some(Lane::Left),
+            _ => Some(Lane::Right),
+        }
+    }
+
     /// Slot index holding `card`, if any.
     pub fn slot_of(&self, card: &str) -> Option<usize> {
         self.hand.iter().position(|c| c.as_deref() == Some(card))
@@ -35,6 +81,7 @@ pub struct Tracker {
     state: GameState,
     battle_start: Option<Instant>,
     last_bar: Option<Instant>,
+    last_enemies_seen: Option<Instant>,
 }
 
 pub const BATTLE_END_GRACE: Duration = Duration::from_secs(10);
@@ -67,6 +114,18 @@ impl Tracker {
             self.state.battle_time = now.duration_since(start);
         }
         &self.state
+    }
+
+    /// Feeds this frame's unit detections (call after `update` for the same frame).
+    pub fn update_units(&mut self, now: Instant, units: &[Unit]) {
+        let enemies: Vec<(u32, u32)> =
+            units.iter().filter(|u| u.team == Team::Enemy).filter_map(|u| u.tile).collect();
+        if !enemies.is_empty() {
+            self.state.enemies = enemies;
+            self.last_enemies_seen = Some(now);
+        } else if self.last_enemies_seen.is_none_or(|t| now.duration_since(t) > ENEMY_HOLD) {
+            self.state.enemies.clear();
+        }
     }
 
     pub fn state(&self) -> &GameState {
@@ -138,6 +197,25 @@ mod tests {
         t.update(t0 + Duration::from_secs(20), None, None);
         let s = t.update(t0 + Duration::from_secs(30), el(5), None);
         assert!(s.in_battle && s.hand.iter().all(Option::is_none) && s.battle_time.is_zero());
+    }
+
+    fn enemy(col: u32, row: u32) -> Unit {
+        Unit { team: Team::Enemy, tag: [0.0; 4], feet: calib::NPoint::default(), tile: Some((col, row)) }
+    }
+
+    #[test]
+    fn enemies_held_across_flicker_and_threats_by_lane() {
+        let t0 = Instant::now();
+        let mut t = Tracker::default();
+        t.update(t0, el(5), None);
+        t.update_units(t0, &[enemy(3, 20), enemy(4, 22), enemy(14, 10)]);
+        assert_eq!(t.state().threats(Lane::Left).len(), 2);
+        assert_eq!(t.state().threats(Lane::Right).len(), 0, "row 10 is still on the enemy side");
+        assert_eq!(t.state().main_threat(), Some(Lane::Left));
+        t.update_units(t0 + Duration::from_millis(200), &[]);
+        assert_eq!(t.state().enemies.len(), 3, "held through a 200 ms gap");
+        t.update_units(t0 + Duration::from_millis(700), &[]);
+        assert!(t.state().enemies.is_empty() && t.state().main_threat().is_none());
     }
 
     #[test]
