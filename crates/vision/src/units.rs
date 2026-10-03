@@ -191,6 +191,18 @@ pub fn detect_units(frame: &Frame, calib: &Calibration, mapping: &ArenaMapping) 
         .collect()
 }
 
+/// Pixel region of a unit's body (below its tag), as cut for the unit-type classifier.
+/// Shared by dataset extraction and runtime classification so both see the same crop.
+pub fn body_rect(u: &Unit, calib: &Calibration, width: u32, height: u32) -> Option<calib::PxRect> {
+    let a = &calib.arena;
+    let (tile_w, tile_h) = ((a.top_right.x - a.top_left.x) / 18.0, (a.bottom_left.y - a.top_left.y) / 32.0);
+    let x0 = ((u.feet.x - 1.3 * tile_w) * width as f64).max(0.0) as u32;
+    let x1 = (((u.feet.x + 1.3 * tile_w) * width as f64) as u32).min(width);
+    let y0 = (u.tag[3] as f64 * height as f64).max(0.0) as u32;
+    let y1 = (((u.tag[3] as f64 + 2.4 * tile_h) * height as f64) as u32).min(height);
+    (x1 > x0 + 8 && y1 > y0 + 8).then_some(calib::PxRect { x: x0, y: y0, w: x1 - x0, h: y1 - y0 })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

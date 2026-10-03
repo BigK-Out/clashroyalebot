@@ -584,6 +584,7 @@ dependencies = [
  "calib",
  "capture",
  "clap",
+ "detect",
  "image",
  "input",
  "state",
@@ -980,6 +981,7 @@ dependencies = [
  "anyhow",
  "calib",
  "capture",
+ "image",
  "ort",
  "vision",
 ]
@@ -4046,6 +4048,7 @@ dependencies = [
  "calib",
  "capture",
  "clap",
+ "detect",
  "eframe",
  "image",
  "tracing",

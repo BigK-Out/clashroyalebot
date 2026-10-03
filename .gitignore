@@ -26,3 +26,6 @@ __pycache__/
 .firecrawl/
 
 # Local frame dumps live in frames/ (ignored); test fixtures go in fixtures/.
+
+# Runtime models the bot needs (small; regenerate with training/train_units.py)
+!/assets/models/units.onnx

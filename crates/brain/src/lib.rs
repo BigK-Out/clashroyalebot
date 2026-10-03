@@ -149,6 +149,8 @@ const DEFENSE_COOLDOWN: Duration = Duration::from_millis(3000);
 const COUNTER_WINDOW: Duration = Duration::from_secs(8);
 const SWARM_RADIUS: f32 = 2.5;
 const SWARM_MIN: usize = 3;
+/// Units that die to The Log: two of these together already justify a spell.
+const SWARM_KINDS: [&str; 4] = ["skeletons", "goblins", "barbarians", "archers"];
 /// Defensive elixir per lane within this window is capped by `defense_budget`.
 const BUDGET_WINDOW: Duration = Duration::from_secs(4);
 /// Counter-push Hog Rider needs only this much elixir right after a defense.
@@ -187,9 +189,17 @@ impl HogCycle {
         // Most advanced attacker (closest to my towers).
         let &(fc, fr) = threats.iter().max_by_key(|t| t.1)?;
 
-        if let Some((gc, gr, n)) = densest(&threats, SWARM_RADIUS)
-            && n >= SWARM_MIN
-        {
+        // Swarm: 3+ units together, or 2+ known swarm units (classifier) together.
+        let swarmy: Vec<(u32, u32)> = s
+            .threat_kinds(lane)
+            .into_iter()
+            .filter(|(_, k)| k.is_some_and(|k| SWARM_KINDS.contains(&k)))
+            .map(|(t, _)| t)
+            .collect();
+        let group = densest(&threats, SWARM_RADIUS)
+            .filter(|g| g.2 >= SWARM_MIN)
+            .or_else(|| densest(&swarmy, SWARM_RADIUS).filter(|g| g.2 >= 2));
+        if let Some((gc, gr, _)) = group {
             // The Log rolls up the arena from where it lands: drop it just behind the group.
             if let Some(a) = Self::deploy(s, "the_log", my_side(gc, gr + 2), false, Why::Swarm) {
                 return Some(a);
@@ -317,6 +327,7 @@ mod tests {
             next: None,
             battle_time: Duration::from_secs(secs),
             enemies: enemies.to_vec(),
+            enemy_kinds: Vec::new(),
         }
     }
 
@@ -434,6 +445,17 @@ mod tests {
         let mut p = HogCycle::default();
         let s = state(9, ["cannon", "musketeer", "ice_spirit", "the_log"], 40, &[]);
         assert_eq!(act(p.decide(&s)).map(|a| a.0).as_deref(), Some("ice_spirit"));
+    }
+
+    #[test]
+    fn two_known_swarm_units_get_logged() {
+        let mut p = HogCycle::default();
+        let mut s = state(5, ["the_log", "cannon", "hog_rider", "musketeer"], 40, &[(14, 20), (15, 21)]);
+        s.enemy_kinds = vec![Some("goblins".into()), Some("goblins".into())];
+        assert_eq!(act(p.decide(&s)).map(|a| (a.0, a.3)), Some(("the_log".to_string(), Why::Swarm)));
+        // Same two units, unknown type: a troop defends instead.
+        s.enemy_kinds = vec![None, None];
+        assert_eq!(act(p.decide(&s)).map(|a| a.0).as_deref(), Some("cannon"));
     }
 
     #[test]

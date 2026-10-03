@@ -104,6 +104,10 @@ fn main() -> anyhow::Result<()> {
     let (w, h) = shell.screen_size();
     let mut deployer = Deployer::new(shell, calib.clone())?;
     let mapping = calib.arena_mapping()?;
+    // Unit types are optional: without the model the bot still sees positions and teams.
+    let mut classifier = detect::units::UnitClassifier::load("assets/models/units.onnx", "assets/models/units.txt")
+        .inspect_err(|e| tracing::warn!("unit classifier disabled: {e:#}"))
+        .ok();
     let latest = spawn_capture(args.device.clone());
     let mut tracker = Tracker::default();
     let mut policy = HogCycle::default();
@@ -154,7 +158,15 @@ fn main() -> anyhow::Result<()> {
         tracker.update(frame.captured_at, elixir, hand.as_ref());
         if elixir.is_some() {
             let units = vision::units::detect_units(&frame, &calib, &mapping);
-            tracker.update_units(frame.captured_at, &units);
+            let kinds: Vec<Option<String>> = match classifier.as_mut().map(|c| c.classify(&frame, &calib, &units)) {
+                Some(Ok(types)) => types.into_iter().map(|t| t.map(|t| t.name)).collect(),
+                Some(Err(e)) => {
+                    tracing::warn!("classify: {e:#}");
+                    Vec::new()
+                }
+                None => Vec::new(),
+            };
+            tracker.update_units(frame.captured_at, &units, &kinds);
         }
         let state = tracker.state().clone();
         let perceive_ms = t_perceive.elapsed().as_secs_f64() * 1e3;
@@ -173,7 +185,7 @@ fn main() -> anyhow::Result<()> {
                 elixir.map(|e| e.value),
                 state.hand.iter().map(|c| c.as_deref().unwrap_or("-")).collect::<Vec<_>>(),
                 state.next.as_deref().unwrap_or("-"),
-                state.enemies,
+                state.enemies.iter().zip(&state.enemy_kinds).map(|(t, k)| format!("{}@{},{}", k.as_deref().unwrap_or("?"), t.0, t.1)).collect::<Vec<_>>(),
             );
         }
         if last_debug.elapsed() >= Duration::from_secs(10) {

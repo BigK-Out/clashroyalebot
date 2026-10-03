@@ -1,0 +1,14 @@
+archers
+baby_dragon
+barbarians
+cannon
+elixir_collector
+elixir_golem
+goblin_hut
+goblins
+hog_rider
+ice_golem
+junk
+magic_archer
+musketeer
+skeletons

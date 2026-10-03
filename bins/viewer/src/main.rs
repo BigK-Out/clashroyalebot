@@ -57,6 +57,7 @@ struct Perceiver {
     calib: Calibration,
     mapping: calib::ArenaMapping,
     cards: CardLibrary,
+    classifier: Option<std::sync::Mutex<detect::units::UnitClassifier>>,
 }
 
 /// Perception result for one frame.
@@ -65,6 +66,7 @@ struct Perceived {
     elixir: Option<Elixir>,
     hand: Option<Hand>,
     units: Vec<vision::units::Unit>,
+    kinds: Vec<Option<String>>,
     ms: f64,
 }
 
@@ -73,7 +75,11 @@ impl Perceiver {
         let load = || -> anyhow::Result<Self> {
             let calib = Calibration::load(&args.calibration)?;
             let mapping = calib.arena_mapping()?;
-            Ok(Self { calib, mapping, cards: CardLibrary::load(&args.cards)? })
+            let classifier = detect::units::UnitClassifier::load("assets/models/units.onnx", "assets/models/units.txt")
+                .inspect_err(|e| tracing::warn!("unit classifier disabled: {e:#}"))
+                .ok()
+                .map(std::sync::Mutex::new);
+            Ok(Self { calib, mapping, cards: CardLibrary::load(&args.cards)?, classifier })
         };
         load().inspect_err(|e| tracing::warn!("perception disabled: {e:#}")).ok()
     }
@@ -85,7 +91,16 @@ impl Perceiver {
         let hand = elixir.is_some().then(|| self.cards.read_hand(f, &self.calib));
         let units =
             if elixir.is_some() { vision::units::detect_units(f, &self.calib, &self.mapping) } else { Vec::new() };
-        Perceived { elixir, hand, units, ms: t0.elapsed().as_secs_f64() * 1e3 }
+        let kinds = match &self.classifier {
+            Some(c) if !units.is_empty() => c
+                .lock()
+                .unwrap()
+                .classify(f, &self.calib, &units)
+                .map(|t| t.into_iter().map(|t| t.map(|t| format!("{} {:.0}%", t.name, t.prob * 100.0))).collect())
+                .unwrap_or_default(),
+            _ => Vec::new(),
+        };
+        Perceived { elixir, hand, units, kinds, ms: t0.elapsed().as_secs_f64() * 1e3 }
     }
 }
 
@@ -319,7 +334,7 @@ impl eframe::App for ViewerApp {
                     let r = resp.rect;
                     let painter = ui.painter_at(r);
                     let at = |x: f32, y: f32| egui::pos2(r.min.x + x * r.width(), r.min.y + y * r.height());
-                    for u in &p.units {
+                    for (i, u) in p.units.iter().enumerate() {
                         let c = match u.team {
                             vision::units::Team::Ally => egui::Color32::from_rgb(60, 160, 255),
                             vision::units::Team::Enemy => egui::Color32::from_rgb(255, 50, 50),
@@ -327,6 +342,15 @@ impl eframe::App for ViewerApp {
                         let tag = egui::Rect::from_min_max(at(u.tag[0], u.tag[1]), at(u.tag[2], u.tag[3])).expand(3.0);
                         painter.rect_stroke(tag, 1.0, egui::Stroke::new(2.0, c), egui::StrokeKind::Outside);
                         painter.circle_filled(at(u.feet.x as f32, u.feet.y as f32), 4.0, c);
+                        if let Some(Some(kind)) = p.kinds.get(i) {
+                            painter.text(
+                                tag.right_top(),
+                                egui::Align2::LEFT_BOTTOM,
+                                kind,
+                                egui::FontId::proportional(12.0),
+                                c,
+                            );
+                        }
                     }
                 }
             } else {

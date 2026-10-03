@@ -47,12 +47,24 @@ pub struct GameState {
     pub battle_time: Duration,
     /// Enemy unit tiles (col, row), held briefly across detection flicker.
     pub enemies: Vec<(u32, u32)>,
+    /// Predicted unit type per entry of `enemies` (None = unclassified or "junk").
+    pub enemy_kinds: Vec<Option<String>>,
 }
 
 impl GameState {
     /// Enemy units on (or about to cross onto) my side, in `lane`.
     pub fn threats(&self, lane: Lane) -> Vec<(u32, u32)> {
         self.enemies.iter().copied().filter(|&(c, r)| r >= THREAT_ROW && Lane::of_col(c) == lane).collect()
+    }
+
+    /// Threats in `lane` with their predicted unit type.
+    pub fn threat_kinds(&self, lane: Lane) -> Vec<((u32, u32), Option<&str>)> {
+        self.enemies
+            .iter()
+            .zip(self.enemy_kinds.iter().map(|k| k.as_deref()).chain(std::iter::repeat(None)))
+            .filter(|((c, r), _)| *r >= THREAT_ROW && Lane::of_col(*c) == lane)
+            .map(|(&t, k)| (t, k))
+            .collect()
     }
 
     /// Lane with the most threats (None if my side is clear).
@@ -117,14 +129,20 @@ impl Tracker {
     }
 
     /// Feeds this frame's unit detections (call after `update` for the same frame).
-    pub fn update_units(&mut self, now: Instant, units: &[Unit]) {
-        let enemies: Vec<(u32, u32)> =
-            units.iter().filter(|u| u.team == Team::Enemy).filter_map(|u| u.tile).collect();
+    /// `kinds` holds a predicted type per unit (same order), or is empty if not classified.
+    pub fn update_units(&mut self, now: Instant, units: &[Unit], kinds: &[Option<String>]) {
+        let enemies: Vec<((u32, u32), Option<String>)> = units
+            .iter()
+            .zip(kinds.iter().cloned().chain(std::iter::repeat(None)))
+            .filter(|(u, _)| u.team == Team::Enemy)
+            .filter_map(|(u, k)| u.tile.map(|t| (t, k.filter(|k| k != "junk"))))
+            .collect();
         if !enemies.is_empty() {
-            self.state.enemies = enemies;
+            (self.state.enemies, self.state.enemy_kinds) = enemies.into_iter().unzip();
             self.last_enemies_seen = Some(now);
         } else if self.last_enemies_seen.is_none_or(|t| now.duration_since(t) > ENEMY_HOLD) {
             self.state.enemies.clear();
+            self.state.enemy_kinds.clear();
         }
     }
 
@@ -208,13 +226,14 @@ mod tests {
         let t0 = Instant::now();
         let mut t = Tracker::default();
         t.update(t0, el(5), None);
-        t.update_units(t0, &[enemy(3, 20), enemy(4, 22), enemy(14, 10)]);
+        t.update_units(t0, &[enemy(3, 20), enemy(4, 22), enemy(14, 10)], &[Some("hog_rider".into()), Some("junk".into())]);
+        assert_eq!(t.state().threat_kinds(Lane::Left), vec![((3, 20), Some("hog_rider")), ((4, 22), None)]);
         assert_eq!(t.state().threats(Lane::Left).len(), 2);
         assert_eq!(t.state().threats(Lane::Right).len(), 0, "row 10 is still on the enemy side");
         assert_eq!(t.state().main_threat(), Some(Lane::Left));
-        t.update_units(t0 + Duration::from_millis(200), &[]);
+        t.update_units(t0 + Duration::from_millis(200), &[], &[]);
         assert_eq!(t.state().enemies.len(), 3, "held through a 200 ms gap");
-        t.update_units(t0 + Duration::from_millis(700), &[]);
+        t.update_units(t0 + Duration::from_millis(700), &[], &[]);
         assert!(t.state().enemies.is_empty() && t.state().main_threat().is_none());
     }
 

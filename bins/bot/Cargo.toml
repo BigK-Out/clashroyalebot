@@ -10,6 +10,7 @@ brain = { version = "0.1.0", path = "../../crates/brain" }
 calib = { version = "0.1.0", path = "../../crates/calib" }
 capture = { version = "0.1.0", path = "../../crates/capture" }
 clap = { version = "4.6.7", features = ["derive"] }
+detect = { version = "0.1.0", path = "../../crates/detect" }
 image = { version = "0.25.10", default-features = false, features = ["png"] }
 input = { version = "0.1.0", path = "../../crates/input" }
 state = { version = "0.1.0", path = "../../crates/state" }

@@ -8,5 +8,6 @@ publish.workspace = true
 anyhow = "1.0.104"
 calib = { version = "0.1.0", path = "../calib" }
 capture = { version = "0.1.0", path = "../capture" }
+image = { version = "0.25.10", default-features = false, features = ["png"] }
 ort = "2.0.0-rc.13"
 vision = { version = "0.1.0", path = "../vision" }
