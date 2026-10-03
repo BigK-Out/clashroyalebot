@@ -36,10 +36,10 @@ struct Args {
     /// Card template directory.
     #[arg(long, default_value = "assets/cards")]
     cards: PathBuf,
-    /// In battle, auto-save frames where a card slot is unknown or weakly matched
-    /// (at most one per second) into <save-dir>/unsure/.
+    /// Disable auto-saving frames where a card slot is unknown or weakly matched.
+    /// (By default, in battle, at most one such frame per second goes to <save-dir>/unsure/.)
     #[arg(long)]
-    auto_save: bool,
+    no_auto_save: bool,
 }
 
 /// Score below which a recognized card still counts as "unsure" for --auto-save.
@@ -155,7 +155,7 @@ fn open_source(args: &Args) -> anyhow::Result<Box<dyn FrameSource>> {
 /// Capture loop on its own thread; reopens the source if it fails (e.g. scrcpy restarted).
 fn spawn_capture(args: Args, shared: Arc<Mutex<Shared>>, on_frame: impl Fn() + Send + 'static) {
     let perceiver = Perceiver::load(&args);
-    let unsure_dir = args.auto_save.then(|| args.save_dir.join("unsure"));
+    let unsure_dir = (!args.no_auto_save).then(|| args.save_dir.join("unsure"));
     let mut last_auto_save: Option<Instant> = None;
     std::thread::spawn(move || {
         loop {
@@ -278,7 +278,11 @@ impl eframe::App for ViewerApp {
                 let color = if p.elixir.is_some() { egui::Color32::LIGHT_GREEN } else { egui::Color32::GRAY };
                 ui.add(egui::Label::new(egui::RichText::new(perceived_text(p)).monospace().color(color)).wrap());
             }
-            ui.small(format!("{desc}   [S] save frame to {}/   {}", self.save_dir.display(), self.status));
+            ui.small(format!(
+                "{desc}   [S] save frame to {}/   auto-save of unsure frames: on   {}",
+                self.save_dir.display(),
+                self.status
+            ));
             if let Some(e) = error {
                 ui.colored_label(egui::Color32::LIGHT_RED, e);
             }
