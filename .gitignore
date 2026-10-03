@@ -1,0 +1,25 @@
+# Rust
+/target/
+
+# Captured frames, recordings, datasets (large, regenerable)
+/frames/
+/dumps/
+/recordings/
+/datasets/
+*.mp4
+
+# Training outputs and model weights
+/training/runs/
+/training/datasets/
+*.pt
+*.onnx
+__pycache__/
+.venv/
+
+# APKs (third-party binaries, not ours to redistribute)
+*.apk
+*.xapk
+
+# Local secrets / tool scratch
+.env
+.firecrawl/
