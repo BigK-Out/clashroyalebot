@@ -26,6 +26,9 @@ struct Args {
     /// Log stats to stdout instead of opening a window.
     #[arg(long)]
     headless: bool,
+    /// Where the S key saves frames.
+    #[arg(long, default_value = "frames")]
+    save_dir: PathBuf,
 }
 
 /// Frames per second over a sliding one-second window.
@@ -120,6 +123,21 @@ struct ViewerApp {
     /// Capture → texture upload, for the frame on screen.
     frame_age_ms: f64,
     display_fps: FpsCounter,
+    /// Frame on screen, kept for saving with S.
+    last_frame: Option<Frame>,
+    save_dir: PathBuf,
+    status: String,
+}
+
+/// Saves a frame as PNG named by wall-clock millis so dumps sort chronologically.
+fn save_frame(f: &Frame, dir: &std::path::Path) -> anyhow::Result<PathBuf> {
+    std::fs::create_dir_all(dir)?;
+    let ms = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH)?.as_millis();
+    let path = dir.join(format!("{ms}.png"));
+    image::RgbImage::from_raw(f.width, f.height, f.rgb.clone())
+        .ok_or_else(|| anyhow::anyhow!("frame buffer size mismatch"))?
+        .save(&path)?;
+    Ok(path)
 }
 
 impl eframe::App for ViewerApp {
@@ -141,6 +159,17 @@ impl eframe::App for ViewerApp {
             self.frame_age_ms = f.captured_at.elapsed().as_secs_f64() * 1e3;
             self.shown_seq = f.seq;
             self.display_fps.tick();
+            self.last_frame = Some(f);
+        }
+
+        if ui.input(|i| i.key_pressed(egui::Key::S))
+            && let Some(f) = &self.last_frame
+        {
+            self.status = match save_frame(f, &self.save_dir) {
+                Ok(p) => format!("saved {}", p.display()),
+                Err(e) => format!("save failed: {e:#}"),
+            };
+            tracing::info!("{}", self.status);
         }
 
         egui::Panel::top("stats").show(ui, |ui| {
@@ -150,7 +179,7 @@ impl eframe::App for ViewerApp {
                     self.display_fps.fps, self.frame_age_ms, self.shown_seq
                 ));
             });
-            ui.small(&desc);
+            ui.small(format!("{desc}   [S] save frame → {}   {}", self.save_dir.display(), self.status));
             if let Some(e) = error {
                 ui.colored_label(egui::Color32::LIGHT_RED, e);
             }
@@ -203,6 +232,7 @@ fn main() -> anyhow::Result<()> {
     }
 
     let shared = Arc::new(Mutex::new(Shared::default()));
+    let save_dir = args.save_dir.clone();
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default().with_inner_size([480.0, 900.0]).with_title("CR viewer"),
         ..Default::default()
@@ -220,6 +250,9 @@ fn main() -> anyhow::Result<()> {
                 shown_seq: 0,
                 frame_age_ms: 0.0,
                 display_fps: FpsCounter::new(),
+                last_frame: None,
+                save_dir,
+                status: String::new(),
             }))
         }),
     )

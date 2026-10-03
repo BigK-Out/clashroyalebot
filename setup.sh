@@ -116,6 +116,6 @@ Done. Versions:
 Next (new terminal, or: source ~/.bashrc):
   emulator -avd $AVD_NAME &
   adb install path/to/clash.apk           # confirm game runs and reaches a match
-  scrcpy --v4l2-sink=/dev/video10 --no-playback --max-fps=60
+  scrcpy --v4l2-sink=/dev/video10 --no-window --no-audio --max-fps=60
   ffplay /dev/video10                      # should show the game
 EOF
