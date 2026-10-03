@@ -1,0 +1,10 @@
+[package]
+name = "input"
+edition.workspace = true
+version.workspace = true
+publish.workspace = true
+
+[dependencies]
+anyhow = "1.0.104"
+calib = { version = "0.1.0", path = "../calib" }
+tracing = "0.1.44"

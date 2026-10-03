@@ -1,0 +1,8 @@
+[package]
+name = "state"
+edition.workspace = true
+version.workspace = true
+publish.workspace = true
+
+[dependencies]
+vision = { version = "0.1.0", path = "../vision" }

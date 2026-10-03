@@ -564,6 +564,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "bot"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "brain",
+ "calib",
+ "capture",
+ "clap",
+ "image",
+ "input",
+ "state",
+ "tracing",
+ "tracing-subscriber",
+ "vision",
+]
+
+[[package]]
+name = "brain"
+version = "0.1.0"
+dependencies = [
+ "state",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -896,6 +920,20 @@ name = "cursor-icon"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f27ae1dd37df86211c42e150270f82743308803d90a6f6e6651cd730d5e1732f"
+
+[[package]]
+name = "deploy"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "calib",
+ "capture",
+ "clap",
+ "input",
+ "tracing",
+ "tracing-subscriber",
+ "vision",
+]
 
 [[package]]
 name = "dispatch"
@@ -1715,6 +1753,15 @@ checksum = "cc4e190f5d26ca7051642629da2c52fc03bde85a03197c99408dcd291734c855"
 dependencies = [
  "equivalent",
  "hashbrown 0.17.1",
+]
+
+[[package]]
+name = "input"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "calib",
+ "tracing",
 ]
 
 [[package]]
@@ -3201,6 +3248,13 @@ name = "stable_deref_trait"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
+
+[[package]]
+name = "state"
+version = "0.1.0"
+dependencies = [
+ "vision",
+]
 
 [[package]]
 name = "static_assertions"
