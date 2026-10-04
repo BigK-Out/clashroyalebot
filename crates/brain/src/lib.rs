@@ -1,5 +1,9 @@
 //! Decision making: the `Policy` trait and a rule-based Hog 2.6 bot.
 
+mod cards;
+
+pub use cards::{Card, Cards, cards};
+
 use std::time::Duration;
 
 use state::{GameState, Lane, MY_FIRST_ROW_HINT};
@@ -41,16 +45,9 @@ pub trait Policy {
     fn on_action(&mut self, _action: &Action, _state: &GameState) {}
 }
 
-/// Elixir cost of known cards.
+/// Elixir cost of a card (from `assets/cards.json`); `None` for unknown cards and Mirror.
 pub fn cost(card: &str) -> Option<u8> {
-    Some(match card {
-        "ice_spirit" | "skeletons" => 1,
-        "the_log" | "ice_golem" => 2,
-        "cannon" | "archers" | "arrows" | "minions" | "knight" => 3,
-        "hog_rider" | "musketeer" | "fireball" | "mini_pekka" => 4,
-        "giant" => 5,
-        _ => return None,
-    })
+    cards().get(card)?.elixir
 }
 
 /// Bridge tile on my side.
@@ -166,22 +163,11 @@ fn defense_budget(push_value: f32) -> u8 {
 /// Pushes worth this much or less are left to the towers (Skeletons, Ice Spirit, few Goblins).
 const TOWER_HANDLES: f32 = 2.0;
 
-/// Enemy card cost for a classified unit type, and whether the card spawns several units
-/// (then a whole group of that type counts as one card).
+/// Enemy card cost for a classified unit type (unit types are card slugs), and whether the
+/// card spawns several units (then a whole group of that type counts as one card).
 fn enemy_card(kind: &str) -> Option<(f32, bool)> {
-    Some(match kind {
-        "skeletons" => (1.0, true),
-        "goblins" => (2.0, true),
-        "barbarians" => (5.0, true),
-        "archers" => (3.0, true),
-        "hog_rider" | "musketeer" | "baby_dragon" | "magic_archer" => (4.0, false),
-        "elixir_golem" => (3.0, false),
-        "ice_golem" => (2.0, false),
-        "cannon" => (3.0, false),
-        "goblin_hut" => (5.0, false),
-        "elixir_collector" => (6.0, false),
-        _ => return None,
-    })
+    let c = cards().get(kind)?;
+    Some((c.elixir? as f32, c.swarm))
 }
 
 /// Estimated elixir value of a group of enemy units (one lane).
@@ -560,6 +546,35 @@ mod tests {
         let mut s = state(8, ["cannon", "musketeer", "ice_golem", "skeletons"], 40, &[(14, 20)]);
         s.enemy_kinds = vec![Some("elixir_golem".into())];
         assert_eq!(act(p.decide(&s)).map(|a| a.0).as_deref(), Some("ice_golem"));
+    }
+
+    #[test]
+    fn card_table_from_assets() {
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../assets/cards.json");
+        let t = Cards::from_json(&std::fs::read_to_string(path).unwrap()).unwrap();
+        assert_eq!(t.len(), 122 + 4, "122 cards + 4 tower troops");
+        let e = |s: &str| t.get(s).unwrap_or_else(|| panic!("{s} missing")).elixir;
+        for (card, c) in [("skeletons", 1), ("ice_spirit", 1), ("the_log", 2), ("ice_golem", 2), ("knight", 3),
+            ("cannon", 3), ("hog_rider", 4), ("musketeer", 4), ("fireball", 4), ("mini_pekka", 4), ("giant", 5),
+            ("pekka", 7), ("golem", 8), ("three_musketeers", 9)]
+        {
+            assert_eq!(e(card), Some(c), "{card}");
+        }
+        assert_eq!(e("mirror"), None);
+        for s in ["skeletons", "goblins", "barbarians", "skeleton_army", "minion_horde"] {
+            assert!(t.get(s).unwrap().swarm, "{s} is a swarm");
+        }
+        for s in ["hog_rider", "knight", "cannon", "fireball"] {
+            assert!(!t.get(s).unwrap().swarm, "{s} is not a swarm");
+        }
+        // Every playable card has a cost (Mirror copies one; tower troops aren't played).
+        let troops = t.iter().filter(|c| c.kind.as_deref() == Some("Tower Troop")).count();
+        assert_eq!(troops, 4);
+        assert!(t.iter().all(|c| c.elixir.is_some_and(|e| (1..=10).contains(&e))
+            || c.slug == "mirror"
+            || c.kind.as_deref() == Some("Tower Troop")));
+        // The embedded table is that file.
+        assert_eq!(cards().len(), t.len());
     }
 
     #[test]
