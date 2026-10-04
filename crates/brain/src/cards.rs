@@ -27,6 +27,9 @@ pub struct Card {
     /// Several units per card: a group of them counts as one card.
     #[serde(default)]
     pub swarm: bool,
+    /// The game's card id (26000021 = Hog Rider), for deck links. `None` for tower troops.
+    #[serde(default)]
+    pub id: Option<u32>,
 }
 
 fn one() -> u32 {

@@ -51,6 +51,19 @@ pub fn classify(frame: &Frame, screens: &[ScreenCheck]) -> Option<String> {
     screens.iter().find(|s| matches(frame, s)).map(|s| s.name.clone())
 }
 
+/// The tap that moves a phone from `screen` toward the main screen after a failed match, or
+/// `None` to wait (battles end by themselves) or because the screen is unknown or main.
+pub fn recovery_tap(screen: Option<&str>) -> Option<&'static str> {
+    match screen? {
+        "result" => Some("result_ok"),
+        "deck_view" => Some("battle_tab"),
+        "tower_pick" => Some("tower_ok"),
+        "connection_lost" => Some("retry_login"),
+        "friends_list" => Some("social_battle_tab"),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -91,6 +104,36 @@ mod tests {
             let frame = capture::load_rgb(root().join(format!("fixtures/screens/{phone}/{file}.png"))).unwrap();
             assert_eq!(classify(&frame, screens).as_deref(), Some("result"), "{phone}/{file}");
         }
+    }
+
+    #[test]
+    fn recovery_taps_only_known_exits() {
+        assert_eq!(recovery_tap(Some("result")), Some("result_ok"));
+        assert_eq!(recovery_tap(Some("deck_view")), Some("battle_tab"));
+        assert_eq!(recovery_tap(Some("tower_pick")), Some("tower_ok"));
+        assert_eq!(recovery_tap(Some("connection_lost")), Some("retry_login"));
+        assert_eq!(recovery_tap(Some("friends_list")), Some("social_battle_tab"));
+        // Battles finish by themselves; unknown screens are never tapped blind.
+        assert_eq!(recovery_tap(Some("battle")), None);
+        assert_eq!(recovery_tap(None), None);
+        assert_eq!(recovery_tap(Some("main")), None);
+    }
+
+    #[test]
+    fn recovery_taps_exist_in_flows() {
+        let f = flows();
+        for s in ["result", "deck_view", "tower_pick", "connection_lost", "friends_list"] {
+            assert!(f.note9.taps.contains_key(recovery_tap(Some(s)).unwrap()), "note9 {s}");
+        }
+        assert!(f.note14.taps.contains_key(recovery_tap(Some("result")).unwrap()));
+    }
+
+    #[test]
+    fn spectating_is_no_menu() {
+        // Watching the observer's ladder match from the friend list: sandy arena, yellow UI.
+        let f = flows();
+        let frame = capture::load_rgb(root().join("fixtures/screens/note9/spectating.png")).unwrap();
+        assert_eq!(classify(&frame, &f.note9.screens), None);
     }
 
     #[test]

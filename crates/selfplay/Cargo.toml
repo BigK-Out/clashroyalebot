@@ -11,6 +11,8 @@ serde_json = "1"
 fastrand = "2"
 toml = "1.1.6"
 capture = { path = "../capture" }
+calib = { path = "../calib" }
+vision = { path = "../vision" }
 brain = { version = "0.1.0", path = "../brain" }
 
 [dev-dependencies]

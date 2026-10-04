@@ -18,7 +18,8 @@
    "Range": "Meleg: Etrt",
    "Count": "3"
   },
-  "dir": "000"
+  "dir": "000",
+  "id": 26000010
  },
  {
   "name": "Fire Spirit",
@@ -35,7 +36,8 @@
    "Speed": "Very Fast",
    "Range": "25"
   },
-  "dir": "001"
+  "dir": "001",
+  "id": 26000031
  },
  {
   "name": "Electro Spirit",
@@ -55,7 +57,8 @@
    "Speed": "VVery Fast",
    "Range": "25"
   },
-  "dir": "002"
+  "dir": "002",
+  "id": 26000084
  },
  {
   "name": "Ice Spirit",
@@ -75,7 +78,8 @@
    "Speed": "VVery Fast",
    "Range": "25"
   },
-  "dir": "003"
+  "dir": "003",
+  "id": 26000030
  },
  {
   "name": "Goblins",
@@ -95,7 +99,8 @@
    "Speed": "(Veny Fast",
    "Range": "Meleg: Etrt"
   },
-  "dir": "004"
+  "dir": "004",
+  "id": 26000002
  },
  {
   "name": "Heal Spirit",
@@ -114,7 +119,8 @@
    "Speed": "VVery Fast",
    "Range": "25"
   },
-  "dir": "005"
+  "dir": "005",
+  "id": 28000016
  },
  {
   "name": "Mirror",
@@ -125,7 +131,8 @@
   "count": 1,
   "swarm": false,
   "stats": {},
-  "dir": "006"
+  "dir": "006",
+  "id": 28000006
  },
  {
   "name": "Spear Goblins",
@@ -145,7 +152,8 @@
    "Range": "5",
    "Count": "3"
   },
-  "dir": "008"
+  "dir": "008",
+  "id": 26000019
  },
  {
   "name": "Giant Snowball",
@@ -161,7 +169,8 @@
    "Slowdown Duration": "Bsec",
    "Radius": "25"
   },
-  "dir": "010"
+  "dir": "010",
+  "id": 28000017
  },
  {
   "name": "Bomber",
@@ -179,7 +188,8 @@
    "Speed": "Mediu",
    "Range": "455"
   },
-  "dir": "011"
+  "dir": "011",
+  "id": 26000013
  },
  {
   "name": "Bats",
@@ -199,7 +209,8 @@
    "Range": "Mellee: Medium",
    "Count": "5"
   },
-  "dir": "012"
+  "dir": "012",
+  "id": 26000049
  },
  {
   "name": "Zap",
@@ -214,7 +225,8 @@
    "Stun Duration": "@Ssec",
    "Radius": "25"
   },
-  "dir": "013"
+  "dir": "013",
+  "id": 28000008
  },
  {
   "name": "The Log",
@@ -231,7 +243,8 @@
    "Width": "39",
    "Range": "10517"
   },
-  "dir": "017"
+  "dir": "017",
+  "id": 28000011
  },
  {
   "name": "Berserker",
@@ -250,7 +263,8 @@
    "Speed": "Fast",
    "Range": "Meleg: Etrt"
   },
-  "dir": "018"
+  "dir": "018",
+  "id": 26000102
  },
  {
   "name": "Barbarian Barrel",
@@ -267,7 +281,8 @@
    "Range": "455",
    "Barbarian Level": "16"
   },
-  "dir": "019"
+  "dir": "019",
+  "id": 28000015
  },
  {
   "name": "Ice Golem",
@@ -287,7 +302,8 @@
    "Speed": "Elow",
    "Range": "Meleea Stpont"
   },
-  "dir": "020"
+  "dir": "020",
+  "id": 26000038
  },
  {
   "name": "Wall Breakers",
@@ -305,7 +321,8 @@
    "Range": "Meleg: Etrt",
    "Count": "2"
   },
-  "dir": "025"
+  "dir": "025",
+  "id": 26000058
  },
  {
   "name": "Suspicious Bush",
@@ -322,7 +339,8 @@
    "Bush Goblin Level": "16",
    "Speed": "Mediu"
   },
-  "dir": "026"
+  "dir": "026",
+  "id": 26000097
  },
  {
   "name": "Rage",
@@ -341,7 +359,8 @@
    "Boost": "4303",
    "Radius": "3"
   },
-  "dir": "027"
+  "dir": "027",
+  "id": 28000002
  },
  {
   "name": "Goblin Curse",
@@ -359,7 +378,8 @@
    "Duration": "Esec",
    "Radius": "3"
   },
-  "dir": "028"
+  "dir": "028",
+  "id": 28000024
  },
  {
   "name": "Knight",
@@ -378,7 +398,8 @@
    "Speed": "Mediu",
    "Range": "Mlelleg: Medim"
   },
-  "dir": "034"
+  "dir": "034",
+  "id": 26000000
  },
  {
   "name": "Archers",
@@ -399,7 +420,8 @@
    "Range": "5",
    "Count": "2"
   },
-  "dir": "035"
+  "dir": "035",
+  "id": 26000001
  },
  {
   "name": "Minions",
@@ -419,7 +441,8 @@
    "Range": "25",
    "Count": "3"
   },
-  "dir": "036"
+  "dir": "036",
+  "id": 26000005
  },
  {
   "name": "Arrows",
@@ -434,7 +457,8 @@
    "Crown Tower Damage": "40x",
    "Radius": "35"
   },
-  "dir": "037"
+  "dir": "037",
+  "id": 28000001
  },
  {
   "name": "Tombstone",
@@ -451,7 +475,8 @@
    "Spawn Speed": "4sec",
    "Lifetime": "30sec"
   },
-  "dir": "038"
+  "dir": "038",
+  "id": 27000009
  },
  {
   "name": "Cannon",
@@ -471,7 +496,8 @@
    "Range": "55",
    "Lifetime": "30sec"
   },
-  "dir": "039"
+  "dir": "039",
+  "id": 27000000
  },
  {
   "name": "Mega Minion",
@@ -490,7 +516,8 @@
    "Speed": "Mediu",
    "Range": "Melee: [ong"
   },
-  "dir": "040"
+  "dir": "040",
+  "id": 26000039
  },
  {
   "name": "Skeleton Army",
@@ -504,7 +531,8 @@
    "Skeleton Level": "16",
    "Skeleton Count": "15"
   },
-  "dir": "041"
+  "dir": "041",
+  "id": 26000012
  },
  {
   "name": "Guards",
@@ -525,7 +553,8 @@
    "Speed": "Fast",
    "Range": "Meiee: [ongg"
   },
-  "dir": "042"
+  "dir": "042",
+  "id": 26000025
  },
  {
   "name": "Goblin Barrel",
@@ -540,7 +569,8 @@
    "Goblin Level": "16",
    "Goblin Counb": "3"
   },
-  "dir": "043"
+  "dir": "043",
+  "id": 28000004
  },
  {
   "name": "Vines",
@@ -557,7 +587,8 @@
    "Duration": "Zse",
    "Radius": "25"
   },
-  "dir": "044"
+  "dir": "044",
+  "id": 28000026
  },
  {
   "name": "Goblin Gang",
@@ -573,7 +604,8 @@
    "Spear Goblin Level": "16",
    "Spear Goblin Count": "3"
   },
-  "dir": "045"
+  "dir": "045",
+  "id": 26000041
  },
  {
   "name": "Dart Goblin",
@@ -592,7 +624,8 @@
    "Speed": "VVery Fast",
    "Range": "655"
   },
-  "dir": "055"
+  "dir": "055",
+  "id": 26000040
  },
  {
   "name": "Princess",
@@ -614,7 +647,8 @@
    "Mediu": "Deploy Time",
    "Deploy Time": "1123"
   },
-  "dir": "056"
+  "dir": "056",
+  "id": 26000026
  },
  {
   "name": "Miner",
@@ -634,7 +668,8 @@
    "Speed": "Fast",
    "Range": "Mellee: Medium"
   },
-  "dir": "057"
+  "dir": "057",
+  "id": 26000032
  },
  {
   "name": "Skeleton Barrel",
@@ -652,7 +687,8 @@
    "Skeleton Level": "16",
    "Speed": "Fast"
   },
-  "dir": "059"
+  "dir": "059",
+  "id": 26000056
  },
  {
   "name": "Firecracker",
@@ -672,7 +708,8 @@
    "Speed": "Fast",
    "Range": "6"
   },
-  "dir": "066"
+  "dir": "066",
+  "id": 26000064
  },
  {
   "name": "Royal Ghost",
@@ -691,7 +728,8 @@
    "Speed": "Fast",
    "Range": "Mlelleg: Medim"
   },
-  "dir": "067"
+  "dir": "067",
+  "id": 26000050
  },
  {
   "name": "Ice Wizard",
@@ -711,7 +749,8 @@
    "Speed": "Mlediu",
    "Range": "55"
   },
-  "dir": "068"
+  "dir": "068",
+  "id": 26000023
  },
  {
   "name": "Earthquake",
@@ -729,7 +768,8 @@
    "Duration": "Bsec",
    "Radius": "35"
   },
-  "dir": "069"
+  "dir": "069",
+  "id": 28000014
  },
  {
   "name": "Bandit",
@@ -748,7 +788,8 @@
    "Targets": "Growd",
    "Speed": "Fast"
   },
-  "dir": "070"
+  "dir": "070",
+  "id": 26000046
  },
  {
   "name": "Royal Delivery",
@@ -764,7 +805,8 @@
    "Radius": "3",
    "Royal Recruits Level": "16"
   },
-  "dir": "071"
+  "dir": "071",
+  "id": 28000018
  },
  {
   "name": "Elixir Golem",
@@ -784,7 +826,8 @@
    "Targets": "Buildings",
    "Speed": "Elow"
   },
-  "dir": "072"
+  "dir": "072",
+  "id": 26000067
  },
  {
   "name": "Tornado",
@@ -800,7 +843,8 @@
    "Duration": "[sec",
    "Radius": "55"
   },
-  "dir": "073"
+  "dir": "073",
+  "id": 28000012
  },
  {
   "name": "Clone",
@@ -820,7 +864,8 @@
    "Shield Hitpoints": "V",
    "Radius": "3"
   },
-  "dir": "074"
+  "dir": "074",
+  "id": 28000013
  },
  {
   "name": "Fisherman",
@@ -840,7 +885,8 @@
    "Speed": "Mlediu",
    "Range": "Mellee: Medium"
   },
-  "dir": "075"
+  "dir": "075",
+  "id": 26000061
  },
  {
   "name": "Musketeer",
@@ -860,7 +906,8 @@
    "Speed": "Mediu",
    "Range": "6"
   },
-  "dir": "076"
+  "dir": "076",
+  "id": 26000014
  },
  {
   "name": "Little Prince",
@@ -880,7 +927,8 @@
    "Speed": "Mediu",
    "Range": "55"
   },
-  "dir": "077"
+  "dir": "077",
+  "id": 26000093
  },
  {
   "name": "Mini P.E.K.K.A",
@@ -899,7 +947,8 @@
    "Speed": "Fast",
    "Range": "Mleleg: Etrt"
   },
-  "dir": "078"
+  "dir": "078",
+  "id": 26000018
  },
  {
   "name": "Goblin Hut",
@@ -919,7 +968,8 @@
    "Spawn on Death": "Spear Gobli x1l",
    "Lifetime": "30sec"
   },
-  "dir": "079"
+  "dir": "079",
+  "id": 27000001
  },
  {
   "name": "Goblin Cage",
@@ -937,7 +987,8 @@
    "Goblit Bradler xi]": "Lifetime",
    "Lifetime": "2"
   },
-  "dir": "080"
+  "dir": "080",
+  "id": 27000012
  },
  {
   "name": "Fireball",
@@ -952,7 +1003,8 @@
    "Crown Tower Damage": "275",
    "Radius": "25"
   },
-  "dir": "081"
+  "dir": "081",
+  "id": 28000000
  },
  {
   "name": "Skeleton Dragons",
@@ -972,7 +1024,8 @@
    "Range": "35",
    "Count": "2"
   },
-  "dir": "082"
+  "dir": "082",
+  "id": 26000080
  },
  {
   "name": "Bomb Tower",
@@ -992,7 +1045,8 @@
    "Growd": "Lifetime",
    "Lifetime": "30sec"
   },
-  "dir": "083"
+  "dir": "083",
+  "id": 27000004
  },
  {
   "name": "Battle Ram",
@@ -1011,7 +1065,8 @@
    "Speed": "Mediu",
    "Range": "Meleea Stpont"
   },
-  "dir": "084"
+  "dir": "084",
+  "id": 26000036
  },
  {
   "name": "Valkyrie",
@@ -1031,7 +1086,8 @@
    "Speed": "Mediu",
    "Range": "Mellee: Medium"
   },
-  "dir": "085"
+  "dir": "085",
+  "id": 26000011
  },
  {
   "name": "Mortar",
@@ -1050,7 +1106,8 @@
    "Deploy Time": "3",
    "Lifetime": "30sec"
   },
-  "dir": "086"
+  "dir": "086",
+  "id": 27000002
  },
  {
   "name": "Hog Rider",
@@ -1069,7 +1126,8 @@
    "Speed": "(Veny Fast",
    "Range": "Meleea Stpont"
   },
-  "dir": "087"
+  "dir": "087",
+  "id": 26000021
  },
  {
   "name": "Flying Machine",
@@ -1089,7 +1147,8 @@
    "Speed": "Fast",
    "Range": "6"
   },
-  "dir": "088"
+  "dir": "088",
+  "id": 26000057
  },
  {
   "name": "Baby Dragon",
@@ -1108,7 +1167,8 @@
    "Speed": "Fast",
    "Range": "35"
   },
-  "dir": "089"
+  "dir": "089",
+  "id": 26000015
  },
  {
   "name": "Battle Healer",
@@ -1129,7 +1189,8 @@
    "Range": "Meleea [ong",
    "Heal per Atback": "160"
   },
-  "dir": "090"
+  "dir": "090",
+  "id": 26000068
  },
  {
   "name": "Dark Prince",
@@ -1149,7 +1210,8 @@
    "Targets": "Growd",
    "Speed": "Mlediu"
   },
-  "dir": "091"
+  "dir": "091",
+  "id": 26000027
  },
  {
   "name": "Rune Giant",
@@ -1169,7 +1231,8 @@
    "Range": "Mellee: Medium",
    "Bonus Damage": "351"
   },
-  "dir": "092"
+  "dir": "092",
+  "id": 26000101
  },
  {
   "name": "Freeze",
@@ -1185,7 +1248,8 @@
    "Freeze Duration": "4sec",
    "Radius": "3"
   },
-  "dir": "093"
+  "dir": "093",
+  "id": 28000005
  },
  {
   "name": "Poison",
@@ -1202,7 +1266,8 @@
    "Duration": "Bs",
    "Radius": "35"
   },
-  "dir": "094"
+  "dir": "094",
+  "id": 28000009
  },
  {
   "name": "Tesla",
@@ -1223,7 +1288,8 @@
    "Aib & Groud": "Lifetime",
    "Lifetime": "25"
   },
-  "dir": "095"
+  "dir": "095",
+  "id": 27000006
  },
  {
   "name": "Furnace",
@@ -1244,7 +1310,8 @@
    "Speed": "Mlediu",
    "Range": "55"
   },
-  "dir": "096"
+  "dir": "096",
+  "id": 27000010
  },
  {
   "name": "Zappies",
@@ -1265,7 +1332,8 @@
    "Speed": "Mlediu",
    "Range": "455"
   },
-  "dir": "097"
+  "dir": "097",
+  "id": 26000052
  },
  {
   "name": "Hunter",
@@ -1286,7 +1354,8 @@
    "Mlediu": "Prgjectile Range",
    "Prgjectile Range": "655"
   },
-  "dir": "098"
+  "dir": "098",
+  "id": 26000044
  },
  {
   "name": "Inferno Dragon",
@@ -1306,7 +1375,8 @@
    "Speed": "Mediu",
    "Range": "35"
   },
-  "dir": "099"
+  "dir": "099",
+  "id": 26000037
  },
  {
   "name": "Electro Wizard",
@@ -1327,7 +1397,8 @@
    "Speed": "Fast",
    "Range": "5"
   },
-  "dir": "100"
+  "dir": "100",
+  "id": 26000042
  },
  {
   "name": "Goblin Demolisher",
@@ -1348,7 +1419,8 @@
    "Range": "5",
    "Acbivabion": "503"
   },
-  "dir": "101"
+  "dir": "101",
+  "id": 26000095
  },
  {
   "name": "Phoenix",
@@ -1368,7 +1440,8 @@
    "Targets": "Aib",
    "Speed": "Mlediu"
   },
-  "dir": "102"
+  "dir": "102",
+  "id": 26000087
  },
  {
   "name": "Goblin Drill",
@@ -1387,7 +1460,8 @@
    "Spawn Speed": "Bsec",
    "Lifetime": "1"
   },
-  "dir": "103"
+  "dir": "103",
+  "id": 27000013
  },
  {
   "name": "Lumberjack",
@@ -1406,7 +1480,8 @@
    "Speed": "VVery Fast",
    "Range": "Mleleg: Etrt"
   },
-  "dir": "104"
+  "dir": "104",
+  "id": 26000035
  },
  {
   "name": "Magic Archer",
@@ -1428,7 +1503,8 @@
    "Mediu": "Projectile Range",
    "Projectile Range": "17"
   },
-  "dir": "105"
+  "dir": "105",
+  "id": 26000062
  },
  {
   "name": "Night Witch",
@@ -1449,7 +1525,8 @@
    "Hit Speed": "1135",
    "Targets": "Growd"
   },
-  "dir": "106"
+  "dir": "106",
+  "id": 26000048
  },
  {
   "name": "Mother Witch",
@@ -1470,7 +1547,8 @@
    "Cursed Hog Level": "16",
    "Effect Durabion": "5sec"
   },
-  "dir": "107"
+  "dir": "107",
+  "id": 26000083
  },
  {
   "name": "Skeleton King",
@@ -1489,7 +1567,8 @@
    "Speed": "Mediu",
    "Range": "Mellee: Medium"
   },
-  "dir": "108"
+  "dir": "108",
+  "id": 26000069
  },
  {
   "name": "Golden Knight",
@@ -1509,7 +1588,8 @@
    "Speed": "Mediu",
    "Range": "Mellee: Medium"
   },
-  "dir": "109"
+  "dir": "109",
+  "id": 26000074
  },
  {
   "name": "Mighty Miner",
@@ -1529,7 +1609,8 @@
    "Speed": "Mediu",
    "Range": "Meleea [ong"
   },
-  "dir": "110"
+  "dir": "110",
+  "id": 26000065
  },
  {
   "name": "Giant",
@@ -1549,7 +1630,8 @@
    "Speed": "Elow",
    "Range": "Mellee: Medium"
   },
-  "dir": "111"
+  "dir": "111",
+  "id": 26000003
  },
  {
   "name": "Barbarians",
@@ -1569,7 +1651,8 @@
    "Range": "Mleleg: Etrt",
    "Count": "5"
   },
-  "dir": "112"
+  "dir": "112",
+  "id": 26000008
  },
  {
   "name": "Wizard",
@@ -1588,7 +1671,8 @@
    "Speed": "Mediu",
    "Range": "55"
   },
-  "dir": "113"
+  "dir": "113",
+  "id": 26000017
  },
  {
   "name": "Witch",
@@ -1609,7 +1693,8 @@
    "Speed": "Mlediu",
    "Range": "55"
   },
-  "dir": "114"
+  "dir": "114",
+  "id": 26000007
  },
  {
   "name": "Royal Hogs",
@@ -1628,7 +1713,8 @@
    "Speed": "(Veny Fast",
    "Range": "Mleleg: Etrt"
   },
-  "dir": "115"
+  "dir": "115",
+  "id": 26000059
  },
  {
   "name": "Balloon",
@@ -1648,7 +1734,8 @@
    "Speed": "Mlediu",
    "Range": "Mleleg: Etrt"
   },
-  "dir": "116"
+  "dir": "116",
+  "id": 26000006
  },
  {
   "name": "Inferno Tower",
@@ -1668,7 +1755,8 @@
    "Range": "6",
    "Lifetime": "30sec"
   },
-  "dir": "117"
+  "dir": "117",
+  "id": 27000003
  },
  {
   "name": "Minion Horde",
@@ -1688,7 +1776,8 @@
    "Range": "25",
    "Count": "6"
   },
-  "dir": "118"
+  "dir": "118",
+  "id": 26000022
  },
  {
   "name": "Ram Rider",
@@ -1708,7 +1797,8 @@
    "Hit Speed": "1137sec",
    "Targets": "Buildings"
   },
-  "dir": "119"
+  "dir": "119",
+  "id": 26000051
  },
  {
   "name": "Prince",
@@ -1728,7 +1818,8 @@
    "Speed": "Mlediu",
    "Range": "Meiee: [ongg"
   },
-  "dir": "120"
+  "dir": "120",
+  "id": 26000016
  },
  {
   "name": "Electro Dragon",
@@ -1749,7 +1840,8 @@
    "Speed": "Mlediu",
    "Range": "35"
   },
-  "dir": "121"
+  "dir": "121",
+  "id": 26000063
  },
  {
   "name": "Bowler",
@@ -1769,7 +1861,8 @@
    "Elow": "Projectile Range",
    "Projectile Range": "U"
   },
-  "dir": "122"
+  "dir": "122",
+  "id": 26000034
  },
  {
   "name": "Executioner",
@@ -1790,7 +1883,8 @@
    "Mlediu": "Projectile Range",
    "Projectile Range": "U"
   },
-  "dir": "123"
+  "dir": "123",
+  "id": 26000045
  },
  {
   "name": "Graveyard",
@@ -1805,7 +1899,8 @@
    "Skelebon Level": "16",
    "Skeleton Count": "12"
   },
-  "dir": "124"
+  "dir": "124",
+  "id": 28000010
  },
  {
   "name": "Rascals",
@@ -1820,7 +1915,8 @@
    "Rascal Girl Level": "16",
    "Rascal Gir] Counb": "2"
   },
-  "dir": "125"
+  "dir": "125",
+  "id": 26000053
  },
  {
   "name": "Ronin",
@@ -1842,7 +1938,8 @@
    "Charge Damage": "2003",
    "Mellee: Medium": "Pacry Cooldown"
   },
-  "dir": "126"
+  "dir": "126",
+  "id": 26000106
  },
  {
   "name": "Cannon Cart",
@@ -1862,7 +1959,8 @@
    "Range": "55",
    "Acbivabion": "503"
   },
-  "dir": "127"
+  "dir": "127",
+  "id": 26000054
  },
  {
   "name": "Void",
@@ -1879,7 +1977,8 @@
    "Duration": "Asec",
    "Radius": "25"
   },
-  "dir": "128"
+  "dir": "128",
+  "id": 28000023
  },
  {
   "name": "Goblin Machine",
@@ -1899,7 +1998,8 @@
    "Range": "Mellee: Medium",
    "Rockeb level": "16"
   },
-  "dir": "129"
+  "dir": "129",
+  "id": 26000096
  },
  {
   "name": "Archer Queen",
@@ -1918,7 +2018,8 @@
    "Speed": "Mediu",
    "Range": "5"
   },
-  "dir": "130"
+  "dir": "130",
+  "id": 26000072
  },
  {
   "name": "Monk",
@@ -1938,7 +2039,8 @@
    "Speed": "Mlediu",
    "Range": "Mellee: Medium"
   },
-  "dir": "131"
+  "dir": "131",
+  "id": 26000077
  },
  {
   "name": "Goblinstein",
@@ -1959,7 +2061,8 @@
    "Range": "55",
    "Monster Level": "16"
   },
-  "dir": "132"
+  "dir": "132",
+  "id": 26000099
  },
  {
   "name": "Rocket",
@@ -1974,7 +2077,8 @@
    "Crown Tower Damage": "646",
    "Radius": "2"
   },
-  "dir": "133"
+  "dir": "133",
+  "id": 28000003
  },
  {
   "name": "Giant Skeleton",
@@ -1994,7 +2098,8 @@
    "Speed": "Mlediu",
    "Range": "Mleleg: Etrt"
   },
-  "dir": "134"
+  "dir": "134",
+  "id": 26000020
  },
  {
   "name": "Lightning",
@@ -2011,7 +2116,8 @@
    "Stun Duration": "@Ssec",
    "Radius": "35"
   },
-  "dir": "135"
+  "dir": "135",
+  "id": 28000007
  },
  {
   "name": "Barbarian Hut",
@@ -2028,7 +2134,8 @@
    "Spawn Speed": "[sec",
    "Lifetime": "30sec"
   },
-  "dir": "136"
+  "dir": "136",
+  "id": 27000005
  },
  {
   "name": "Royal Giant",
@@ -2046,7 +2153,8 @@
    "Speed": "Elow",
    "Range": "5"
   },
-  "dir": "137"
+  "dir": "137",
+  "id": 26000024
  },
  {
   "name": "Goblin Giant",
@@ -2066,7 +2174,8 @@
    "Targets": "Buildings",
    "Speed": "Mlediu"
   },
-  "dir": "138"
+  "dir": "138",
+  "id": 26000060
  },
  {
   "name": "Elite Barbarians",
@@ -2086,7 +2195,8 @@
    "Range": "Mellee: Medium",
    "Count": "2"
   },
-  "dir": "139"
+  "dir": "139",
+  "id": 26000043
  },
  {
   "name": "X-Bow",
@@ -2106,7 +2216,8 @@
    "Deploy Time": "3",
    "Lifetime": "30sec"
   },
-  "dir": "140"
+  "dir": "140",
+  "id": 27000008
  },
  {
   "name": "Sparky",
@@ -2124,7 +2235,8 @@
    "Speed": "Elow",
    "Range": "5"
   },
-  "dir": "141"
+  "dir": "141",
+  "id": 26000033
  },
  {
   "name": "Elixir Collector",
@@ -2139,7 +2251,8 @@
    "Production Speed": "[Bzec",
    "Lifetime": "35"
   },
-  "dir": "142"
+  "dir": "142",
+  "id": 27000007
  },
  {
   "name": "Spirit Empress",
@@ -2159,7 +2272,8 @@
    "Range": "5",
    "Ground Elixir": "3"
   },
-  "dir": "143"
+  "dir": "143",
+  "id": 28000025
  },
  {
   "name": "Boss Bandit",
@@ -2178,7 +2292,8 @@
    "Targets": "Growd",
    "Speed": "Fast"
   },
-  "dir": "144"
+  "dir": "144",
+  "id": 26000103
  },
  {
   "name": "P.E.K.K.A",
@@ -2197,7 +2312,8 @@
    "Speed": "Elow",
    "Range": "Mellee: Medium"
   },
-  "dir": "145"
+  "dir": "145",
+  "id": 26000004
  },
  {
   "name": "Royal Recruits",
@@ -2218,7 +2334,8 @@
    "Speed": "Mlediu",
    "Range": "Meiee: [ongg"
   },
-  "dir": "146"
+  "dir": "146",
+  "id": 26000047
  },
  {
   "name": "Mega Knight",
@@ -2238,7 +2355,8 @@
    "Hit Speed": "7sec",
    "Targets": "Growd"
   },
-  "dir": "147"
+  "dir": "147",
+  "id": 26000055
  },
  {
   "name": "Electro Giant",
@@ -2258,7 +2376,8 @@
    "Targets": "Buildings",
    "Speed": "Elow"
   },
-  "dir": "148"
+  "dir": "148",
+  "id": 26000085
  },
  {
   "name": "Lava Hound",
@@ -2277,7 +2396,8 @@
    "Speed": "Elow",
    "Range": "35"
   },
-  "dir": "149"
+  "dir": "149",
+  "id": 26000029
  },
  {
   "name": "Three Musketeers",
@@ -2298,7 +2418,8 @@
    "Melee Damage": "503",
    "Melee Range": "Melee3 Long"
   },
-  "dir": "150"
+  "dir": "150",
+  "id": 26000028
  },
  {
   "name": "Golem",
@@ -2318,7 +2439,8 @@
    "Targets": "Buildings",
    "Speed": "Elow"
   },
-  "dir": "151"
+  "dir": "151",
+  "id": 26000009
  },
  {
   "name": "Royal Chef",
@@ -2333,7 +2455,7 @@
    "Damage/Sec": "113",
    "Damage": "1173",
    "Hit Speed": "IIsec",
-   "Targets": "Ai \u20ac Growvd",
+   "Targets": "Ai € Growvd",
    "Range": "75",
    "Cooking Time": "2352",
    "BufF Threshold": "3393"

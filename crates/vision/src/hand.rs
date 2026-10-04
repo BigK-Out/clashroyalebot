@@ -165,6 +165,11 @@ impl CardLibrary {
         }
     }
 
+    /// One card shown at `rect` (a whole card, like a hand slot), e.g. on the Decks screen.
+    pub fn read_card(&self, frame: &Frame, rect: NRect) -> Slot {
+        self.read_slot(frame, rect, false)
+    }
+
     pub fn read_hand(&self, frame: &Frame, calib: &Calibration) -> Hand {
         Hand {
             slots: std::array::from_fn(|i| self.read_slot(frame, calib.card_slots[i], true)),

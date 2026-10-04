@@ -3318,12 +3318,14 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "brain",
+ "calib",
  "capture",
  "fastrand",
  "serde",
  "serde_json",
  "tempfile",
  "toml",
+ "vision",
 ]
 
 [[package]]
@@ -3339,6 +3341,7 @@ dependencies = [
  "toml",
  "tracing",
  "tracing-subscriber",
+ "vision",
 ]
 
 [[package]]

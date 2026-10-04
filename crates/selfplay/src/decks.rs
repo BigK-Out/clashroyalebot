@@ -36,6 +36,48 @@ pub fn plan_decks(seed: u64, rounds: usize) -> Vec<Vec<String>> {
     out
 }
 
+/// The game's copy-deck link for `deck`: opening it on the phone shows "Copy to Deck N".
+pub fn copy_deck_link(deck: &[String]) -> anyhow::Result<String> {
+    anyhow::ensure!(deck.len() == 8, "a deck has 8 cards, got {}", deck.len());
+    let cards = brain::cards();
+    // A champion in slot 1 (an evolution slot) makes the server drop the connection; slot 2
+    // is the hero slot.
+    let mut deck = deck.to_vec();
+    if let Some(i) = deck.iter().position(|s| cards.get(s).and_then(|c| c.rarity.as_deref()) == Some("Champion")) {
+        let champ = deck.remove(i);
+        deck.insert(1, champ);
+    }
+    let ids = deck
+        .iter()
+        .map(|s| cards.get(s).and_then(|c| c.id).map(|id| id.to_string()).ok_or_else(|| anyhow::anyhow!("no card id for {s}")))
+        .collect::<anyhow::Result<Vec<_>>>()?;
+    // Without the tower troop (tt, Tower Princess) the game closes the popup and copies nothing.
+    Ok(format!("nullsroyale://copyDeck?deck={}&l=Royals&tt=159000000", ids.join(";")))
+}
+
+/// The 8 cards on the Decks screen (scrolled to the top), row by row: card rects measured on
+/// the Note 9 at 576x1248 (card frame without the "Max" band, like the Info portraits).
+pub fn read_deck(frame: &capture::Frame, lib: &vision::CardLibrary) -> Vec<Option<String>> {
+    const COLS: [f64; 4] = [20.0, 159.0, 298.0, 437.0];
+    const ROWS: [f64; 2] = [318.0, 543.0];
+    const SIZE: (f64, f64) = (113.0, 138.0);
+    ROWS.iter()
+        .flat_map(|&y| COLS.iter().map(move |&x| (x, y)))
+        .map(|(x, y)| {
+            let rect = calib::NRect { x: x / 576.0, y: y / 1248.0, w: SIZE.0 / 576.0, h: SIZE.1 / 1248.0 };
+            lib.read_card(frame, rect).name().map(str::to_string)
+        })
+        .collect()
+}
+
+/// The deck read back from the Decks screen is `want`: every recognized card belongs to it,
+/// none twice, and at most one slot is unread (the gold hero slot does not match portraits).
+pub fn deck_matches(read: &[Option<String>], want: &[String]) -> bool {
+    let known: Vec<&String> = read.iter().flatten().collect();
+    let distinct: std::collections::HashSet<&String> = known.iter().copied().collect();
+    known.len() >= 7 && distinct.len() == known.len() && known.iter().all(|c| want.contains(c))
+}
+
 #[cfg(test)]
 mod tests {
     use super::plan_decks;
@@ -62,6 +104,70 @@ mod tests {
             assert_eq!(d.iter().collect::<HashSet<_>>().len(), 8, "distinct: {d:?}");
             assert!(d.iter().filter(|c| champion(c)).count() <= 1, "{d:?}");
         }
+    }
+
+    #[test]
+    fn copy_deck_link_uses_card_ids_in_order() {
+        let deck: Vec<String> = ["hog_rider", "musketeer", "cannon", "ice_golem", "skeletons", "ice_spirit", "the_log", "fireball"]
+            .map(String::from)
+            .to_vec();
+        assert_eq!(
+            super::copy_deck_link(&deck).unwrap(),
+            "nullsroyale://copyDeck?deck=26000021;26000014;27000000;26000038;26000010;26000030;28000011;28000000&l=Royals&tt=159000000"
+        );
+    }
+
+    #[test]
+    fn copy_deck_link_rejects_bad_decks() {
+        let seven: Vec<String> = plan_decks(1, 1)[0][..7].to_vec();
+        assert!(super::copy_deck_link(&seven).is_err());
+        let mut unknown = plan_decks(1, 1)[0].clone();
+        unknown[0] = "not_a_card".into();
+        assert!(super::copy_deck_link(&unknown).is_err());
+    }
+
+    #[test]
+    fn every_planned_card_has_an_id() {
+        for d in plan_decks(3, 1) {
+            super::copy_deck_link(&d).unwrap();
+        }
+    }
+
+    #[test]
+    fn reads_the_deck_back_from_the_decks_screen() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let deck = ["hog_rider", "musketeer", "cannon", "ice_golem", "skeletons", "ice_spirit", "the_log", "fireball"];
+        let lib = vision::CardLibrary::load_subset(root.join("assets/cards_all"), &deck).unwrap();
+        let f = capture::load_rgb(root.join("fixtures/screens/note9/deck_view.png")).unwrap();
+        let got = super::read_deck(&f, &lib);
+        let want = ["skeletons", "hog_rider", "ice_golem", "ice_spirit", "fireball", "cannon", "musketeer", "the_log"];
+        assert_eq!(got, want.map(|s| Some(s.to_string())).to_vec());
+    }
+
+    #[test]
+    fn champion_goes_to_the_second_slot() {
+        // In slot 1 (an evolution slot) the server drops the connection; slot 2 is the hero slot.
+        let deck: Vec<String> = ["mighty_miner", "void", "spear_goblins", "poison", "royal_giant", "ice_wizard", "mortar", "bomb_tower"]
+            .map(String::from)
+            .to_vec();
+        let link = super::copy_deck_link(&deck).unwrap();
+        let ids: Vec<&str> = link.split("deck=").nth(1).unwrap().split('&').next().unwrap().split(';').collect();
+        let mm = brain::cards().get("mighty_miner").unwrap().id.unwrap().to_string();
+        assert_eq!(ids[1], mm, "{link}");
+        assert_eq!(ids.len(), 8);
+    }
+
+    #[test]
+    fn reads_new_cards_with_ribbons() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let deck = ["void", "mighty_miner", "spear_goblins", "poison", "royal_giant", "ice_wizard", "mortar", "bomb_tower"];
+        let lib = vision::CardLibrary::load_subset(root.join("assets/cards_all"), &deck).unwrap();
+        let f = capture::load_rgb(root.join("fixtures/screens/note9/deck_view_new.png")).unwrap();
+        let want: Vec<String> = deck.map(String::from).to_vec();
+        assert!(super::deck_matches(&super::read_deck(&f, &lib), &want));
+        // The old Hog deck on screen must not pass as this one.
+        let hog = capture::load_rgb(root.join("fixtures/screens/note9/deck_view.png")).unwrap();
+        assert!(!super::deck_matches(&super::read_deck(&hog, &lib), &want));
     }
 
     #[test]
