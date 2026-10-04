@@ -203,6 +203,19 @@ pub fn body_rect(u: &Unit, calib: &Calibration, width: u32, height: u32) -> Opti
     (x1 > x0 + 8 && y1 > y0 + 8).then_some(calib::PxRect { x: x0, y: y0, w: x1 - x0, h: y1 - y0 })
 }
 
+/// Enemy units as compact JSON for offline tools: [[x, y, col, row], ...] (feet, normalized).
+pub fn enemy_json(units: &[Unit]) -> String {
+    let items: Vec<String> = units
+        .iter()
+        .filter(|u| u.team == Team::Enemy)
+        .map(|u| {
+            let (c, r) = u.tile.map_or((-1, -1), |(c, r)| (c as i64, r as i64));
+            format!("[{:.4},{:.4},{c},{r}]", u.feet.x, u.feet.y)
+        })
+        .collect();
+    format!("[{}]", items.join(","))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -232,4 +245,16 @@ mod tests {
         assert_eq!(comps, vec![(0, 0, 3, 3, 3), (5, 0, 6, 2, 2)]);
     }
 
+}
+
+#[cfg(test)]
+mod json_tests {
+    use super::*;
+
+    #[test]
+    fn enemy_json_keeps_only_enemies() {
+        let u = |team, x, y, tile| Unit { team, tag: [0.0; 4], feet: NPoint { x, y }, tile };
+        let units = [u(Team::Enemy, 0.25, 0.5, Some((4, 15))), u(Team::Ally, 0.5, 0.7, Some((9, 22))), u(Team::Enemy, 0.1, 0.05, None)];
+        assert_eq!(enemy_json(&units), "[[0.2500,0.5000,4,15],[0.1000,0.0500,-1,-1]]");
+    }
 }
