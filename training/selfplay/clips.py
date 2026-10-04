@@ -1,5 +1,6 @@
 """Labeled 8-frame clips around every proposal and every logged enemy play."""
 import json
+import zlib
 from pathlib import Path
 
 import cv2
@@ -45,6 +46,17 @@ def label_events(props, plays, video_ms, lag_ms=MISSED_DELAY):
     return sorted((e for e in ev if 0 <= e["t_ms"] <= end), key=lambda e: e["t_ms"])
 
 
+def cap_negatives(events, ratio=2, seed=0):
+    """All play clips, and at most `ratio` x as many no_play clips (sampled, reproducible)."""
+    pos = [e for e in events if e["label"] != "no_play"]
+    neg = [e for e in events if e["label"] == "no_play"]
+    keep = max(ratio * len(pos), 10)
+    if len(neg) > keep:
+        idx = sorted(np.random.default_rng(seed).choice(len(neg), keep, replace=False))
+        neg = [neg[i] for i in idx]
+    return sorted(pos + neg, key=lambda e: e.get("t_ms", 0))
+
+
 def tag_lag_ms(props, plays, default=MISSED_DELAY):
     """Median delay from a play to its first enemy tag in this video (phones differ: ~0.5 s
     vs ~1.5 s), from tag proposals on the play's tile."""
@@ -71,7 +83,7 @@ def build_match(match_dir, out_dir):
         video = match_dir / f"{viewer}.mkv"
         props, plays = video_proposals(match_dir, viewer), enemy_plays(match_dir, viewer)
         lag = tag_lag_ms(props, plays)
-        events = label_events(props, plays, video_length_ms(video), lag)
+        events = cap_negatives(label_events(props, plays, video_length_ms(video), lag), seed=zlib.crc32((match_dir.name + viewer).encode()))
         wanted = sorted({(k, e["t_ms"] + off) for k, e in enumerate(events) for off in FRAME_OFFSETS}, key=lambda x: x[1])
         X = np.zeros((len(events), len(FRAME_OFFSETS), 128, 128, 3), np.uint8)
         filled = {}

@@ -39,3 +39,12 @@ def test_positive_clip_uses_the_logged_play_not_the_proposal():
     plays = [{"card": "fireball", "t_view": 1000, "col": 4, "row": 10}]
     ev = label_events(props, plays, video_ms=60_000, lag_ms=500)
     assert ev == [{"t_ms": 1500, "col": 4, "row": 10, "label": "fireball", "proposed": True}]
+
+
+def test_negatives_are_capped_and_positives_kept():
+    from selfplay.clips import cap_negatives
+    ev = [{"label": "knight"}] * 5 + [{"label": "no_play", "t_ms": i} for i in range(100)]
+    out = cap_negatives(ev, ratio=2, seed=1)
+    assert sum(e["label"] == "knight" for e in out) == 5
+    assert sum(e["label"] == "no_play" for e in out) == 10
+    assert out == cap_negatives(ev, ratio=2, seed=1)

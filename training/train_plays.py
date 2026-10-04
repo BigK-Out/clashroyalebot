@@ -28,7 +28,12 @@ class Clips(Dataset):
         self.data = {}
         for f in files:
             d = np.load(f)
-            self.data[f] = (d["X"], d["y"], d["t"])
+            # Unpack the clips once to a plain .npy next to the npz and memory-map it:
+            # the whole dataset does not fit in RAM.
+            raw = f.with_suffix(".X.npy")
+            if not raw.exists():
+                np.save(raw, d["X"])
+            self.data[f] = (np.load(raw, mmap_mode="r"), d["y"], d["t"])
             self.items += [(f, i) for i in range(len(d["y"]))]
 
     def __len__(self):
@@ -37,7 +42,7 @@ class Clips(Dataset):
     def __getitem__(self, k):
         f, i = self.items[k]
         X, y, t = self.data[f]
-        x = torch.from_numpy(X[i]).permute(0, 3, 1, 2).float() / 255  # [8,3,128,128]
+        x = torch.from_numpy(np.array(X[i])).permute(0, 3, 1, 2).float() / 255  # [8,3,128,128]
         if self.augment:
             x = x * (0.8 + 0.4 * torch.rand(1)) + 0.1 * (torch.rand(1) - 0.5)
             dx, dy = np.random.randint(-8, 9, 2)
@@ -50,7 +55,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--epochs", type=int, default=12)
     a = ap.parse_args()
-    files = sorted(CLIPS.glob("*.npz"))
+    files = sorted(CLIPS.glob("*_note*.npz"))
     train = Clips([f for f in files if not is_val(f.name.rsplit("_", 1)[0])], True)
     val = Clips([f for f in files if is_val(f.name.rsplit("_", 1)[0])], False)
     print(f"train {len(train)} clips, val {len(val)} clips, {len(files)} files", flush=True)
