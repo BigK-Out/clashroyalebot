@@ -82,7 +82,18 @@ fn art_region(slot: NRect, frame: &Frame, dy: f64) -> (f64, f64, f64, f64) {
 
 impl CardLibrary {
     pub fn load(dir: impl AsRef<Path>) -> anyhow::Result<Self> {
-        let dir = dir.as_ref();
+        Self::load_filtered(dir.as_ref(), |_| true)
+    }
+
+    /// Only the given cards (plus the empty-slot template): the sparring deck's 8 cards.
+    pub fn load_subset(dir: impl AsRef<Path>, names: &[&str]) -> anyhow::Result<Self> {
+        let lib = Self::load_filtered(dir.as_ref(), |n| n == EMPTY_TEMPLATE || names.contains(&n))?;
+        let missing: Vec<_> = names.iter().filter(|n| !lib.templates.iter().any(|t| t.name == **n)).collect();
+        anyhow::ensure!(missing.is_empty(), "no templates for {missing:?} in {}", dir.as_ref().display());
+        Ok(lib)
+    }
+
+    fn load_filtered(dir: &Path, keep: impl Fn(&str) -> bool) -> anyhow::Result<Self> {
         let mut templates = Vec::new();
         for entry in std::fs::read_dir(dir).with_context(|| format!("read {}", dir.display()))? {
             let path = entry?.path();
@@ -92,6 +103,9 @@ impl CardLibrary {
             // `name@variant.png` adds another look of the same card (raised, next-preview, ...).
             let stem = path.file_stem().and_then(|s| s.to_str()).context("bad file name")?;
             let name = stem.split('@').next().unwrap_or(stem).to_string();
+            if !keep(&name) {
+                continue;
+            }
             let frame = capture::load_rgb(&path)?;
             let patch = Patch::from_frame(&frame).with_context(|| format!("empty template {}", path.display()))?;
             templates.push(Template { name, patch });

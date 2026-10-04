@@ -24,6 +24,9 @@ struct Args {
     seed: u64,
     #[arg(long)]
     dry_run: bool,
+    /// The sparring deck (8 slugs): hand templates come from assets/cards_all, any card.
+    #[arg(long, value_delimiter = ',')]
+    deck: Vec<String>,
 }
 
 fn adb_path() -> String {
@@ -39,7 +42,11 @@ fn main() -> anyhow::Result<()> {
     let mut ctx = Ctx {
         deployer: Deployer::new(shell, calib.clone())?,
         calib,
-        cards: vision::CardLibrary::load(&a.cards)?,
+        cards: if a.deck.is_empty() {
+            vision::CardLibrary::load(&a.cards)?
+        } else {
+            vision::CardLibrary::load_subset("assets/cards_all", &a.deck.iter().map(String::as_str).collect::<Vec<_>>())?
+        },
         policy: SparringPolicy::new(a.seed),
         dry_run: a.dry_run,
     };

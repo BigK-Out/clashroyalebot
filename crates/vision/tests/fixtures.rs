@@ -71,3 +71,21 @@ fn note9_elixir_and_hand_read() {
         assert!(known >= 3, "battle_{i}: {:?}", hand.slots);
     }
 }
+
+#[test]
+fn portrait_templates_read_note9_hands() {
+    let calib = calib::Calibration::load(root().join("calibration_note9.toml")).unwrap();
+    let deck = ["hog_rider", "musketeer", "cannon", "ice_golem", "skeletons", "ice_spirit", "the_log", "fireball"];
+    let lib = vision::CardLibrary::load_subset(root().join("assets/cards_all"), &deck).unwrap();
+    let reference = vision::CardLibrary::load(root().join("assets/cards")).unwrap();
+    for i in 1..=5 {
+        let f = capture::load_rgb(root().join(format!("fixtures/note9/battle_{i}.png"))).unwrap();
+        let want = reference.read_hand(&f, &calib);
+        let got = lib.read_hand(&f, &calib);
+        for s in 0..4 {
+            if let Some(w) = want.slots[s].name() {
+                assert_eq!(got.slots[s].name(), Some(w), "battle_{i} slot {s}");
+            }
+        }
+    }
+}
