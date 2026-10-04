@@ -132,6 +132,14 @@ mod tests {
     }
 
     #[test]
+    fn incomplete_match_marked() {
+        let dir = tempfile::tempdir().unwrap();
+        MatchMeta { match_id: "x".into(), error: Some("sparring exit status: 1".into()), ..Default::default() }.save(dir.path()).unwrap();
+        let m: MatchMeta = serde_json::from_str(&std::fs::read_to_string(dir.path().join("meta.json")).unwrap()).unwrap();
+        assert!(!m.complete && m.error.is_some());
+    }
+
+    #[test]
     fn host_clock_is_epoch_ms() {
         assert!(host_ms() > 1_700_000_000_000);
     }

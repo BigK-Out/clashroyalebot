@@ -149,7 +149,7 @@ fn main() -> anyhow::Result<()> {
         .as_ref()
         .map(|d| selfplay::JsonlLog::<selfplay::ObserverRecord>::create(&d.join("observer.jsonl")))
         .transpose()?;
-    let mut prev_enemies = 0usize;
+    let mut new_enemy_gate = selfplay::NewEnemyGate::new();
     let obs = |kind: &str, card: Option<String>, tile: Option<(u32, u32)>, enemies: &[(u32, u32)]| selfplay::ObserverRecord {
         host_ms: selfplay::host_ms(),
         kind: kind.into(),
@@ -190,13 +190,12 @@ fn main() -> anyhow::Result<()> {
         let perceive_ms = t_perceive.elapsed().as_secs_f64() * 1e3;
         if let Some(dir) = args.selfplay_dir.as_ref().filter(|_| state.in_battle) {
             let now = selfplay::host_ms();
-            if state.enemies.len() > prev_enemies {
+            if new_enemy_gate.update(now, state.enemies.len()) {
                 schedule.burst(now);
                 if let Some(log) = observer_log.as_mut() {
                     log.append(&obs("new_enemy", None, None, &state.enemies))?;
                 }
             }
-            prev_enemies = state.enemies.len();
             if schedule.should_save(now) {
                 let path = dir.join("frames").join(format!("{now}.jpg"));
                 std::fs::create_dir_all(path.parent().unwrap())?;

@@ -1,0 +1,20 @@
+[package]
+name = "selfplay-run"
+edition.workspace = true
+version.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "selfplay"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.104"
+capture = { path = "../../crates/capture" }
+image = { version = "0.25.10", default-features = false, features = ["png"] }
+clap = { version = "4.6.7", features = ["derive"] }
+input = { path = "../../crates/input" }
+selfplay = { path = "../../crates/selfplay" }
+toml = "1.1.6"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }

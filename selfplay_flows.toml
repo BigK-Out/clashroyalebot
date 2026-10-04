@@ -1,0 +1,126 @@
+# Screen checks and taps for the self-play orchestrator. Boxes: normalized (0..1) in 576-px-wide
+# screenshots (Note 9 576x1248, Note 14 576x1280), measured on fixtures/screens/<phone>/<name>.png.
+# A screen matches when min_frac of the box's pixels are within tol of rgb. First match wins.
+# Taps: normalized screen positions, measured on the same screenshots.
+
+[[note9.screens]]
+name = "main"  # yellow Battle button, strip above the text
+x = 0.3559
+y = 0.7893
+w = 0.3038
+h = 0.0080
+rgb = [255, 187, 0]
+tol = 40
+min_frac = 0.6
+
+[[note9.screens]]
+name = "friend_menu"  # white popup (View Profile / Friendly Battle / Remove); before friends_list
+x = 0.0347
+y = 0.3766
+w = 0.3646
+h = 0.0160
+rgb = [255, 255, 255]
+tol = 40
+min_frac = 0.6
+
+[[note9.screens]]
+name = "friends_list"  # green Add Friends! button (dimmed under popups)
+x = 0.5208
+y = 0.8694
+w = 0.2604
+h = 0.0080
+rgb = [42, 206, 112]
+tol = 40
+min_frac = 0.6
+
+[[note9.screens]]
+name = "mode_picker"  # blue 1v1 Battle bar in the Friendly Battle mode picker
+x = 0.1736
+y = 0.3205
+w = 0.7292
+h = 0.0096
+rgb = [15, 139, 203]
+tol = 40
+min_frac = 0.6
+
+[[note9.screens]]
+name = "invite_sent"  # red Cancel on the Waiting for Khazar banner
+x = 0.7292
+y = 0.1026
+w = 0.1997
+h = 0.0048
+rgb = [252, 95, 97]
+tol = 40
+min_frac = 0.6
+
+[[note9.screens]]
+name = "battle"  # dark blue hand panel left of the cards
+x = 0.0087
+y = 0.9095
+w = 0.0868
+h = 0.0080
+rgb = [6, 69, 131]
+tol = 40
+min_frac = 0.6
+
+[[note9.screens]]
+name = "result"  # blue OK button, left of the text
+x = 0.3906
+y = 0.8373
+w = 0.0434
+h = 0.0361
+rgb = [90, 181, 255]
+tol = 40
+min_frac = 0.6
+
+[[note14.screens]]
+name = "main"  # yellow Battle button, strip above the text
+x = 0.3559
+y = 0.7945
+w = 0.3038
+h = 0.0078
+rgb = [255, 187, 0]
+tol = 40
+min_frac = 0.6
+
+[[note14.screens]]
+name = "invite_popup"  # green invite panel on the Social tab
+x = 0.0694
+y = 0.3438
+w = 0.1389
+h = 0.0078
+rgb = [0, 213, 140]
+tol = 40
+min_frac = 0.6
+
+[[note14.screens]]
+name = "battle"  # dark blue hand panel left of the cards
+x = 0.0087
+y = 0.9117
+w = 0.0868
+h = 0.0078
+rgb = [6, 69, 131]
+tol = 40
+min_frac = 0.6
+
+[[note14.screens]]
+name = "result"  # blue OK button, left of the text
+x = 0.3906
+y = 0.8289
+w = 0.0434
+h = 0.0352
+rgb = [90, 181, 255]
+tol = 40
+min_frac = 0.6
+
+[note9.taps]
+friends_tab = [0.6472, 0.1308]      # Social icon, top right of the main screen
+khazar_row = [0.5028, 0.4222]       # Khazar in the Online list
+friendly_battle = [0.2148, 0.4756]  # Friendly Battle in the row's popup
+one_v_one = [0.5, 0.3372]           # 1v1 Battle in the mode picker
+result_ok = [0.5, 0.8573]
+
+[note14.taps]
+social_tab = [0.7463, 0.9608]       # Social tab in the bottom bar (invite badge)
+accept_invite = [0.6389, 0.4142]    # yellow Friendly Battle on the invite panel
+result_ok = [0.5, 0.8483]

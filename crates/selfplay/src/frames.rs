@@ -29,6 +29,36 @@ impl FrameSchedule {
     }
 }
 
+/// How long an enemy count is remembered when deciding whether units are new.
+const GATE_WINDOW_MS: u64 = 1_500;
+
+/// Fires when the enemy count rises above everything seen in the last 1.5 s, so detection
+/// flicker (a unit dropping out for a frame and coming back) is not a new enemy.
+pub struct NewEnemyGate {
+    recent: std::collections::VecDeque<(u64, usize)>,
+}
+
+impl NewEnemyGate {
+    pub fn new() -> Self {
+        Self { recent: std::collections::VecDeque::new() }
+    }
+
+    pub fn update(&mut self, now_ms: u64, count: usize) -> bool {
+        while self.recent.front().is_some_and(|&(t, _)| t + GATE_WINDOW_MS < now_ms) {
+            self.recent.pop_front();
+        }
+        let fired = count > self.recent.iter().map(|&(_, c)| c).max().unwrap_or(0);
+        self.recent.push_back((now_ms, count));
+        fired
+    }
+}
+
+impl Default for NewEnemyGate {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Default for FrameSchedule {
     fn default() -> Self {
         Self::new()
@@ -37,10 +67,24 @@ impl Default for FrameSchedule {
 
 #[cfg(test)]
 mod tests {
-    use super::FrameSchedule;
+    use super::{FrameSchedule, NewEnemyGate};
 
     fn saved(s: &mut FrameSchedule, from: u64, to: u64) -> usize {
         (from..to).step_by(10).filter(|&t| s.should_save(t)).count()
+    }
+
+    #[test]
+    fn new_enemy_gate_ignores_flicker() {
+        let mut g = NewEnemyGate::new();
+        assert!(g.update(1_000, 1), "first unit");
+        // Detection flicker: the unit drops out for a frame and comes back.
+        assert!(!g.update(1_100, 0));
+        assert!(!g.update(1_200, 1));
+        // A second unit is new.
+        assert!(g.update(1_300, 2));
+        // Back to the same count after the window: new again (a later play).
+        assert!(!g.update(1_400, 0));
+        assert!(g.update(3_000, 1));
     }
 
     #[test]
