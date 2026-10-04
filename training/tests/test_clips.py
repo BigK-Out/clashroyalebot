@@ -31,3 +31,11 @@ def test_missed_play_is_added_unproposed():
 def test_plays_outside_video_are_skipped():
     plays = [{"card": "zap", "t_view": -2000, "col": 9, "row": 8}, {"card": "zap", "t_view": 59_500, "col": 9, "row": 8}]
     assert label_events([], plays, video_ms=60_000) == []
+
+
+def test_positive_clip_uses_the_logged_play_not_the_proposal():
+    # A proposal matched by chance 2 tiles and 1.2 s away must not move the labeled clip.
+    props = [Proposal(2200, 6, 12, "motion")]
+    plays = [{"card": "fireball", "t_view": 1000, "col": 4, "row": 10}]
+    ev = label_events(props, plays, video_ms=60_000, lag_ms=500)
+    assert ev == [{"t_ms": 1500, "col": 4, "row": 10, "label": "fireball", "proposed": True}]

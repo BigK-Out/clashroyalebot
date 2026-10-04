@@ -19,11 +19,10 @@ Proposal = namedtuple("Proposal", "t_ms col row kind")
 
 TRACK_DIST = 0.06  # normalized screen distance a tag may move between samples (10 fps)
 TRACK_TTL = 400  # ms a lost tag is remembered (detection flicker)
-MOTION_ON = 0.5  # changed-pixel fraction of a tile that counts as burst
-MOTION_QUIET = 0.15  # the same tiles must have been below this in the previous 300 ms
-MOTION_MIN_TILES = 4
+MOTION_ON = 0.25  # changed-pixel fraction of a 3x3-tile block that counts as burst
+MOTION_QUIET = 0.2  # the same block must have been below this in the previous 300 ms
 MERGE_MS, MERGE_TILES = 600, 3
-MATCH_WINDOW = (-300, 1500)
+MATCH_WINDOW = (-500, 3000)  # the Note 9 shows enemy tags ~1.5 s after the play
 MATCH_TILES = 3
 
 
@@ -44,19 +43,17 @@ def tag_proposals(frames_enemies):
 
 
 def motion_proposals(diffs):
+    """A 3x3-tile block that turns busy after 300 ms of being quiet (spells, late tags)."""
     props, history = [], []
     for t, grid in diffs:
-        hot = grid >= MOTION_ON
-        recent = [g for tt, g in history if t - tt <= 300]
-        if recent:
-            hot &= np.max(recent, axis=0) < MOTION_QUIET
-        n, labels, stats, cents = cv2.connectedComponentsWithStats(hot.astype(np.uint8), connectivity=8)
+        blk = cv2.blur(grid.astype(np.float32), (3, 3))
+        prev = np.max([h for _, h in history], axis=0) if history else np.zeros_like(blk)
+        hot = (blk >= MOTION_ON) & (prev < MOTION_QUIET)
+        n, _, _, cents = cv2.connectedComponentsWithStats(hot.astype(np.uint8), connectivity=8)
         for i in range(1, n):
-            if stats[i, cv2.CC_STAT_AREA] >= MOTION_MIN_TILES:
-                cx, cy = cents[i]
-                props.append(Proposal(t, int(round(cx)), int(round(cy)), "motion"))
-        history.append((t, grid))
-        history = [(tt, g) for tt, g in history if t - tt <= 300]
+            cx, cy = cents[i]
+            props.append(Proposal(t, int(round(cx)), int(round(cy)), "motion"))
+        history = [(tt, h) for tt, h in history + [(t, blk)] if t - tt <= 300]
     return props
 
 
@@ -121,9 +118,10 @@ def video_proposals(match_dir, viewer):
         proc.stdin.flush()
         tags.append((t, json.loads(proc.stdout.readline())))
         g = cv2.GaussianBlur(cv2.cvtColor(f[y0:y1, x0:x1], cv2.COLOR_BGR2GRAY), (5, 5), 0)
+        g = cv2.resize(g, (144, 256), interpolation=cv2.INTER_AREA)
         ref = prev.get("g")
         if ref is not None:
-            changed = (cv2.absdiff(g, ref) > 40).astype(np.float32)
+            changed = (cv2.absdiff(g, ref) > 25).astype(np.float32)
             diffs.append((t, cv2.resize(changed, (18, 32), interpolation=cv2.INTER_AREA)))
         # Compare against the frame 200 ms back (two samples), not the previous one.
         prev["g"], prev["g1"] = prev.get("g1", g), g

@@ -33,18 +33,24 @@ def crop(frame, cx, cy, size_px, out=128):
     return cv2.resize(canvas, (out, out), interpolation=cv2.INTER_AREA)
 
 
-def label_events(props, plays, video_ms):
+def label_events(props, plays, video_ms, lag_ms=MISSED_DELAY):
+    """Every logged play is a clip at its own tile, `lag_ms` after its time in this video
+    (exact labels); proposals that match no play are "no_play" clips. Proposals matched
+    to a play only set its `proposed` flag: with dense proposals a match can be chance."""
     pairs, unmatched = match_props(props, plays)
-    by_prop = {j: i for i, j in pairs.items()}
-    ev = []
-    for j, p in enumerate(props):
-        label = plays[by_prop[j]]["card"] if j in by_prop else "no_play"
-        ev.append({"t_ms": p.t_ms, "col": p.col, "row": p.row, "label": label, "proposed": True})
-    for i, pl in enumerate(plays):
-        if i not in pairs:
-            ev.append({"t_ms": pl["t_view"] + MISSED_DELAY, "col": pl["col"], "row": pl["row"], "label": pl["card"], "proposed": False})
+    ev = [{"t_ms": pl["t_view"] + lag_ms, "col": pl["col"], "row": pl["row"], "label": pl["card"], "proposed": i in pairs}
+          for i, pl in enumerate(plays)]
+    ev += [{"t_ms": props[j].t_ms, "col": props[j].col, "row": props[j].row, "label": "no_play", "proposed": True} for j in unmatched]
     end = video_ms - FRAME_OFFSETS[-1]
     return sorted((e for e in ev if 0 <= e["t_ms"] <= end), key=lambda e: e["t_ms"])
+
+
+def tag_lag_ms(props, plays, default=MISSED_DELAY):
+    """Median delay from a play to its first enemy tag in this video (phones differ: ~0.5 s
+    vs ~1.5 s), from tag proposals on the play's tile."""
+    d = [p.t_ms - pl["t_view"] for pl in plays for p in props
+         if p.kind == "tag" and 0 <= p.t_ms - pl["t_view"] <= 3000 and max(abs(p.col - pl["col"]), abs(p.row - pl["row"])) <= 1]
+    return float(np.median(d)) if len(d) >= 3 else default
 
 
 def video_length_ms(path):
@@ -63,7 +69,9 @@ def build_match(match_dir, out_dir):
         calib = load_calib(cal)
         tile_px = (calib["arena"]["bottom_right"]["x"] - calib["arena"]["top_left"]["x"]) * 576 / 18
         video = match_dir / f"{viewer}.mkv"
-        events = label_events(video_proposals(match_dir, viewer), enemy_plays(match_dir, viewer), video_length_ms(video))
+        props, plays = video_proposals(match_dir, viewer), enemy_plays(match_dir, viewer)
+        lag = tag_lag_ms(props, plays)
+        events = label_events(props, plays, video_length_ms(video), lag)
         wanted = sorted({(k, e["t_ms"] + off) for k, e in enumerate(events) for off in FRAME_OFFSETS}, key=lambda x: x[1])
         X = np.zeros((len(events), len(FRAME_OFFSETS), 128, 128, 3), np.uint8)
         filled = {}
@@ -83,4 +91,4 @@ def build_match(match_dir, out_dir):
         np.savez_compressed(out_dir / f"{match_dir.name}_{viewer}.npz", X=X, y=y,
                             t=np.array([e["t_ms"] for e in events], np.float32),
                             proposed=np.array([e["proposed"] for e in events], bool))
-        print(match_dir.name, viewer, len(events), "events", int((y < len(CLASSES) - 1).sum()), "plays", flush=True)
+        print(match_dir.name, viewer, f"lag {lag:.0f} ms", len(events), "events", int((y < len(CLASSES) - 1).sum()), "plays", flush=True)
