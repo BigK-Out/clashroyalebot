@@ -109,7 +109,7 @@ X-Bow
 P.E.K.K.A
 Goblin Giant
 Mega Knight
-Electro Spirit
+Skeleton Dragons
 Golem
 Lava Hound
 Three Musketeers
@@ -120,3 +120,7 @@ Tower Princess
 Cannoneer
 Dagger Duchess
 Royal Chef
+Prince
+Goblin Drill
+Ronin
+Vines

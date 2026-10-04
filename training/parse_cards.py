@@ -1,7 +1,8 @@
 """OCR the harvested Info screens into a card table.
 
 dataset/cards/NNN/{info,stats}.png -> ../assets/cards.json
-  [{"name", "slug", "elixir", "rarity", "type", "stats": {label: value}, "dir"}], one per card
+  [{"name", "slug", "elixir", "rarity", "type", "count", "swarm", "stats": {label: value}, "dir"}],
+  one per card
   (duplicates from the harvest are dropped by name; the first copy wins).
 OCR is imperfect: names/type/elixir are reliable, stat values are best-effort strings.
 """
@@ -18,6 +19,10 @@ ROOT = Path("../dataset/cards")
 TITLE = (830, 1000, 300, 1000)      # y0, y1, x0, x1 on 1080x2400 screens
 TAGS = (1080, 1240, 340, 880)
 BADGE = (835, 900, 55, 120)         # elixir drop on the card portrait
+# Champion popups (layout.txt == "champion") sit higher, with the tags further down.
+CHAMP = {"TITLE": (395, 540, 300, 1000), "TAGS": (1600, 1730, 60, 620), "BADGE": (405, 465, 55, 125)}
+# Tower troops (harvest_towers.py, layout.txt == "tower"): no elixir cost.
+TOWER = {"TITLE": (480, 580, 300, 1000), "TAGS": (1730, 1850, 220, 850)}
 STATS = (1250, 1700, 80, 1000)
 
 reader = easyocr.Reader(["en"], gpu=True, verbose=False)
@@ -26,7 +31,9 @@ KNOWN = [l.strip() for l in open("card_names.txt") if l.strip()]
 
 def canonical(raw):
     """Snap OCR'd names to known card names ("Fire Spinit" -> "Fire Spirit"); keep unknowns."""
-    m = difflib.get_close_matches(raw.lower(), [k.lower() for k in KNOWN], n=1, cutoff=0.75)
+    # Same length +-1 only: OCR swaps letters ("Kwight"), it doesn't drop syllables, and a
+    # name that isn't in the list must not snap to a longer one (Prince -> Princess).
+    m = difflib.get_close_matches(raw.lower(), [k.lower() for k in KNOWN if abs(len(k) - len(raw)) <= 1], n=1, cutoff=0.82)
     return next(k for k in KNOWN if k.lower() == m[0]) if m else raw
 
 
@@ -36,11 +43,25 @@ def crop(img, box):
 
 
 def slug(name):
-    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+    """Bot card id: "Mini P.E.K.K.A" -> "mini_pekka", "X-Bow" -> "x_bow"."""
+    return re.sub(r"[^a-z0-9]+", "_", re.sub(r"[.']", "", name.lower())).strip("_")
 
 
-def elixir(img):
-    badge = cv2.resize(crop(img, BADGE), None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+# Cards that put several units down even when their stats OCR has no readable "Count".
+SWARMS = {"skeletons", "goblins", "spear_goblins", "bats", "minions", "archers", "skeleton_army",
+          "goblin_gang", "guards", "barbarians", "minion_horde", "royal_recruits", "elite_barbarians",
+          "three_musketeers", "wall_breakers", "royal_hogs", "rascals"}
+
+
+def unit_count(st):
+    """Largest "... Count" stat (Skeleton Count 15, Goblin Count 3, ...), 1 if none."""
+    n = [int(m.group(1)) for k, v in st.items()
+         if "coun" in k.lower() and (m := re.fullmatch(r"x?(\d{1,2})x?", v))]  # OCR: "Counb"
+    return max(n, default=1)
+
+
+def elixir(img, box=BADGE):
+    badge = cv2.resize(crop(img, box), None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     txt = "".join(reader.readtext(badge, detail=0, allowlist="0123456789?"))
     if "?" in txt:
         return None  # Mirror: costs 1 more than the mirrored card
@@ -86,22 +107,36 @@ def stats(img):
 cards, seen = [], set()
 for d in sorted(p for p in ROOT.iterdir() if p.is_dir()):
     info, st = cv2.imread(str(d / "info.png")), cv2.imread(str(d / "stats.png"))
+    layout = (d / "layout.txt").read_text().strip() if (d / "layout.txt").exists() else "card"
+    title_box, tags_box, badge_box = {
+        "champion": (CHAMP["TITLE"], CHAMP["TAGS"], CHAMP["BADGE"]),
+        "tower": (TOWER["TITLE"], TOWER["TAGS"], None),
+    }.get(layout, (TITLE, TAGS, BADGE))
     if info is None:
         continue
-    title = [t for t in reader.readtext(crop(info, TITLE), detail=0) if not t.lower().startswith("level")]
-    name = canonical(" ".join(title).strip().title())
+    if (d / "name.txt").exists():  # written by harvest_cards.py (same OCR)
+        name = (d / "name.txt").read_text().strip()
+    else:
+        title = [t for t in reader.readtext(crop(info, title_box), detail=0) if not t.lower().startswith("level") and not t.strip().isdigit()]
+        name = canonical(re.sub(r"^\d+\s+", "", " ".join(title).strip()).title())
     if not name or name in seen:
         continue
     seen.add(name)
-    tags = reader.readtext(crop(info, TAGS), detail=0)
+    tags = reader.readtext(crop(info, tags_box), detail=0)
     vals = [t for t in tags if t.upper() not in ("RARITY", "TYPE")]
+    st_vals = stats(st) if st is not None else {}
+    count = unit_count(st_vals)
     cards.append({
         "name": name,
         "slug": slug(name),
-        "elixir": None if name == "Mirror" else elixir(info),  # Mirror: mirrored card + 1
+        # Mirror: mirrored card + 1; tower troops aren't played.
+        "elixir": None if name == "Mirror" or badge_box is None else elixir(info, badge_box),
         "rarity": vals[0].title() if vals else None,
         "type": vals[1].title() if len(vals) > 1 else None,
-        "stats": stats(st) if st is not None else {},
+        "count": count,
+        # Spells' counts are hits/spawns (Lightning 3, Graveyard 12), not units on the field.
+        "swarm": len(vals) > 1 and vals[1].title() == "Troop" and (count > 1 or slug(name) in SWARMS),
+        "stats": st_vals,
         "dir": d.name,
     })
     print(f"{d.name}  {name:22s} {cards[-1]['elixir']}  {cards[-1]['type']}")

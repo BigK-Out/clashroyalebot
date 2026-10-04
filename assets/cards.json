@@ -5,6 +5,8 @@
   "elixir": 1,
   "rarity": "Common",
   "type": "Troop",
+  "count": 3,
+  "swarm": true,
   "stats": {
    "Damage": "130",
    "Damage/Sec": "018",
@@ -24,6 +26,8 @@
   "elixir": 1,
   "rarity": "Common",
   "type": "Troop",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Area Damage": "337",
    "Hitpoints": "343",
@@ -39,6 +43,8 @@
   "elixir": 1,
   "rarity": "Common",
   "type": "Troop",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Hitpoints": "343",
    "Ranged Damage": "159",
@@ -57,6 +63,8 @@
   "elixir": 1,
   "rarity": "Common",
   "type": "Troop",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Area Damage": "125",
    "Hitpoints": "343",
@@ -75,6 +83,8 @@
   "elixir": 2,
   "rarity": "Common",
   "type": "Troop",
+  "count": 1,
+  "swarm": true,
   "stats": {
    "Damage": "200",
    "Damage/Sec": "187",
@@ -93,6 +103,8 @@
   "elixir": 1,
   "rarity": "Rare",
   "type": "Troop",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Area Damage": "125",
    "Hitpoints": "343",
@@ -110,6 +122,8 @@
   "elixir": null,
   "rarity": "Epic",
   "type": "Spell",
+  "count": 1,
+  "swarm": false,
   "stats": {},
   "dir": "006"
  },
@@ -119,6 +133,8 @@
   "elixir": 2,
   "rarity": "Common",
   "type": "Troop",
+  "count": 3,
+  "swarm": true,
   "stats": {
    "Hitpoints": "212",
    "Ranged Damage": "130",
@@ -137,6 +153,8 @@
   "elixir": 2,
   "rarity": "Common",
   "type": "Spell",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Area Damage": "286",
    "Crown Tower Damage": "172",
@@ -151,6 +169,8 @@
   "elixir": 2,
   "rarity": "Common",
   "type": "Troop",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Area Damage": "359",
    "Hitpoints": "486",
@@ -167,6 +187,8 @@
   "elixir": 2,
   "rarity": "Common",
   "type": "Troop",
+  "count": 5,
+  "swarm": true,
   "stats": {
    "Damage": "130",
    "Damage/Sec": "108",
@@ -185,6 +207,8 @@
   "elixir": 2,
   "rarity": "Common",
   "type": "Spell",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Area Damage": "306",
    "Stun Duration": "@Ssec",
@@ -198,6 +222,8 @@
   "elixir": 2,
   "rarity": "Legendary",
   "type": "Spell",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Area Damage": "429",
    "Crown Tower Damage": "56",
@@ -213,6 +239,8 @@
   "elixir": 2,
   "rarity": "Common",
   "type": "Troop",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Damage": "163",
    "Damage/Sec": "221",
@@ -230,6 +258,8 @@
   "elixir": 2,
   "rarity": "Epic",
   "type": "Spell",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Area Damage": "372",
    "Targets": "Ground",
@@ -245,6 +275,8 @@
   "elixir": 2,
   "rarity": "Rare",
   "type": "Troop",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Damage": "14",
    "Death Damage": "14",
@@ -263,6 +295,8 @@
   "elixir": 2,
   "rarity": "Epic",
   "type": "Troop",
+  "count": 2,
+  "swarm": true,
   "stats": {
    "Area Damage": "449",
    "Hitpoints": "527",
@@ -279,6 +313,8 @@
   "elixir": 2,
   "rarity": "Rare",
   "type": "Troop",
+  "count": 2,
+  "swarm": true,
   "stats": {
    "Hitpoints": "130",
    "Bush Goblin Count": "2",
@@ -294,6 +330,8 @@
   "elixir": 2,
   "rarity": "Epic",
   "type": "Spell",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Area Damage": "286",
    "Crown Tower Damage": "72",
@@ -311,6 +349,8 @@
   "elixir": 2,
   "rarity": "Epic",
   "type": "Spell",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Damage": "5",
    "Crown Tower Damage": "16",
@@ -327,6 +367,8 @@
   "elixir": 3,
   "rarity": "Common",
   "type": "Troop",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Damage": "323",
    "Damage/Sec": "269",
@@ -344,6 +386,8 @@
   "elixir": 3,
   "rarity": "Common",
   "type": "Troop",
+  "count": 2,
+  "swarm": true,
   "stats": {
    "Hitpoints": "486",
    "Ranged Damage": "179",
@@ -363,6 +407,8 @@
   "elixir": 3,
   "rarity": "Common",
   "type": "Troop",
+  "count": 3,
+  "swarm": true,
   "stats": {
    "Hitpoints": "368",
    "Ranged Damage": "171",
@@ -381,6 +427,8 @@
   "elixir": 3,
   "rarity": "Common",
   "type": "Spell",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Area Damage": "196x",
    "Crown Tower Damage": "40x",
@@ -394,6 +442,8 @@
   "elixir": 3,
   "rarity": "Rare",
   "type": "Building",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Hitpoints": "846",
    "Spawn on Death": "Ekellto x4",
@@ -409,6 +459,8 @@
   "elixir": 3,
   "rarity": "Common",
   "type": "Building",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Hitpoints": "1316",
    "Ranged Damage": "323",
@@ -427,6 +479,8 @@
   "elixir": 3,
   "rarity": "Rare",
   "type": "Troop",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Hitpoints": "1337",
    "Ranged Damage": "498",
@@ -444,6 +498,8 @@
   "elixir": 3,
   "rarity": "Epic",
   "type": "Troop",
+  "count": 15,
+  "swarm": true,
   "stats": {
    "Skeleton Level": "16",
    "Skeleton Count": "15"
@@ -456,6 +512,8 @@
   "elixir": 3,
   "rarity": "Epic",
   "type": "Troop",
+  "count": 1,
+  "swarm": true,
   "stats": {
    "Damage": "188",
    "Damage/Sec": "188",
@@ -475,6 +533,8 @@
   "elixir": 3,
   "rarity": "Epic",
   "type": "Spell",
+  "count": 3,
+  "swarm": false,
   "stats": {
    "Radius": "1155",
    "Goblin Level": "16",
@@ -488,6 +548,8 @@
   "elixir": 3,
   "rarity": "Epic",
   "type": "Spell",
+  "count": 3,
+  "swarm": false,
   "stats": {
    "Damage/Sec": "245",
    "Crown Tower Damage": "5",
@@ -503,6 +565,8 @@
   "elixir": 3,
   "rarity": "Common",
   "type": "Troop",
+  "count": 3,
+  "swarm": true,
   "stats": {
    "Goblin Level": "16",
    "Goblin Counb": "3",
@@ -517,6 +581,8 @@
   "elixir": 3,
   "rarity": "Rare",
   "type": "Troop",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Hitpoints": "417",
    "Ranged Damage": "2417",
@@ -534,6 +600,8 @@
   "elixir": 3,
   "rarity": "Legendary",
   "type": "Troop",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Area Damage": "269",
    "Hitpoints": "417",
@@ -554,6 +622,8 @@
   "elixir": 3,
   "rarity": "Legendary",
   "type": "Troop",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Damage": "310",
    "Crown Tower Damage": "62",
@@ -572,6 +642,8 @@
   "elixir": 3,
   "rarity": "Common",
   "type": "Troop",
+  "count": 1,
+  "swarm": false,
   "stats": {
    "Death Damage": "233",
    "Hitpoints": "850",
@@ -581,5 +653,1749 @@
    "Speed": "Fast"
   },
   "dir": "059"
+ },
+ {
+  "name": "Firecracker",
+  "slug": "firecracker",
+  "elixir": 3,
+  "rarity": "Common",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "486",
+   "Ranged Damage": "102x",
+   "Hit Speed": "Bsec",
+   "Targets": "Air & Ground",
+   "Bsec": "Speed",
+   "Ai & Ground": "Range",
+   "Speed": "Fast",
+   "Range": "6"
+  },
+  "dir": "066"
+ },
+ {
+  "name": "Royal Ghost",
+  "slug": "royal_ghost",
+  "elixir": 3,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "417",
+   "Damage/Sec": "231",
+   "Hitpoints": "1934",
+   "Hit Speed": "118sec",
+   "Targets": "Ground",
+   "Speed": "Fast",
+   "Range": "Mlelleg: Medim"
+  },
+  "dir": "067"
+ },
+ {
+  "name": "Ice Wizard",
+  "slug": "ice_wizard",
+  "elixir": 3,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "143",
+   "Spawn Damage": "14",
+   "Hitpoints": "110",
+   "Hit Speed": "117",
+   "Slowdown Duration": "2",
+   "Targets": "Aib & Ground",
+   "Speed": "Mlediu",
+   "Range": "55"
+  },
+  "dir": "068"
+ },
+ {
+  "name": "Earthquake",
+  "slug": "earthquake",
+  "elixir": 3,
+  "rarity": "Rare",
+  "type": "Spell",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage/Sec": "130",
+   "Crown Tower Damage": "78",
+   "Slowdown Enemies": "55038",
+   "Building Damage/Sec": "455",
+   "Duration": "Bsec",
+   "Radius": "35"
+  },
+  "dir": "069"
+ },
+ {
+  "name": "Bandit",
+  "slug": "bandit",
+  "elixir": 3,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "310",
+   "Dash Damage": "356",
+   "Damage/Sec": "310",
+   "Hitpoints": "1447",
+   "Hit Speed": "IIsec",
+   "Targets": "Growd",
+   "Speed": "Fast"
+  },
+  "dir": "070"
+ },
+ {
+  "name": "Royal Delivery",
+  "slug": "royal_delivery",
+  "elixir": 3,
+  "rarity": "Common",
+  "type": "Spell",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "613",
+   "Count": "1",
+   "Radius": "3",
+   "Royal Recruits Level": "16"
+  },
+  "dir": "071"
+ },
+ {
+  "name": "Elixir Golem",
+  "slug": "elixir_golem",
+  "elixir": 3,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "04",
+   "Damage/Sec": "361",
+   "Hitpoints": "2507",
+   "Elixir Golemite Level": "16",
+   "Elixir Blob Level": "16",
+   "Hit Speed": "1sec",
+   "Targets": "Buildings",
+   "Speed": "Elow"
+  },
+  "dir": "072"
+ },
+ {
+  "name": "Tornado",
+  "slug": "tornado",
+  "elixir": 3,
+  "rarity": "Epic",
+  "type": "Spell",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "14",
+   "Crown Tower Damage": "40",
+   "Duration": "[sec",
+   "Radius": "55"
+  },
+  "dir": "073"
+ },
+ {
+  "name": "Clone",
+  "slug": "clone",
+  "elixir": 3,
+  "rarity": "Epic",
+  "type": "Spell",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Cloned Common Level": "16",
+   "Cloned Rare Level": "16",
+   "Cloned Epic Level": "16",
+   "Cloned Legendary Level": "16",
+   "Cloned Champion Level": "16",
+   "Clone Hitpoinbs": "1",
+   "Shield Hitpoints": "V",
+   "Radius": "3"
+  },
+  "dir": "074"
+ },
+ {
+  "name": "Fisherman",
+  "slug": "fisherman",
+  "elixir": 3,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "310",
+   "Damage/Sec": "238",
+   "Hitpoints": "190",
+   "Ranged Atback Range": "35",
+   "Hit Speed": "13sec",
+   "Targets": "Growd",
+   "Speed": "Mlediu",
+   "Range": "Mellee: Medium"
+  },
+  "dir": "075"
+ },
+ {
+  "name": "Musketeer",
+  "slug": "musketeer",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "0153",
+   "Ranged Damage": "347",
+   "Hit Speed": "[sec",
+   "Targets": "Air & Ground",
+   "[sec": "Speed",
+   "Ai & Ground": "Range",
+   "Speed": "Mediu",
+   "Range": "6"
+  },
+  "dir": "076"
+ },
+ {
+  "name": "Little Prince",
+  "slug": "little_prince",
+  "elixir": 3,
+  "rarity": "Champion",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "0",
+   "Ranged Damage": "167",
+   "Hit Speed": "04",
+   "Targets": "Air & Ground",
+   "[Zsec04se": "Speed",
+   "Ai & Ground": "Range",
+   "Speed": "Mediu",
+   "Range": "55"
+  },
+  "dir": "077"
+ },
+ {
+  "name": "Mini P.E.K.K.A",
+  "slug": "mini_pekka",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "1206",
+   "Damage/Sec": "753",
+   "Hitpoints": "2220",
+   "Hit Speed": "16sec",
+   "Targets": "Ground",
+   "Speed": "Fast",
+   "Range": "Mleleg: Etrt"
+  },
+  "dir": "078"
+ },
+ {
+  "name": "Goblin Hut",
+  "slug": "goblin_hut",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Building",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "1885",
+   "Spear Goblin Level": "16",
+   "Spawn Speed": "2.2sec",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Spawn on Death",
+   "Range": "6",
+   "Spawn on Death": "Spear Gobli x1l",
+   "Lifetime": "30sec"
+  },
+  "dir": "079"
+ },
+ {
+  "name": "Goblin Cage",
+  "slug": "goblin_cage",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Building",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "1247",
+   "Goblin Brawler Count": "1",
+   "Spawn on Death": "Goblit Bradler xi]",
+   "Goblin Brawler Level": "16",
+   "Goblit Bradler xi]": "Lifetime",
+   "Lifetime": "2"
+  },
+  "dir": "080"
+ },
+ {
+  "name": "Fireball",
+  "slug": "fireball",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Spell",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "171700",
+   "Crown Tower Damage": "275",
+   "Radius": "25"
+  },
+  "dir": "081"
+ },
+ {
+  "name": "Skeleton Dragons",
+  "slug": "skeleton_dragons",
+  "elixir": 4,
+  "rarity": "Common",
+  "type": "Troop",
+  "count": 2,
+  "swarm": true,
+  "stats": {
+   "Area Damage": "247",
+   "Hitpoints": "895",
+   "Hit Speed": "23",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Range",
+   "Speed": "Fast",
+   "Range": "35",
+   "Count": "2"
+  },
+  "dir": "082"
+ },
+ {
+  "name": "Bomb Tower",
+  "slug": "bomb_tower",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Building",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "355",
+   "Death Damage": "355",
+   "Hitpoints": "2167",
+   "Hit Speed": "118sec",
+   "Targets": "Growd",
+   "Range": "6",
+   "Growd": "Lifetime",
+   "Lifetime": "30sec"
+  },
+  "dir": "083"
+ },
+ {
+  "name": "Battle Ram",
+  "slug": "battle_ram",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "458",
+   "Charge Damage": "916",
+   "Hitpoints": "1546",
+   "Barbarian Level": "16",
+   "Targets": "Buildings",
+   "Speed": "Mediu",
+   "Range": "Meleea Stpont"
+  },
+  "dir": "084"
+ },
+ {
+  "name": "Valkyrie",
+  "slug": "valkyrie",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "425",
+   "Damage/Sec": "283",
+   "Hitpoints": "3047",
+   "Hit Speed": "5sec",
+   "#5sec": "Speed",
+   "Targets": "Growd",
+   "Speed": "Mediu",
+   "Range": "Mellee: Medium"
+  },
+  "dir": "085"
+ },
+ {
+  "name": "Mortar",
+  "slug": "mortar",
+  "elixir": 4,
+  "rarity": "Common",
+  "type": "Building",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "425",
+   "Hitpoints": "2188",
+   "Hit Speed": "4x",
+   "Targets": "Grod",
+   "Range": "01",
+   "Deploy Time": "3",
+   "Lifetime": "30sec"
+  },
+  "dir": "086"
+ },
+ {
+  "name": "Hog Rider",
+  "slug": "hog_rider",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "507",
+   "Damage/Sec": "316",
+   "Hitpoints": "2717",
+   "Hit Speed": "16sec",
+   "Targets": "Buildings",
+   "Speed": "(Veny Fast",
+   "Range": "Meleea Stpont"
+  },
+  "dir": "087"
+ },
+ {
+  "name": "Flying Machine",
+  "slug": "flying_machine",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "9817",
+   "Ranged Damage": "274",
+   "Hit Speed": "1sec",
+   "Targets": "Air & Ground",
+   "#1sec": "Speed",
+   "Ai & Ground": "Range",
+   "Speed": "Fast",
+   "Range": "6"
+  },
+  "dir": "088"
+ },
+ {
+  "name": "Baby Dragon",
+  "slug": "baby_dragon",
+  "elixir": 4,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "269",
+   "Hitpoints": "1840",
+   "Hit Speed": "15sec",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Range",
+   "Speed": "Fast",
+   "Range": "35"
+  },
+  "dir": "089"
+ },
+ {
+  "name": "Battle Healer",
+  "slug": "battle_healer",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "429",
+   "Damage/Sec": "14",
+   "Hitpoints": "3067",
+   "Hit Speed": "Zzec",
+   "Zzec": "Speed",
+   "Targets": "Ground",
+   "Speed": "Mediu",
+   "Range": "Meleea [ong",
+   "Heal per Atback": "160"
+  },
+  "dir": "090"
+ },
+ {
+  "name": "Dark Prince",
+  "slug": "dark_prince",
+  "elixir": 4,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "425",
+   "Charge Damage": "850",
+   "Damage/Sec": "303",
+   "Hitpoints": "1918",
+   "Shield Hitpoints": "384",
+   "Hit Speed": "14sec",
+   "Targets": "Growd",
+   "Speed": "Mlediu"
+  },
+  "dir": "091"
+ },
+ {
+  "name": "Rune Giant",
+  "slug": "rune_giant",
+  "elixir": 4,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "245",
+   "Damage/Sec": "163",
+   "Hitpoints": "4499",
+   "Hit Speed": "15sec",
+   "Targets": "Buildings",
+   "Speed": "Mediu",
+   "Range": "Mellee: Medium",
+   "Bonus Damage": "351"
+  },
+  "dir": "092"
+ },
+ {
+  "name": "Freeze",
+  "slug": "freeze",
+  "elixir": 4,
+  "rarity": "Epic",
+  "type": "Spell",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "237",
+   "Crown Tower Damage": "60",
+   "Freeze Duration": "4sec",
+   "Radius": "3"
+  },
+  "dir": "093"
+ },
+ {
+  "name": "Poison",
+  "slug": "poison",
+  "elixir": 4,
+  "rarity": "Epic",
+  "type": "Spell",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage/Sec": "147",
+   "Crown Tower Damage": "4",
+   "Slowdown Enemies": "41593",
+   "Duration": "Bs",
+   "Radius": "35"
+  },
+  "dir": "094"
+ },
+ {
+  "name": "Tesla",
+  "slug": "tesla",
+  "elixir": 4,
+  "rarity": "Common",
+  "type": "Building",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "351",
+   "Damage/Sec": "319",
+   "Hitpoints": "1889",
+   "Hit Speed": "1sec",
+   "#1sec": "Range",
+   "Targets": "Aib & Ground",
+   "Range": "55",
+   "Aib & Groud": "Lifetime",
+   "Lifetime": "25"
+  },
+  "dir": "095"
+ },
+ {
+  "name": "Furnace",
+  "slug": "furnace",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "0161",
+   "Ranged Damage": "286",
+   "Fire Spirit Level": "16",
+   "Spawn Speed": "Esec",
+   "Esec": "Targets",
+   "Hit Speed": "1137sec",
+   "Targets": "Aib & Ground",
+   "Speed": "Mlediu",
+   "Range": "55"
+  },
+  "dir": "096"
+ },
+ {
+  "name": "Zappies",
+  "slug": "zappies",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "188",
+   "Damage/Sec": "85",
+   "Hitpoints": "846",
+   "Hit Speed": "22",
+   "Stun Duration": "@Ssec",
+   "Targets": "Aib & Ground",
+   "@Ssec": "Speed",
+   "Speed": "Mlediu",
+   "Range": "455"
+  },
+  "dir": "097"
+ },
+ {
+  "name": "Hunter",
+  "slug": "hunter",
+  "elixir": 4,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "1415",
+   "Ranged Damage": "134x",
+   "Hit Speed": "22sec",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Range",
+   "Speed": "Mlediu",
+   "Range": "4",
+   "Mlediu": "Prgjectile Range",
+   "Prgjectile Range": "655"
+  },
+  "dir": "098"
+ },
+ {
+  "name": "Inferno Dragon",
+  "slug": "inferno_dragon",
+  "elixir": 4,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "57",
+   "Damage/Sec": "1142",
+   "Hitpoints": "2069",
+   "Hit Speed": "4sec",
+   "@4sec": "Speed",
+   "Targets": "Aib & Ground",
+   "Speed": "Mediu",
+   "Range": "35"
+  },
+  "dir": "099"
+ },
+ {
+  "name": "Electro Wizard",
+  "slug": "electro_wizard",
+  "elixir": 4,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "188x",
+   "Spawn Damage": "306",
+   "Hitpoints": "0141",
+   "Hit Speed": "118sec",
+   "Stun Duration": "@Ssec",
+   "Targets": "Aib & Ground",
+   "@Ssec": "Speed",
+   "Speed": "Fast",
+   "Range": "5"
+  },
+  "dir": "100"
+ },
+ {
+  "name": "Goblin Demolisher",
+  "slug": "goblin_demolisher",
+  "elixir": 4,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "298",
+   "Death Damage": "646",
+   "Hitpoints": "2077",
+   "Hit Speed": "1sec",
+   "#1sec": "Speed",
+   "Targets": "Ground",
+   "Speed": "Mlediu",
+   "Range": "5",
+   "Acbivabion": "503"
+  },
+  "dir": "101"
+ },
+ {
+  "name": "Phoenix",
+  "slug": "phoenix",
+  "elixir": 4,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "347",
+   "Death Damage": "281",
+   "Damage/Sec": "347",
+   "Hitpoints": "1680",
+   "Phoenix Egg Level": "16",
+   "Hit Speed": "IIsec",
+   "Targets": "Aib",
+   "Speed": "Mlediu"
+  },
+  "dir": "102"
+ },
+ {
+  "name": "Goblin Drill",
+  "slug": "goblin_drill",
+  "elixir": 4,
+  "rarity": "Epic",
+  "type": "Building",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Spawn Damage": "14",
+   "Hitpoints": "2098",
+   "Spawn on Death": "Gobli x2",
+   "Goblin Level": "16",
+   "Gobli x2": "Spawn Speed",
+   "Spawn Speed": "Bsec",
+   "Lifetime": "1"
+  },
+  "dir": "103"
+ },
+ {
+  "name": "Lumberjack",
+  "slug": "lumberjack",
+  "elixir": 4,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "409",
+   "Damage/Sec": "5117",
+   "Hitpoints": "2049",
+   "Hit Speed": "08sec",
+   "Targets": "Ground",
+   "Speed": "VVery Fast",
+   "Range": "Mleleg: Etrt"
+  },
+  "dir": "104"
+ },
+ {
+  "name": "Magic Archer",
+  "slug": "magic_archer",
+  "elixir": 4,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "216",
+   "Hitpoints": "846",
+   "Hit Speed": "1sec",
+   "Targets": "Air & Ground",
+   "#1sec": "Speed",
+   "Ai & Ground": "Range",
+   "Speed": "Mediu",
+   "Range": "7",
+   "Mediu": "Projectile Range",
+   "Projectile Range": "17"
+  },
+  "dir": "105"
+ },
+ {
+  "name": "Night Witch",
+  "slug": "night_witch",
+  "elixir": 4,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "503",
+   "Damage/Sec": "386",
+   "Hitpoints": "1447",
+   "Spawn on Death": "17",
+   "Bat x17": "Spawn Speed",
+   "Bab Level": "16",
+   "Spawn Speed": "5sec",
+   "Hit Speed": "1135",
+   "Targets": "Growd"
+  },
+  "dir": "106"
+ },
+ {
+  "name": "Mother Witch",
+  "slug": "mother_witch",
+  "elixir": 4,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "846",
+   "Ranged Damage": "21",
+   "Hit Speed": "[sec",
+   "Targets": "Air & Ground",
+   "[sec": "Speed",
+   "Speed": "Mediu",
+   "Range": "55",
+   "Cursed Hog Level": "16",
+   "Effect Durabion": "5sec"
+  },
+  "dir": "107"
+ },
+ {
+  "name": "Skeleton King",
+  "slug": "skeleton_king",
+  "elixir": 4,
+  "rarity": "Champion",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "327",
+   "Damage/Sec": "204",
+   "Hitpoints": "3622",
+   "Hit Speed": "16sec",
+   "Targets": "Growd",
+   "Speed": "Mediu",
+   "Range": "Mellee: Medium"
+  },
+  "dir": "108"
+ },
+ {
+  "name": "Golden Knight",
+  "slug": "golden_knight",
+  "elixir": 4,
+  "rarity": "Champion",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "257",
+   "Damage/Sec": "285",
+   "Hitpoints": "2875",
+   "Hit Speed": "9sec",
+   "@9sec": "Speed",
+   "Targets": "Growd",
+   "Speed": "Mediu",
+   "Range": "Mellee: Medium"
+  },
+  "dir": "109"
+ },
+ {
+  "name": "Mighty Miner",
+  "slug": "mighty_miner",
+  "elixir": 4,
+  "rarity": "Champion",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "69",
+   "Damage/Sec": "1122",
+   "Hitpoints": "3595",
+   "Hit Speed": "4sec",
+   "@4sec": "Speed",
+   "Targets": "Growd",
+   "Speed": "Mediu",
+   "Range": "Meleea [ong"
+  },
+  "dir": "110"
+ },
+ {
+  "name": "Giant",
+  "slug": "giant",
+  "elixir": 5,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "04",
+   "Damage/Sec": "269",
+   "Hitpoints": "6339",
+   "Hit Speed": "5sec",
+   "#5sec": "Speed",
+   "Targets": "Buildings",
+   "Speed": "Elow",
+   "Range": "Mellee: Medium"
+  },
+  "dir": "111"
+ },
+ {
+  "name": "Barbarians",
+  "slug": "barbarians",
+  "elixir": 5,
+  "rarity": "Common",
+  "type": "Troop",
+  "count": 5,
+  "swarm": true,
+  "stats": {
+   "Damage": "306",
+   "Damage/Sec": "218",
+   "Hitpoints": "1145",
+   "Hit Speed": "114",
+   "Targets": "Growd",
+   "Speed": "Mlediu",
+   "Range": "Mleleg: Etrt",
+   "Count": "5"
+  },
+  "dir": "112"
+ },
+ {
+  "name": "Wizard",
+  "slug": "wizard",
+  "elixir": 5,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "449",
+   "Hitpoints": "1206",
+   "Hit Speed": "114sec",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Range",
+   "Speed": "Mediu",
+   "Range": "55"
+  },
+  "dir": "113"
+ },
+ {
+  "name": "Witch",
+  "slug": "witch",
+  "elixir": 5,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "2176",
+   "Hitpoints": "1341",
+   "Skelebon Level": "16",
+   "Spawn Speed": "Tsec",
+   "Tsec": "Targets",
+   "Hit Speed": "1sec",
+   "Targets": "Aib & Ground",
+   "Speed": "Mlediu",
+   "Range": "55"
+  },
+  "dir": "114"
+ },
+ {
+  "name": "Royal Hogs",
+  "slug": "royal_hogs",
+  "elixir": 5,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": true,
+  "stats": {
+   "Damage": "018",
+   "Damage/Sec": "98",
+   "Hitpoints": "1337",
+   "Hit Speed": "112",
+   "Targets": "Buildings",
+   "Speed": "(Veny Fast",
+   "Range": "Mleleg: Etrt"
+  },
+  "dir": "115"
+ },
+ {
+  "name": "Balloon",
+  "slug": "balloon",
+  "elixir": 5,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "11022",
+   "Death Damage": "384",
+   "Damage/Sec": "5117",
+   "Hitpoints": "2678",
+   "Hit Speed": "3",
+   "Targets": "Buildings",
+   "Speed": "Mlediu",
+   "Range": "Mleleg: Etrt"
+  },
+  "dir": "116"
+ },
+ {
+  "name": "Inferno Tower",
+  "slug": "inferno_tower",
+  "elixir": 5,
+  "rarity": "Rare",
+  "type": "Building",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "694353",
+   "Damage/Sec": "11728382",
+   "Hitpoints": "2793",
+   "Hit Speed": "4sec",
+   "@4sec": "Range",
+   "Targets": "Aib & Ground",
+   "Range": "6",
+   "Lifetime": "30sec"
+  },
+  "dir": "117"
+ },
+ {
+  "name": "Minion Horde",
+  "slug": "minion_horde",
+  "elixir": 5,
+  "rarity": "Common",
+  "type": "Troop",
+  "count": 6,
+  "swarm": true,
+  "stats": {
+   "Hitpoints": "368",
+   "Ranged Damage": "171",
+   "Hit Speed": "112",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Range",
+   "Speed": "Fast",
+   "Range": "25",
+   "Count": "6"
+  },
+  "dir": "118"
+ },
+ {
+  "name": "Ram Rider",
+  "slug": "ram_rider",
+  "elixir": 5,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "400",
+   "Charge Damage": "807",
+   "Damage/Sec": "235",
+   "Hitpoints": "2822",
+   "Rider Counb": "V",
+   "Rider Level": "16",
+   "Hit Speed": "1137sec",
+   "Targets": "Buildings"
+  },
+  "dir": "119"
+ },
+ {
+  "name": "Prince",
+  "slug": "prince",
+  "elixir": 5,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "625",
+   "Charge Damage": "1251",
+   "Damage/Sec": "446",
+   "Hitpoints": "3067",
+   "Hit Speed": "14sec",
+   "Targets": "Growd",
+   "Speed": "Mlediu",
+   "Range": "Meiee: [ongg"
+  },
+  "dir": "120"
+ },
+ {
+  "name": "Electro Dragon",
+  "slug": "electro_dragon",
+  "elixir": 5,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "1676",
+   "Ranged Damage": "306",
+   "Chained Attacks": "3",
+   "Hit Speed": "215",
+   "Stun Duration": "@Ssec",
+   "Targets": "Aib & Ground",
+   "@Ssec": "Speed",
+   "Speed": "Mlediu",
+   "Range": "35"
+  },
+  "dir": "121"
+ },
+ {
+  "name": "Bowler",
+  "slug": "bowler",
+  "elixir": 5,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "462",
+   "Hitpoints": "3325",
+   "Hit Speed": "25sec",
+   "Targets": "Ground",
+   "Speed": "Elow",
+   "Range": "4",
+   "Elow": "Projectile Range",
+   "Projectile Range": "U"
+  },
+  "dir": "122"
+ },
+ {
+  "name": "Executioner",
+  "slug": "executioner",
+  "elixir": 5,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "28822",
+   "Hitpoints": "2045",
+   "Hit Speed": "24sec",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Range",
+   "Speed": "Mlediu",
+   "Range": "455",
+   "Mlediu": "Projectile Range",
+   "Projectile Range": "U"
+  },
+  "dir": "123"
+ },
+ {
+  "name": "Graveyard",
+  "slug": "graveyard",
+  "elixir": 5,
+  "rarity": "Legendary",
+  "type": "Spell",
+  "count": 12,
+  "swarm": false,
+  "stats": {
+   "Duration": "Esec",
+   "Skelebon Level": "16",
+   "Skeleton Count": "12"
+  },
+  "dir": "124"
+ },
+ {
+  "name": "Rascals",
+  "slug": "rascals",
+  "elixir": 5,
+  "rarity": "Common",
+  "type": "Troop",
+  "count": 2,
+  "swarm": true,
+  "stats": {
+   "Rascal": "1",
+   "Rascal Girl Level": "16",
+   "Rascal Gir] Counb": "2"
+  },
+  "dir": "125"
+ },
+ {
+  "name": "Ronin",
+  "slug": "ronin",
+  "elixir": 5,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "593",
+   "Damage/Sec": "423",
+   "Hitpoints": "2842",
+   "Hit Speed": "114",
+   "Targets": "Ground",
+   "Speed": "Fast",
+   "Fast": "Parry Damage",
+   "Range": "Mellee: Medium",
+   "Charge Damage": "2003",
+   "Mellee: Medium": "Pacry Cooldown"
+  },
+  "dir": "126"
+ },
+ {
+  "name": "Cannon Cart",
+  "slug": "cannon_cart",
+  "elixir": 5,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "2891",
+   "Ranged Damage": "339",
+   "Hit Speed": "@Isec",
+   "Targets": "Ground",
+   "@Isec": "Speed",
+   "Speed": "Mediu",
+   "Range": "55",
+   "Acbivabion": "503"
+  },
+  "dir": "127"
+ },
+ {
+  "name": "Void",
+  "slug": "void",
+  "elixir": 5,
+  "rarity": "Epic",
+  "type": "Spell",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "011",
+   "Crown Tower Damage": "155",
+   "Targets": "57",
+   "Duration": "Asec",
+   "Radius": "25"
+  },
+  "dir": "128"
+ },
+ {
+  "name": "Goblin Machine",
+  "slug": "goblin_machine",
+  "elixir": 5,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "372",
+   "Damage/Sec": "310",
+   "Hitpoints": "3619",
+   "Hit Speed": "112",
+   "Targets": "Growd",
+   "Speed": "Mlediu",
+   "Range": "Mellee: Medium",
+   "Rockeb level": "16"
+  },
+  "dir": "129"
+ },
+ {
+  "name": "Archer Queen",
+  "slug": "archer_queen",
+  "elixir": 5,
+  "rarity": "Champion",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "1599",
+   "Ranged Damage": "359",
+   "Hit Speed": "112",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Range",
+   "Speed": "Mediu",
+   "Range": "5"
+  },
+  "dir": "130"
+ },
+ {
+  "name": "Monk",
+  "slug": "monk",
+  "elixir": 5,
+  "rarity": "Champion",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "22",
+   "Combo Damage": "674",
+   "Damage/Sec": "280",
+   "Hitpoints": "3537",
+   "Hit Speed": "085",
+   "Targets": "Growd",
+   "Speed": "Mlediu",
+   "Range": "Mellee: Medium"
+  },
+  "dir": "131"
+ },
+ {
+  "name": "Goblinstein",
+  "slug": "goblinstein",
+  "elixir": 5,
+  "rarity": "Champion",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "0153",
+   "Ranged Damage": "2176",
+   "Hit Speed": "118sec",
+   "Stun Duration": "@Ssec",
+   "@Ssec": "Speed",
+   "Targets": "Aib & Ground",
+   "Speed": "Mlediu",
+   "Range": "55",
+   "Monster Level": "16"
+  },
+  "dir": "132"
+ },
+ {
+  "name": "Rocket",
+  "slug": "rocket",
+  "elixir": 6,
+  "rarity": "Rare",
+  "type": "Spell",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "2372",
+   "Crown Tower Damage": "646",
+   "Radius": "2"
+  },
+  "dir": "133"
+ },
+ {
+  "name": "Giant Skeleton",
+  "slug": "giant_skeleton",
+  "elixir": 6,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "441",
+   "Death Damage": "110",
+   "Damage/Sec": "339",
+   "Hitpoints": "5370",
+   "Hit Speed": "13sec",
+   "Targets": "Growd",
+   "Speed": "Mlediu",
+   "Range": "Mleleg: Etrt"
+  },
+  "dir": "134"
+ },
+ {
+  "name": "Lightning",
+  "slug": "lightning",
+  "elixir": 6,
+  "rarity": "Epic",
+  "type": "Spell",
+  "count": 3,
+  "swarm": false,
+  "stats": {
+   "Damage": "1689",
+   "Crown Tower Damage": "423",
+   "Count": "3",
+   "Stun Duration": "@Ssec",
+   "Radius": "35"
+  },
+  "dir": "135"
+ },
+ {
+  "name": "Barbarian Hut",
+  "slug": "barbarian_hut",
+  "elixir": 6,
+  "rarity": "Rare",
+  "type": "Building",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "1860",
+   "Spawn on Death": "BaRbanianxi",
+   "Barbarian Level": "16",
+   "Spawn Speed": "[sec",
+   "Lifetime": "30sec"
+  },
+  "dir": "136"
+ },
+ {
+  "name": "Royal Giant",
+  "slug": "royal_giant",
+  "elixir": 6,
+  "rarity": "Common",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "5055",
+   "Ranged Damage": "490",
+   "Hit Speed": "118sec",
+   "Targets": "Buiidigs",
+   "Speed": "Elow",
+   "Range": "5"
+  },
+  "dir": "137"
+ },
+ {
+  "name": "Goblin Giant",
+  "slug": "goblin_giant",
+  "elixir": 6,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 2,
+  "swarm": true,
+  "stats": {
+   "Damage": "282",
+   "Damage/Sec": "188",
+   "Hitpoints": "4969",
+   "Spear Goblin Count": "2",
+   "Spear Goblin Level": "16",
+   "Hit Speed": "11",
+   "Targets": "Buildings",
+   "Speed": "Mlediu"
+  },
+  "dir": "138"
+ },
+ {
+  "name": "Elite Barbarians",
+  "slug": "elite_barbarians",
+  "elixir": 6,
+  "rarity": "Common",
+  "type": "Troop",
+  "count": 2,
+  "swarm": true,
+  "stats": {
+   "Damage": "613",
+   "Damage/Sec": "437",
+   "Hitpoints": "2148",
+   "Hit Speed": "114",
+   "Targets": "Growd",
+   "Speed": "Fast",
+   "Range": "Mellee: Medium",
+   "Count": "2"
+  },
+  "dir": "139"
+ },
+ {
+  "name": "X-Bow",
+  "slug": "x_bow",
+  "elixir": 6,
+  "rarity": "Epic",
+  "type": "Building",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "2556",
+   "Ranged Damage": "4",
+   "Hit Speed": "4sec",
+   "Targets": "Grod",
+   "@4sec": "Range",
+   "Range": "01",
+   "Deploy Time": "3",
+   "Lifetime": "30sec"
+  },
+  "dir": "140"
+ },
+ {
+  "name": "Sparky",
+  "slug": "sparky",
+  "elixir": 6,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "2128",
+   "Hitpoints": "2319",
+   "Hit Speed": "4sec",
+   "Targets": "Ground",
+   "Speed": "Elow",
+   "Range": "5"
+  },
+  "dir": "141"
+ },
+ {
+  "name": "Elixir Collector",
+  "slug": "elixir_collector",
+  "elixir": 6,
+  "rarity": "Rare",
+  "type": "Building",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "{og",
+   "Production Speed": "[Bzec",
+   "Lifetime": "35"
+  },
+  "dir": "142"
+ },
+ {
+  "name": "Spirit Empress",
+  "slug": "spirit_empress",
+  "elixir": 6,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "11297",
+   "Ranged Damage": "494",
+   "Hit Speed": "114",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Range",
+   "Speed": "Mlediu",
+   "Range": "5",
+   "Ground Elixir": "3"
+  },
+  "dir": "143"
+ },
+ {
+  "name": "Boss Bandit",
+  "slug": "boss_bandit",
+  "elixir": 6,
+  "rarity": "Champion",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "392",
+   "Dash Damage": "356",
+   "Damage/Sec": "356",
+   "Hitpoints": "4192",
+   "Hit Speed": "1sec",
+   "Targets": "Growd",
+   "Speed": "Fast"
+  },
+  "dir": "144"
+ },
+ {
+  "name": "P.E.K.K.A",
+  "slug": "pekka",
+  "elixir": 7,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "1345",
+   "Damage/Sec": "747",
+   "Hitpoints": "6008",
+   "Hit Speed": "118sec",
+   "Targets": "Growd",
+   "Speed": "Elow",
+   "Range": "Mellee: Medium"
+  },
+  "dir": "145"
+ },
+ {
+  "name": "Royal Recruits",
+  "slug": "royal_recruits",
+  "elixir": 7,
+  "rarity": "Common",
+  "type": "Troop",
+  "count": 1,
+  "swarm": true,
+  "stats": {
+   "Damage": "21",
+   "Damage/Sec": "163",
+   "Hitpoints": "875",
+   "Shield Hitpoints": "384",
+   "Hit Speed": "13sec",
+   "Targets": "Growd",
+   "Growd": "Range",
+   "Speed": "Mlediu",
+   "Range": "Meiee: [ongg"
+  },
+  "dir": "146"
+ },
+ {
+  "name": "Mega Knight",
+  "slug": "mega_knight",
+  "elixir": 7,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Area Damage": "429",
+   "Damage": "858",
+   "Spawn Damage": "687",
+   "Damage/Sec": "252",
+   "Hitpoints": "6380",
+   "Jump Range": "355",
+   "Hit Speed": "7sec",
+   "Targets": "Growd"
+  },
+  "dir": "147"
+ },
+ {
+  "name": "Electro Giant",
+  "slug": "electro_giant",
+  "elixir": 7,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "261",
+   "Reflected Damage": "306",
+   "Reflected Tower Damage": "155",
+   "Damage/Sec": "145",
+   "Hitpoints": "6314",
+   "Hit Speed": "118sec",
+   "Targets": "Buildings",
+   "Speed": "Elow"
+  },
+  "dir": "148"
+ },
+ {
+  "name": "Lava Hound",
+  "slug": "lava_hound",
+  "elixir": 7,
+  "rarity": "Legendary",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "5721",
+   "Ranged Damage": "85",
+   "Lava Pups Level": "16",
+   "Hit Speed": "1",
+   "Targets": "Buildings",
+   "Speed": "Elow",
+   "Range": "35"
+  },
+  "dir": "149"
+ },
+ {
+  "name": "Three Musketeers",
+  "slug": "three_musketeers",
+  "elixir": 9,
+  "rarity": "Rare",
+  "type": "Troop",
+  "count": 1,
+  "swarm": true,
+  "stats": {
+   "Hitpoints": "14017",
+   "Ranged Damage": "327",
+   "Hit Speed": "1",
+   "Targets": "Air & Ground",
+   "Ai & Ground": "Range",
+   "Speed": "Mediu",
+   "Range": "6",
+   "Melee Damage": "503",
+   "Melee Range": "Melee3 Long"
+  },
+  "dir": "150"
+ },
+ {
+  "name": "Golem",
+  "slug": "golem",
+  "elixir": 8,
+  "rarity": "Epic",
+  "type": "Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Damage": "498",
+   "Death Damage": "359",
+   "Damage/Sec": "199",
+   "Hitpoints": "8180",
+   "Golemite Level": "16",
+   "Hit Speed": "2",
+   "Targets": "Buildings",
+   "Speed": "Elow"
+  },
+  "dir": "151"
+ },
+ {
+  "name": "Royal Chef",
+  "slug": "royal_chef",
+  "elixir": null,
+  "rarity": "Legendary",
+  "type": "Tower Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "4302",
+   "Damage/Sec": "113",
+   "Damage": "1173",
+   "Hit Speed": "IIsec",
+   "Targets": "Ai \u20ac Growvd",
+   "Range": "75",
+   "Cooking Time": "2352",
+   "BufF Threshold": "3393"
+  },
+  "dir": "152"
+ },
+ {
+  "name": "Dagger Duchess",
+  "slug": "dagger_duchess",
+  "elixir": null,
+  "rarity": "Legendary",
+  "type": "Tower Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "4406",
+   "Damage/Sec": "342",
+   "Damage": "171",
+   "Hit Speed": "@Ssec",
+   "@Ssec": "Range",
+   "Targets": "Air & Ground",
+   "Range": "75",
+   "Ai & Ground": "Max Daggers",
+   "Max Daggers": "8",
+   "Dagger Charge": "9sec"
+  },
+  "dir": "153"
+ },
+ {
+  "name": "Cannoneer",
+  "slug": "cannoneer",
+  "elixir": null,
+  "rarity": "Epic",
+  "type": "Tower Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "4164",
+   "Damage/Sec": "232",
+   "Damage": "5117",
+   "Hit Speed": "223",
+   "Targets": "Air & Ground",
+   "Range": "75"
+  },
+  "dir": "154"
+ },
+ {
+  "name": "Tower Princess",
+  "slug": "tower_princess",
+  "elixir": null,
+  "rarity": "Common",
+  "type": "Tower Troop",
+  "count": 1,
+  "swarm": false,
+  "stats": {
+   "Hitpoints": "4858",
+   "Damage/Sec": "216",
+   "Damage": "1173",
+   "Hit Speed": "085",
+   "Targets": "Aib & Ground",
+   "Range": "75"
+  },
+  "dir": "155"
  }
 ]
