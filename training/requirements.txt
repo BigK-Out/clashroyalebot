@@ -5,3 +5,5 @@ onnxslim
 onnxruntime
 onnxscript
 easyocr
+pytest
+torchvision
