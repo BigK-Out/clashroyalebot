@@ -42,6 +42,10 @@ struct Args {
     /// Debug frames: saved on battle start/end and every 10 s.
     #[arg(long, default_value = "frames/bot")]
     debug_dir: PathBuf,
+    /// Self-play observer mode: save frames (2 fps, 10 fps after new enemies) and
+    /// observer.jsonl into this match directory.
+    #[arg(long)]
+    selfplay_dir: Option<PathBuf>,
 }
 
 fn save_debug(f: &Frame, dir: &std::path::Path, tag: &str) {
@@ -139,6 +143,20 @@ fn main() -> anyhow::Result<()> {
     let mut last_status = Instant::now();
     let mut recorder = args.record.clone().map(|d| vision::arena::Recorder::new(d, Duration::from_millis(500)));
     let mut last_debug = Instant::now();
+    let mut schedule = selfplay::FrameSchedule::new();
+    let mut observer_log = args
+        .selfplay_dir
+        .as_ref()
+        .map(|d| selfplay::JsonlLog::<selfplay::ObserverRecord>::create(&d.join("observer.jsonl")))
+        .transpose()?;
+    let mut prev_enemies = 0usize;
+    let obs = |kind: &str, card: Option<String>, tile: Option<(u32, u32)>, enemies: &[(u32, u32)]| selfplay::ObserverRecord {
+        host_ms: selfplay::host_ms(),
+        kind: kind.into(),
+        card,
+        tile,
+        enemies: enemies.to_vec(),
+    };
     loop {
         let Some(frame) = latest.lock().unwrap().take_if(|f| f.seq != last_seq) else {
             // In battle the screen always animates; seconds without frames = capture is dead.
@@ -170,6 +188,23 @@ fn main() -> anyhow::Result<()> {
         }
         let state = tracker.state().clone();
         let perceive_ms = t_perceive.elapsed().as_secs_f64() * 1e3;
+        if let Some(dir) = args.selfplay_dir.as_ref().filter(|_| state.in_battle) {
+            let now = selfplay::host_ms();
+            if state.enemies.len() > prev_enemies {
+                schedule.burst(now);
+                if let Some(log) = observer_log.as_mut() {
+                    log.append(&obs("new_enemy", None, None, &state.enemies))?;
+                }
+            }
+            prev_enemies = state.enemies.len();
+            if schedule.should_save(now) {
+                let path = dir.join("frames").join(format!("{now}.jpg"));
+                std::fs::create_dir_all(path.parent().unwrap())?;
+                let img = image::RgbImage::from_raw(frame.width, frame.height, frame.rgb.clone()).context("frame size")?;
+                let mut out = std::io::BufWriter::new(std::fs::File::create(&path)?);
+                image::codecs::jpeg::JpegEncoder::new_with_quality(&mut out, 92).encode_image(&img)?;
+            }
+        }
         if let Some(rec) = recorder.as_mut()
             && let Err(e) = rec.maybe_save(&frame, &calib, state.in_battle)
         {
@@ -195,6 +230,9 @@ fn main() -> anyhow::Result<()> {
 
         if state.in_battle != was_in_battle {
             was_in_battle = state.in_battle;
+            if let Some(log) = observer_log.as_mut() {
+                log.append(&obs(if state.in_battle { "battle_start" } else { "battle_end" }, None, None, &state.enemies))?;
+            }
             save_debug(&frame, &args.debug_dir, if state.in_battle { "start" } else { "end" });
             if state.in_battle {
                 tracing::info!("battle started");
@@ -237,6 +275,9 @@ fn main() -> anyhow::Result<()> {
         };
         actions += 1;
         tracker.mark_played(slot);
+        if let Some(log) = observer_log.as_mut() {
+            log.append(&obs("deploy", Some(card.clone()), Some((col, row)), &state.enemies))?;
+        }
         policy.on_action(&action, &state);
         settle_until = Instant::now() + SETTLE;
         tracing::info!(

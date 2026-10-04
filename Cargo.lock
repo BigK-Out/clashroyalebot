@@ -587,6 +587,7 @@ dependencies = [
  "detect",
  "image",
  "input",
+ "selfplay",
  "state",
  "tracing",
  "tracing-subscriber",
