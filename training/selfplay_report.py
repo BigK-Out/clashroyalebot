@@ -6,7 +6,7 @@ from pathlib import Path
 
 root = Path("../dataset/selfplay")
 cards = {c["slug"] for c in json.load(open("../assets/cards.json")) if c["type"] != "Tower Troop"}
-plays, offsets, frames, complete, total, verified = collections.Counter(), [], [], 0, 0, [0, 0]
+plays, offsets, frames, videos, complete, total, verified = collections.Counter(), [], [], [], 0, 0, [0, 0]
 for m in sorted(p for p in root.iterdir() if (p / "meta.json").exists()):
     meta = json.load(open(m / "meta.json"))
     total += 1
@@ -15,8 +15,9 @@ for m in sorted(p for p in root.iterdir() if (p / "meta.json").exists()):
     complete += 1
     if meta.get("clock_offset_ms") is not None:
         offsets.append(meta["clock_offset_ms"])
-    frames.append(len(list((m / "frames").glob("*.jpg"))))
-    for line in open(m / "plays.jsonl"):
+    frames.append(len(list((m / "frames").glob("*.jpg"))) if (m / "frames").exists() else 0)
+    videos.append(sum(v.stat().st_size for v in m.glob("*.mkv")) / 1e6)
+    for line in (l for f in sorted(m.glob("plays*.jsonl")) for l in open(f)):
         p = json.loads(line)
         verified[0] += p["verified"]
         verified[1] += 1
@@ -31,6 +32,7 @@ lines = [
     f"clock offset ms: median {statistics.median(offsets) if offsets else None}, "
     f"range {min(offsets, default=None)}..{max(offsets, default=None)}",
     f"frames per match: median {statistics.median(frames) if frames else 0}",
+    f"video MB per match: median {statistics.median(videos) if videos else 0:.0f}, total {sum(videos) / 1e3:.1f} GB",
 ]
 text = "\n".join(lines)
 print(text)

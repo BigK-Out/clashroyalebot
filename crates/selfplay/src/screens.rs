@@ -22,6 +22,9 @@ pub struct ScreenCheck {
 pub struct PhoneFlows {
     pub screens: Vec<ScreenCheck>,
     pub taps: HashMap<String, (f64, f64)>,
+    /// Checks that must hold before a risky step (not screens; never used by `classify`).
+    #[serde(default)]
+    pub guards: Vec<ScreenCheck>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -125,7 +128,9 @@ mod tests {
         for s in ["result", "deck_view", "tower_pick", "connection_lost", "friends_list"] {
             assert!(f.note9.taps.contains_key(recovery_tap(Some(s)).unwrap()), "note9 {s}");
         }
-        assert!(f.note14.taps.contains_key(recovery_tap(Some("result")).unwrap()));
+        for s in ["result", "deck_view", "connection_lost"] {
+            assert!(f.note14.taps.contains_key(recovery_tap(Some(s)).unwrap()), "note14 {s}");
+        }
     }
 
     #[test]
@@ -134,6 +139,17 @@ mod tests {
         let f = flows();
         let frame = capture::load_rgb(root().join("fixtures/screens/note9/spectating.png")).unwrap();
         assert_eq!(classify(&frame, &f.note9.screens), None);
+    }
+
+    #[test]
+    fn spare_deck_guard_on_note14() {
+        // Rotation may only copy into Khazar's spare deck 4, never the ladder deck.
+        let f = flows();
+        let guard = f.note14.guards.iter().find(|g| g.name == "spare_deck_selected").unwrap();
+        let on4 = capture::load_rgb(root().join("fixtures/screens/note14/deck_view.png")).unwrap();
+        assert!(matches(&on4, guard));
+        let elsewhere = capture::load_rgb(root().join("fixtures/screens/note14/main.png")).unwrap();
+        assert!(!matches(&elsewhere, guard));
     }
 
     #[test]

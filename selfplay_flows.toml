@@ -114,6 +114,36 @@ tol = 40
 min_frac = 0.6
 
 [[note14.screens]]
+name = "connection_lost"  # grey Connection lost dialog (screen-centred, so first)
+x = 0.2257
+y = 0.5125
+w = 0.5382
+h = 0.0234
+rgb = [66, 66, 66]
+tol = 12
+min_frac = 0.9
+
+[[note14.screens]]
+name = "copy_deck"  # yellow "Copy to Deck N" button
+x = 0.0694
+y = 0.8195
+w = 0.1910
+h = 0.0039
+rgb = [255, 203, 85]
+tol = 15
+min_frac = 0.9
+
+[[note14.screens]]
+name = "deck_view"  # light-blue selected "Decks" tab
+x = 0.1215
+y = 0.1094
+w = 0.0694
+h = 0.0063
+rgb = [48, 142, 207]
+tol = 40
+min_frac = 0.6
+
+[[note14.screens]]
 name = "main"  # yellow Battle button, strip above the text
 x = 0.3559
 y = 0.7945
@@ -165,7 +195,20 @@ battle_tab = [0.5729, 0.9575]       # crossed swords in the bottom bar (back to 
 retry_login = [0.3648, 0.5530]      # RETRY LOGIN in the Connection lost dialog
 social_battle_tab = [0.4028, 0.9575]  # crossed swords in the bottom bar of the Social screen
 
+[[note14.guards]]
+name = "spare_deck_selected"  # yellow selected tab "4" (spare deck); deck rotation refuses any other deck
+x = 0.6458
+y = 0.1656
+w = 0.0694
+h = 0.0078
+rgb = [251, 214, 95]
+tol = 30
+min_frac = 0.6
+
 [note14.taps]
 social_tab = [0.7463, 0.9608]       # Social tab in the bottom bar (invite badge)
 accept_invite = [0.6389, 0.4142]    # yellow Friendly Battle on the invite panel
+copy_button = [0.5, 0.8328]         # "Copy to Deck 4"
+battle_tab = [0.5799, 0.9533]       # crossed swords in the bottom bar (back to main)
+retry_login = [0.3648, 0.5517]      # RETRY LOGIN in the Connection lost dialog
 result_ok = [0.5, 0.8483]

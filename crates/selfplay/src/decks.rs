@@ -56,7 +56,7 @@ pub fn copy_deck_link(deck: &[String]) -> anyhow::Result<String> {
 }
 
 /// The 8 cards on the Decks screen (scrolled to the top), row by row: card rects measured on
-/// the Note 9 at 576x1248 (card frame without the "Max" band, like the Info portraits).
+/// 576-px-wide screenshots (card frame without the "Max" band, like the Info portraits).
 pub fn read_deck(frame: &capture::Frame, lib: &vision::CardLibrary) -> Vec<Option<String>> {
     const COLS: [f64; 4] = [20.0, 159.0, 298.0, 437.0];
     const ROWS: [f64; 2] = [318.0, 543.0];
@@ -64,18 +64,21 @@ pub fn read_deck(frame: &capture::Frame, lib: &vision::CardLibrary) -> Vec<Optio
     ROWS.iter()
         .flat_map(|&y| COLS.iter().map(move |&x| (x, y)))
         .map(|(x, y)| {
-            let rect = calib::NRect { x: x / 576.0, y: y / 1248.0, w: SIZE.0 / 576.0, h: SIZE.1 / 1248.0 };
+            // The Decks screen is laid out from the top: same pixels on 576x1248 and 576x1280.
+            let fh = frame.height as f64;
+            let rect = calib::NRect { x: x / 576.0, y: y / fh, w: SIZE.0 / 576.0, h: SIZE.1 / fh };
             lib.read_card(frame, rect).name().map(str::to_string)
         })
         .collect()
 }
 
 /// The deck read back from the Decks screen is `want`: every recognized card belongs to it,
-/// none twice, and at most one slot is unread (the gold hero slot does not match portraits).
+/// none twice, and at least 5 are recognized. A copy is all or nothing, so 5 cards of the new
+/// deck prove it; the gold hero slot and evolution frames often do not match the portraits.
 pub fn deck_matches(read: &[Option<String>], want: &[String]) -> bool {
     let known: Vec<&String> = read.iter().flatten().collect();
     let distinct: std::collections::HashSet<&String> = known.iter().copied().collect();
-    known.len() >= 7 && distinct.len() == known.len() && known.iter().all(|c| want.contains(c))
+    known.len() >= 5 && distinct.len() == known.len() && known.iter().all(|c| want.contains(c))
 }
 
 #[cfg(test)]
@@ -168,6 +171,31 @@ mod tests {
         // The old Hog deck on screen must not pass as this one.
         let hog = capture::load_rgb(root.join("fixtures/screens/note9/deck_view.png")).unwrap();
         assert!(!super::deck_matches(&super::read_deck(&hog, &lib), &want));
+    }
+
+    #[test]
+    fn reads_the_deck_on_the_note14_too() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let deck = ["hog_rider", "musketeer", "cannon", "ice_golem", "skeletons", "ice_spirit", "the_log", "fireball"];
+        let lib = vision::CardLibrary::load_subset(root.join("assets/cards_all"), &deck).unwrap();
+        let f = capture::load_rgb(root.join("fixtures/screens/note14/deck_view.png")).unwrap();
+        let read = super::read_deck(&f, &lib);
+        assert!(read.iter().flatten().count() >= 7, "{read:?}");
+        assert!(super::deck_matches(&read, &deck.map(String::from)));
+    }
+
+    #[test]
+    fn hero_and_evolution_frames_still_verify() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let deck = ["executioner", "goblinstein", "goblins", "suspicious_bush", "mortar", "rascals", "rocket", "pekka"];
+        let lib = vision::CardLibrary::load_subset(root.join("assets/cards_all"), &deck).unwrap();
+        let want: Vec<String> = deck.map(String::from).to_vec();
+        let f = capture::load_rgb(root.join("fixtures/screens/note9/deck_view_goblinstein.png")).unwrap();
+        assert!(super::deck_matches(&super::read_deck(&f, &lib), &want));
+        let f14 = capture::load_rgb(root.join("fixtures/screens/note14/deck_view_goblinstein.png")).unwrap();
+        assert!(super::deck_matches(&super::read_deck(&f14, &lib), &want), "{:?}", super::read_deck(&f14, &lib));
+        let hog = capture::load_rgb(root.join("fixtures/screens/note9/deck_view.png")).unwrap();
+        assert!(!super::deck_matches(&super::read_deck(&hog, &lib), &want), "{:?}", super::read_deck(&hog, &lib));
     }
 
     #[test]
