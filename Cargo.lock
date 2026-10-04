@@ -3312,6 +3312,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813"
 
 [[package]]
+name = "selfplay"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "brain",
+ "fastrand",
+ "serde",
+ "serde_json",
+ "tempfile",
+]
+
+[[package]]
 name = "semver"
 version = "1.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"

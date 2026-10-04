@@ -1,0 +1,15 @@
+[package]
+name = "selfplay"
+edition.workspace = true
+version.workspace = true
+publish.workspace = true
+
+[dependencies]
+anyhow = "1.0.104"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1"
+fastrand = "2"
+brain = { version = "0.1.0", path = "../brain" }
+
+[dev-dependencies]
+tempfile = "3"
