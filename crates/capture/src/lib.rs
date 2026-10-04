@@ -1,11 +1,13 @@
 //! Frame sources: live v4l2 (scrcpy → v4l2loopback) and image directories for offline work.
 
+mod adb_screencap;
 mod dir_source;
 mod v4l_source;
 pub mod yuv;
 
 use std::time::Instant;
 
+pub use adb_screencap::{decode_png_scaled, screencap};
 pub use dir_source::DirSource;
 pub use v4l_source::V4lSource;
 
