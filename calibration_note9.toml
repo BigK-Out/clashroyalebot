@@ -1,0 +1,57 @@
+# Redmi Note 9 (1080x2340); normalized 0..1. Derived from calibration.toml (Note 14) by
+# measuring fixtures/note9 at 576x1248: same horizontal scale; the red no-deploy outline sits
+# 18 px higher and the bottom HUD (elixir bar, hand) 32 px higher than on the Note 14's 576x1280.
+screen_width = 1080
+screen_height = 2340
+
+[elixir_bar]
+x = 0.27037
+y = 0.97136
+w = 0.69444
+h = 0.01838
+
+[[card_slots]]
+x = 0.22500
+y = 0.86154
+w = 0.17315
+h = 0.09829
+
+[[card_slots]]
+x = 0.41296
+y = 0.86154
+w = 0.17315
+h = 0.09829
+
+[[card_slots]]
+x = 0.60093
+y = 0.86154
+w = 0.17315
+h = 0.09829
+
+[[card_slots]]
+x = 0.78889
+y = 0.86154
+w = 0.17315
+h = 0.09829
+
+[next_card]
+x = 0.05370
+y = 0.94530
+w = 0.07870
+h = 0.04444
+
+[arena.top_left]
+x = 0.02222
+y = 0.11528
+
+[arena.top_right]
+x = 0.97778
+y = 0.11528
+
+[arena.bottom_right]
+x = 0.97778
+y = 0.74273
+
+[arena.bottom_left]
+x = 0.02222
+y = 0.74273

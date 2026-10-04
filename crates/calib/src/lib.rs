@@ -262,4 +262,16 @@ mod repo_calibration {
         let p = m.tile_center(0, 0);
         assert!(p.x > 0.0 && p.x < 0.1 && p.y > 0.1 && p.y < 0.2, "{p:?}");
     }
+
+    #[test]
+    fn note9_calibration_loads_and_maps() {
+        use super::Calibration;
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let c = Calibration::load(root.join("calibration_note9.toml")).unwrap();
+        let m = c.arena_mapping().unwrap();
+        // Bridges are at rows 15-16; the left bridge tile must be in the upper-middle of the screen.
+        let p = m.tile_center(3, 15);
+        assert!((0.1..0.35).contains(&p.x) && (0.35..0.6).contains(&p.y), "{p:?}");
+        assert!(c.card_slots.iter().all(|s| s.y > 0.8), "card slots at the bottom");
+    }
 }

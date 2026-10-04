@@ -58,3 +58,16 @@ fn reads_elixir_and_hand_on_labeled_frames() {
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
+
+#[test]
+fn note9_elixir_and_hand_read() {
+    let calib = Calibration::load(root().join("calibration_note9.toml")).unwrap();
+    let cards = CardLibrary::load(root().join("assets/cards")).unwrap();
+    for i in 1..=5 {
+        let f = capture::load_rgb(root().join(format!("fixtures/note9/battle_{i}.png"))).unwrap();
+        assert!(read_elixir(&f, &calib).is_some(), "elixir on battle_{i}");
+        let hand = cards.read_hand(&f, &calib);
+        let known = hand.slots.iter().filter(|s| s.name().is_some()).count();
+        assert!(known >= 3, "battle_{i}: {:?}", hand.slots);
+    }
+}
