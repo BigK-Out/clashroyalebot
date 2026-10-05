@@ -19,7 +19,11 @@
    "Count": "3"
   },
   "dir": "000",
-  "id": 26000010
+  "id": 26000010,
+  "roles": [
+   "swarm",
+   "cycle"
+  ]
  },
  {
   "name": "Fire Spirit",
@@ -37,7 +41,10 @@
    "Range": "25"
   },
   "dir": "001",
-  "id": 26000031
+  "id": 26000031,
+  "roles": [
+   "cycle"
+  ]
  },
  {
   "name": "Electro Spirit",
@@ -58,7 +65,10 @@
    "Range": "25"
   },
   "dir": "002",
-  "id": 26000084
+  "id": 26000084,
+  "roles": [
+   "cycle"
+  ]
  },
  {
   "name": "Ice Spirit",
@@ -79,7 +89,10 @@
    "Range": "25"
   },
   "dir": "003",
-  "id": 26000030
+  "id": 26000030,
+  "roles": [
+   "cycle"
+  ]
  },
  {
   "name": "Goblins",
@@ -100,7 +113,11 @@
    "Range": "Meleg: Etrt"
   },
   "dir": "004",
-  "id": 26000002
+  "id": 26000002,
+  "roles": [
+   "swarm",
+   "cycle"
+  ]
  },
  {
   "name": "Heal Spirit",
@@ -120,7 +137,10 @@
    "Range": "25"
   },
   "dir": "005",
-  "id": 28000016
+  "id": 28000016,
+  "roles": [
+   "cycle"
+  ]
  },
  {
   "name": "Mirror",
@@ -132,7 +152,8 @@
   "swarm": false,
   "stats": {},
   "dir": "006",
-  "id": 28000006
+  "id": 28000006,
+  "roles": []
  },
  {
   "name": "Spear Goblins",
@@ -153,7 +174,11 @@
    "Count": "3"
   },
   "dir": "008",
-  "id": 26000019
+  "id": 26000019,
+  "roles": [
+   "swarm",
+   "cycle"
+  ]
  },
  {
   "name": "Giant Snowball",
@@ -170,7 +195,10 @@
    "Radius": "25"
   },
   "dir": "010",
-  "id": 28000017
+  "id": 28000017,
+  "roles": [
+   "spell_small"
+  ]
  },
  {
   "name": "Bomber",
@@ -189,7 +217,11 @@
    "Range": "455"
   },
   "dir": "011",
-  "id": 26000013
+  "id": 26000013,
+  "roles": [
+   "support",
+   "cycle"
+  ]
  },
  {
   "name": "Bats",
@@ -210,7 +242,11 @@
    "Count": "5"
   },
   "dir": "012",
-  "id": 26000049
+  "id": 26000049,
+  "roles": [
+   "swarm",
+   "cycle"
+  ]
  },
  {
   "name": "Zap",
@@ -226,7 +262,10 @@
    "Radius": "25"
   },
   "dir": "013",
-  "id": 28000008
+  "id": 28000008,
+  "roles": [
+   "spell_small"
+  ]
  },
  {
   "name": "The Log",
@@ -244,7 +283,10 @@
    "Range": "10517"
   },
   "dir": "017",
-  "id": 28000011
+  "id": 28000011,
+  "roles": [
+   "spell_small"
+  ]
  },
  {
   "name": "Berserker",
@@ -264,7 +306,11 @@
    "Range": "Meleg: Etrt"
   },
   "dir": "018",
-  "id": 26000102
+  "id": 26000102,
+  "roles": [
+   "mini_tank",
+   "cycle"
+  ]
  },
  {
   "name": "Barbarian Barrel",
@@ -282,7 +328,10 @@
    "Barbarian Level": "16"
   },
   "dir": "019",
-  "id": 28000015
+  "id": 28000015,
+  "roles": [
+   "spell_small"
+  ]
  },
  {
   "name": "Ice Golem",
@@ -303,7 +352,11 @@
    "Range": "Meleea Stpont"
   },
   "dir": "020",
-  "id": 26000038
+  "id": 26000038,
+  "roles": [
+   "mini_tank",
+   "cycle"
+  ]
  },
  {
   "name": "Wall Breakers",
@@ -322,7 +375,12 @@
    "Count": "2"
   },
   "dir": "025",
-  "id": 26000058
+  "id": 26000058,
+  "roles": [
+   "win_fast",
+   "swarm",
+   "cycle"
+  ]
  },
  {
   "name": "Suspicious Bush",
@@ -340,7 +398,10 @@
    "Speed": "Mediu"
   },
   "dir": "026",
-  "id": 26000097
+  "id": 26000097,
+  "roles": [
+   "cycle"
+  ]
  },
  {
   "name": "Rage",
@@ -360,7 +421,10 @@
    "Radius": "3"
   },
   "dir": "027",
-  "id": 28000002
+  "id": 28000002,
+  "roles": [
+   "spell_medium"
+  ]
  },
  {
   "name": "Goblin Curse",
@@ -379,7 +443,10 @@
    "Radius": "3"
   },
   "dir": "028",
-  "id": 28000024
+  "id": 28000024,
+  "roles": [
+   "spell_small"
+  ]
  },
  {
   "name": "Knight",
@@ -399,7 +466,10 @@
    "Range": "Mlelleg: Medim"
   },
   "dir": "034",
-  "id": 26000000
+  "id": 26000000,
+  "roles": [
+   "mini_tank"
+  ]
  },
  {
   "name": "Archers",
@@ -421,7 +491,11 @@
    "Count": "2"
   },
   "dir": "035",
-  "id": 26000001
+  "id": 26000001,
+  "roles": [
+   "support",
+   "swarm"
+  ]
  },
  {
   "name": "Minions",
@@ -442,7 +516,10 @@
    "Count": "3"
   },
   "dir": "036",
-  "id": 26000005
+  "id": 26000005,
+  "roles": [
+   "swarm"
+  ]
  },
  {
   "name": "Arrows",
@@ -458,7 +535,10 @@
    "Radius": "35"
   },
   "dir": "037",
-  "id": 28000001
+  "id": 28000001,
+  "roles": [
+   "spell_small"
+  ]
  },
  {
   "name": "Tombstone",
@@ -476,7 +556,11 @@
    "Lifetime": "30sec"
   },
   "dir": "038",
-  "id": 27000009
+  "id": 27000009,
+  "roles": [
+   "building_defense",
+   "building_spawner"
+  ]
  },
  {
   "name": "Cannon",
@@ -497,7 +581,10 @@
    "Lifetime": "30sec"
   },
   "dir": "039",
-  "id": 27000000
+  "id": 27000000,
+  "roles": [
+   "building_defense"
+  ]
  },
  {
   "name": "Mega Minion",
@@ -517,7 +604,10 @@
    "Range": "Melee: [ong"
   },
   "dir": "040",
-  "id": 26000039
+  "id": 26000039,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Skeleton Army",
@@ -532,7 +622,11 @@
    "Skeleton Count": "15"
   },
   "dir": "041",
-  "id": 26000012
+  "id": 26000012,
+  "roles": [
+   "tank_killer",
+   "swarm"
+  ]
  },
  {
   "name": "Guards",
@@ -554,7 +648,11 @@
    "Range": "Meiee: [ongg"
   },
   "dir": "042",
-  "id": 26000025
+  "id": 26000025,
+  "roles": [
+   "mini_tank",
+   "swarm"
+  ]
  },
  {
   "name": "Goblin Barrel",
@@ -570,7 +668,10 @@
    "Goblin Counb": "3"
   },
   "dir": "043",
-  "id": 28000004
+  "id": 28000004,
+  "roles": [
+   "win_fast"
+  ]
  },
  {
   "name": "Vines",
@@ -588,7 +689,10 @@
    "Radius": "25"
   },
   "dir": "044",
-  "id": 28000026
+  "id": 28000026,
+  "roles": [
+   "spell_small"
+  ]
  },
  {
   "name": "Goblin Gang",
@@ -605,7 +709,10 @@
    "Spear Goblin Count": "3"
   },
   "dir": "045",
-  "id": 26000041
+  "id": 26000041,
+  "roles": [
+   "swarm"
+  ]
  },
  {
   "name": "Dart Goblin",
@@ -625,7 +732,10 @@
    "Range": "655"
   },
   "dir": "055",
-  "id": 26000040
+  "id": 26000040,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Princess",
@@ -648,7 +758,10 @@
    "Deploy Time": "1123"
   },
   "dir": "056",
-  "id": 26000026
+  "id": 26000026,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Miner",
@@ -669,7 +782,10 @@
    "Range": "Mellee: Medium"
   },
   "dir": "057",
-  "id": 26000032
+  "id": 26000032,
+  "roles": [
+   "win_fast"
+  ]
  },
  {
   "name": "Skeleton Barrel",
@@ -688,7 +804,10 @@
    "Speed": "Fast"
   },
   "dir": "059",
-  "id": 26000056
+  "id": 26000056,
+  "roles": [
+   "win_fast"
+  ]
  },
  {
   "name": "Firecracker",
@@ -709,7 +828,10 @@
    "Range": "6"
   },
   "dir": "066",
-  "id": 26000064
+  "id": 26000064,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Royal Ghost",
@@ -729,7 +851,10 @@
    "Range": "Mlelleg: Medim"
   },
   "dir": "067",
-  "id": 26000050
+  "id": 26000050,
+  "roles": [
+   "mini_tank"
+  ]
  },
  {
   "name": "Ice Wizard",
@@ -750,7 +875,10 @@
    "Range": "55"
   },
   "dir": "068",
-  "id": 26000023
+  "id": 26000023,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Earthquake",
@@ -769,7 +897,10 @@
    "Radius": "35"
   },
   "dir": "069",
-  "id": 28000014
+  "id": 28000014,
+  "roles": [
+   "spell_medium"
+  ]
  },
  {
   "name": "Bandit",
@@ -789,7 +920,10 @@
    "Speed": "Fast"
   },
   "dir": "070",
-  "id": 26000046
+  "id": 26000046,
+  "roles": [
+   "win_fast"
+  ]
  },
  {
   "name": "Royal Delivery",
@@ -806,7 +940,10 @@
    "Royal Recruits Level": "16"
   },
   "dir": "071",
-  "id": 28000018
+  "id": 28000018,
+  "roles": [
+   "spell_small"
+  ]
  },
  {
   "name": "Elixir Golem",
@@ -827,7 +964,11 @@
    "Speed": "Elow"
   },
   "dir": "072",
-  "id": 26000067
+  "id": 26000067,
+  "roles": [
+   "win_slow",
+   "tank"
+  ]
  },
  {
   "name": "Tornado",
@@ -844,7 +985,10 @@
    "Radius": "55"
   },
   "dir": "073",
-  "id": 28000012
+  "id": 28000012,
+  "roles": [
+   "spell_medium"
+  ]
  },
  {
   "name": "Clone",
@@ -865,7 +1009,10 @@
    "Radius": "3"
   },
   "dir": "074",
-  "id": 28000013
+  "id": 28000013,
+  "roles": [
+   "spell_medium"
+  ]
  },
  {
   "name": "Fisherman",
@@ -886,7 +1033,10 @@
    "Range": "Mellee: Medium"
   },
   "dir": "075",
-  "id": 26000061
+  "id": 26000061,
+  "roles": [
+   "mini_tank"
+  ]
  },
  {
   "name": "Musketeer",
@@ -907,7 +1057,10 @@
    "Range": "6"
   },
   "dir": "076",
-  "id": 26000014
+  "id": 26000014,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Little Prince",
@@ -928,7 +1081,10 @@
    "Range": "55"
   },
   "dir": "077",
-  "id": 26000093
+  "id": 26000093,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Mini P.E.K.K.A",
@@ -948,7 +1104,10 @@
    "Range": "Mleleg: Etrt"
   },
   "dir": "078",
-  "id": 26000018
+  "id": 26000018,
+  "roles": [
+   "tank_killer"
+  ]
  },
  {
   "name": "Goblin Hut",
@@ -969,7 +1128,10 @@
    "Lifetime": "30sec"
   },
   "dir": "079",
-  "id": 27000001
+  "id": 27000001,
+  "roles": [
+   "building_spawner"
+  ]
  },
  {
   "name": "Goblin Cage",
@@ -988,7 +1150,11 @@
    "Lifetime": "2"
   },
   "dir": "080",
-  "id": 27000012
+  "id": 27000012,
+  "roles": [
+   "tank_killer",
+   "building_defense"
+  ]
  },
  {
   "name": "Fireball",
@@ -1004,7 +1170,10 @@
    "Radius": "25"
   },
   "dir": "081",
-  "id": 28000000
+  "id": 28000000,
+  "roles": [
+   "spell_medium"
+  ]
  },
  {
   "name": "Skeleton Dragons",
@@ -1025,7 +1194,10 @@
    "Count": "2"
   },
   "dir": "082",
-  "id": 26000080
+  "id": 26000080,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Bomb Tower",
@@ -1046,7 +1218,10 @@
    "Lifetime": "30sec"
   },
   "dir": "083",
-  "id": 27000004
+  "id": 27000004,
+  "roles": [
+   "building_defense"
+  ]
  },
  {
   "name": "Battle Ram",
@@ -1066,7 +1241,10 @@
    "Range": "Meleea Stpont"
   },
   "dir": "084",
-  "id": 26000036
+  "id": 26000036,
+  "roles": [
+   "win_fast"
+  ]
  },
  {
   "name": "Valkyrie",
@@ -1087,7 +1265,10 @@
    "Range": "Mellee: Medium"
   },
   "dir": "085",
-  "id": 26000011
+  "id": 26000011,
+  "roles": [
+   "mini_tank"
+  ]
  },
  {
   "name": "Mortar",
@@ -1107,7 +1288,11 @@
    "Lifetime": "30sec"
   },
   "dir": "086",
-  "id": 27000002
+  "id": 27000002,
+  "roles": [
+   "win_slow",
+   "building_siege"
+  ]
  },
  {
   "name": "Hog Rider",
@@ -1127,7 +1312,10 @@
    "Range": "Meleea Stpont"
   },
   "dir": "087",
-  "id": 26000021
+  "id": 26000021,
+  "roles": [
+   "win_fast"
+  ]
  },
  {
   "name": "Flying Machine",
@@ -1148,7 +1336,10 @@
    "Range": "6"
   },
   "dir": "088",
-  "id": 26000057
+  "id": 26000057,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Baby Dragon",
@@ -1168,7 +1359,10 @@
    "Range": "35"
   },
   "dir": "089",
-  "id": 26000015
+  "id": 26000015,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Battle Healer",
@@ -1190,7 +1384,10 @@
    "Heal per Atback": "160"
   },
   "dir": "090",
-  "id": 26000068
+  "id": 26000068,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Dark Prince",
@@ -1211,7 +1408,10 @@
    "Speed": "Mlediu"
   },
   "dir": "091",
-  "id": 26000027
+  "id": 26000027,
+  "roles": [
+   "mini_tank"
+  ]
  },
  {
   "name": "Rune Giant",
@@ -1232,7 +1432,11 @@
    "Bonus Damage": "351"
   },
   "dir": "092",
-  "id": 26000101
+  "id": 26000101,
+  "roles": [
+   "win_slow",
+   "tank"
+  ]
  },
  {
   "name": "Freeze",
@@ -1249,7 +1453,10 @@
    "Radius": "3"
   },
   "dir": "093",
-  "id": 28000005
+  "id": 28000005,
+  "roles": [
+   "spell_medium"
+  ]
  },
  {
   "name": "Poison",
@@ -1267,7 +1474,10 @@
    "Radius": "35"
   },
   "dir": "094",
-  "id": 28000009
+  "id": 28000009,
+  "roles": [
+   "spell_medium"
+  ]
  },
  {
   "name": "Tesla",
@@ -1289,7 +1499,10 @@
    "Lifetime": "25"
   },
   "dir": "095",
-  "id": 27000006
+  "id": 27000006,
+  "roles": [
+   "building_defense"
+  ]
  },
  {
   "name": "Furnace",
@@ -1311,7 +1524,10 @@
    "Range": "55"
   },
   "dir": "096",
-  "id": 27000010
+  "id": 27000010,
+  "roles": [
+   "building_spawner"
+  ]
  },
  {
   "name": "Zappies",
@@ -1333,7 +1549,10 @@
    "Range": "455"
   },
   "dir": "097",
-  "id": 26000052
+  "id": 26000052,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Hunter",
@@ -1355,7 +1574,10 @@
    "Prgjectile Range": "655"
   },
   "dir": "098",
-  "id": 26000044
+  "id": 26000044,
+  "roles": [
+   "tank_killer"
+  ]
  },
  {
   "name": "Inferno Dragon",
@@ -1376,7 +1598,10 @@
    "Range": "35"
   },
   "dir": "099",
-  "id": 26000037
+  "id": 26000037,
+  "roles": [
+   "tank_killer"
+  ]
  },
  {
   "name": "Electro Wizard",
@@ -1398,7 +1623,10 @@
    "Range": "5"
   },
   "dir": "100",
-  "id": 26000042
+  "id": 26000042,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Goblin Demolisher",
@@ -1420,7 +1648,10 @@
    "Acbivabion": "503"
   },
   "dir": "101",
-  "id": 26000095
+  "id": 26000095,
+  "roles": [
+   "win_fast"
+  ]
  },
  {
   "name": "Phoenix",
@@ -1441,7 +1672,10 @@
    "Speed": "Mlediu"
   },
   "dir": "102",
-  "id": 26000087
+  "id": 26000087,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Goblin Drill",
@@ -1461,7 +1695,10 @@
    "Lifetime": "1"
   },
   "dir": "103",
-  "id": 27000013
+  "id": 27000013,
+  "roles": [
+   "win_fast"
+  ]
  },
  {
   "name": "Lumberjack",
@@ -1481,7 +1718,11 @@
    "Range": "Mleleg: Etrt"
   },
   "dir": "104",
-  "id": 26000035
+  "id": 26000035,
+  "roles": [
+   "mini_tank",
+   "tank_killer"
+  ]
  },
  {
   "name": "Magic Archer",
@@ -1504,7 +1745,10 @@
    "Projectile Range": "17"
   },
   "dir": "105",
-  "id": 26000062
+  "id": 26000062,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Night Witch",
@@ -1526,7 +1770,10 @@
    "Targets": "Growd"
   },
   "dir": "106",
-  "id": 26000048
+  "id": 26000048,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Mother Witch",
@@ -1548,7 +1795,10 @@
    "Effect Durabion": "5sec"
   },
   "dir": "107",
-  "id": 26000083
+  "id": 26000083,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Skeleton King",
@@ -1568,7 +1818,10 @@
    "Range": "Mellee: Medium"
   },
   "dir": "108",
-  "id": 26000069
+  "id": 26000069,
+  "roles": [
+   "mini_tank"
+  ]
  },
  {
   "name": "Golden Knight",
@@ -1589,7 +1842,10 @@
    "Range": "Mellee: Medium"
   },
   "dir": "109",
-  "id": 26000074
+  "id": 26000074,
+  "roles": [
+   "mini_tank"
+  ]
  },
  {
   "name": "Mighty Miner",
@@ -1610,7 +1866,11 @@
    "Range": "Meleea [ong"
   },
   "dir": "110",
-  "id": 26000065
+  "id": 26000065,
+  "roles": [
+   "mini_tank",
+   "tank_killer"
+  ]
  },
  {
   "name": "Giant",
@@ -1631,7 +1891,11 @@
    "Range": "Mellee: Medium"
   },
   "dir": "111",
-  "id": 26000003
+  "id": 26000003,
+  "roles": [
+   "win_slow",
+   "tank"
+  ]
  },
  {
   "name": "Barbarians",
@@ -1652,7 +1916,11 @@
    "Count": "5"
   },
   "dir": "112",
-  "id": 26000008
+  "id": 26000008,
+  "roles": [
+   "tank_killer",
+   "swarm"
+  ]
  },
  {
   "name": "Wizard",
@@ -1672,7 +1940,10 @@
    "Range": "55"
   },
   "dir": "113",
-  "id": 26000017
+  "id": 26000017,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Witch",
@@ -1694,7 +1965,10 @@
    "Range": "55"
   },
   "dir": "114",
-  "id": 26000007
+  "id": 26000007,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Royal Hogs",
@@ -1714,7 +1988,10 @@
    "Range": "Mleleg: Etrt"
   },
   "dir": "115",
-  "id": 26000059
+  "id": 26000059,
+  "roles": [
+   "win_fast"
+  ]
  },
  {
   "name": "Balloon",
@@ -1735,7 +2012,10 @@
    "Range": "Mleleg: Etrt"
   },
   "dir": "116",
-  "id": 26000006
+  "id": 26000006,
+  "roles": [
+   "win_slow"
+  ]
  },
  {
   "name": "Inferno Tower",
@@ -1756,7 +2036,11 @@
    "Lifetime": "30sec"
   },
   "dir": "117",
-  "id": 27000003
+  "id": 27000003,
+  "roles": [
+   "tank_killer",
+   "building_defense"
+  ]
  },
  {
   "name": "Minion Horde",
@@ -1777,7 +2061,11 @@
    "Count": "6"
   },
   "dir": "118",
-  "id": 26000022
+  "id": 26000022,
+  "roles": [
+   "tank_killer",
+   "swarm"
+  ]
  },
  {
   "name": "Ram Rider",
@@ -1798,7 +2086,10 @@
    "Targets": "Buildings"
   },
   "dir": "119",
-  "id": 26000051
+  "id": 26000051,
+  "roles": [
+   "win_fast"
+  ]
  },
  {
   "name": "Prince",
@@ -1819,7 +2110,11 @@
    "Range": "Meiee: [ongg"
   },
   "dir": "120",
-  "id": 26000016
+  "id": 26000016,
+  "roles": [
+   "mini_tank",
+   "tank_killer"
+  ]
  },
  {
   "name": "Electro Dragon",
@@ -1841,7 +2136,10 @@
    "Range": "35"
   },
   "dir": "121",
-  "id": 26000063
+  "id": 26000063,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Bowler",
@@ -1862,7 +2160,10 @@
    "Projectile Range": "U"
   },
   "dir": "122",
-  "id": 26000034
+  "id": 26000034,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Executioner",
@@ -1884,7 +2185,10 @@
    "Projectile Range": "U"
   },
   "dir": "123",
-  "id": 26000045
+  "id": 26000045,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Graveyard",
@@ -1900,7 +2204,10 @@
    "Skeleton Count": "12"
   },
   "dir": "124",
-  "id": 28000010
+  "id": 28000010,
+  "roles": [
+   "win_slow"
+  ]
  },
  {
   "name": "Rascals",
@@ -1916,7 +2223,10 @@
    "Rascal Gir] Counb": "2"
   },
   "dir": "125",
-  "id": 26000053
+  "id": 26000053,
+  "roles": [
+   "swarm"
+  ]
  },
  {
   "name": "Ronin",
@@ -1939,7 +2249,10 @@
    "Mellee: Medium": "Pacry Cooldown"
   },
   "dir": "126",
-  "id": 26000106
+  "id": 26000106,
+  "roles": [
+   "mini_tank"
+  ]
  },
  {
   "name": "Cannon Cart",
@@ -1960,7 +2273,10 @@
    "Acbivabion": "503"
   },
   "dir": "127",
-  "id": 26000054
+  "id": 26000054,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Void",
@@ -1978,7 +2294,10 @@
    "Radius": "25"
   },
   "dir": "128",
-  "id": 28000023
+  "id": 28000023,
+  "roles": [
+   "spell_medium"
+  ]
  },
  {
   "name": "Goblin Machine",
@@ -1999,7 +2318,10 @@
    "Rockeb level": "16"
   },
   "dir": "129",
-  "id": 26000096
+  "id": 26000096,
+  "roles": [
+   "win_slow"
+  ]
  },
  {
   "name": "Archer Queen",
@@ -2019,7 +2341,10 @@
    "Range": "5"
   },
   "dir": "130",
-  "id": 26000072
+  "id": 26000072,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Monk",
@@ -2040,7 +2365,10 @@
    "Range": "Mellee: Medium"
   },
   "dir": "131",
-  "id": 26000077
+  "id": 26000077,
+  "roles": [
+   "mini_tank"
+  ]
  },
  {
   "name": "Goblinstein",
@@ -2062,7 +2390,11 @@
    "Monster Level": "16"
   },
   "dir": "132",
-  "id": 26000099
+  "id": 26000099,
+  "roles": [
+   "win_slow",
+   "tank"
+  ]
  },
  {
   "name": "Rocket",
@@ -2078,7 +2410,11 @@
    "Radius": "2"
   },
   "dir": "133",
-  "id": 28000003
+  "id": 28000003,
+  "roles": [
+   "win_slow",
+   "spell_big"
+  ]
  },
  {
   "name": "Giant Skeleton",
@@ -2099,7 +2435,11 @@
    "Range": "Mleleg: Etrt"
   },
   "dir": "134",
-  "id": 26000020
+  "id": 26000020,
+  "roles": [
+   "win_slow",
+   "tank"
+  ]
  },
  {
   "name": "Lightning",
@@ -2117,7 +2457,10 @@
    "Radius": "35"
   },
   "dir": "135",
-  "id": 28000007
+  "id": 28000007,
+  "roles": [
+   "spell_big"
+  ]
  },
  {
   "name": "Barbarian Hut",
@@ -2135,7 +2478,10 @@
    "Lifetime": "30sec"
   },
   "dir": "136",
-  "id": 27000005
+  "id": 27000005,
+  "roles": [
+   "building_spawner"
+  ]
  },
  {
   "name": "Royal Giant",
@@ -2154,7 +2500,11 @@
    "Range": "5"
   },
   "dir": "137",
-  "id": 26000024
+  "id": 26000024,
+  "roles": [
+   "win_slow",
+   "tank"
+  ]
  },
  {
   "name": "Goblin Giant",
@@ -2175,7 +2525,11 @@
    "Speed": "Mlediu"
   },
   "dir": "138",
-  "id": 26000060
+  "id": 26000060,
+  "roles": [
+   "win_slow",
+   "tank"
+  ]
  },
  {
   "name": "Elite Barbarians",
@@ -2196,7 +2550,10 @@
    "Count": "2"
   },
   "dir": "139",
-  "id": 26000043
+  "id": 26000043,
+  "roles": [
+   "tank_killer"
+  ]
  },
  {
   "name": "X-Bow",
@@ -2217,7 +2574,11 @@
    "Lifetime": "30sec"
   },
   "dir": "140",
-  "id": 27000008
+  "id": 27000008,
+  "roles": [
+   "win_slow",
+   "building_siege"
+  ]
  },
  {
   "name": "Sparky",
@@ -2236,7 +2597,10 @@
    "Range": "5"
   },
   "dir": "141",
-  "id": 26000033
+  "id": 26000033,
+  "roles": [
+   "tank_killer"
+  ]
  },
  {
   "name": "Elixir Collector",
@@ -2252,7 +2616,10 @@
    "Lifetime": "35"
   },
   "dir": "142",
-  "id": 27000007
+  "id": 27000007,
+  "roles": [
+   "pump"
+  ]
  },
  {
   "name": "Spirit Empress",
@@ -2273,7 +2640,10 @@
    "Ground Elixir": "3"
   },
   "dir": "143",
-  "id": 28000025
+  "id": 28000025,
+  "roles": [
+   "support"
+  ]
  },
  {
   "name": "Boss Bandit",
@@ -2293,7 +2663,10 @@
    "Speed": "Fast"
   },
   "dir": "144",
-  "id": 26000103
+  "id": 26000103,
+  "roles": [
+   "tank"
+  ]
  },
  {
   "name": "P.E.K.K.A",
@@ -2313,7 +2686,11 @@
    "Range": "Mellee: Medium"
   },
   "dir": "145",
-  "id": 26000004
+  "id": 26000004,
+  "roles": [
+   "tank",
+   "tank_killer"
+  ]
  },
  {
   "name": "Royal Recruits",
@@ -2335,7 +2712,10 @@
    "Range": "Meiee: [ongg"
   },
   "dir": "146",
-  "id": 26000047
+  "id": 26000047,
+  "roles": [
+   "swarm"
+  ]
  },
  {
   "name": "Mega Knight",
@@ -2356,7 +2736,10 @@
    "Targets": "Growd"
   },
   "dir": "147",
-  "id": 26000055
+  "id": 26000055,
+  "roles": [
+   "tank"
+  ]
  },
  {
   "name": "Electro Giant",
@@ -2377,7 +2760,11 @@
    "Speed": "Elow"
   },
   "dir": "148",
-  "id": 26000085
+  "id": 26000085,
+  "roles": [
+   "win_slow",
+   "tank"
+  ]
  },
  {
   "name": "Lava Hound",
@@ -2397,7 +2784,11 @@
    "Range": "35"
   },
   "dir": "149",
-  "id": 26000029
+  "id": 26000029,
+  "roles": [
+   "win_slow",
+   "tank"
+  ]
  },
  {
   "name": "Three Musketeers",
@@ -2419,7 +2810,10 @@
    "Melee Range": "Melee3 Long"
   },
   "dir": "150",
-  "id": 26000028
+  "id": 26000028,
+  "roles": [
+   "win_slow"
+  ]
  },
  {
   "name": "Golem",
@@ -2440,7 +2834,11 @@
    "Speed": "Elow"
   },
   "dir": "151",
-  "id": 26000009
+  "id": 26000009,
+  "roles": [
+   "win_slow",
+   "tank"
+  ]
  },
  {
   "name": "Royal Chef",
@@ -2460,7 +2858,8 @@
    "Cooking Time": "2352",
    "BufF Threshold": "3393"
   },
-  "dir": "152"
+  "dir": "152",
+  "roles": []
  },
  {
   "name": "Dagger Duchess",
@@ -2482,7 +2881,8 @@
    "Max Daggers": "8",
    "Dagger Charge": "9sec"
   },
-  "dir": "153"
+  "dir": "153",
+  "roles": []
  },
  {
   "name": "Cannoneer",
@@ -2500,7 +2900,8 @@
    "Targets": "Air & Ground",
    "Range": "75"
   },
-  "dir": "154"
+  "dir": "154",
+  "roles": []
  },
  {
   "name": "Tower Princess",
@@ -2518,6 +2919,7 @@
    "Targets": "Aib & Ground",
    "Range": "75"
   },
-  "dir": "155"
+  "dir": "155",
+  "roles": []
  }
 ]
