@@ -36,6 +36,41 @@ pub fn plan_decks(seed: u64, rounds: usize) -> Vec<Vec<String>> {
     out
 }
 
+/// Cards the first big collection missed or that the classifier reads worst: Mirror (never
+/// played before its rule), Three Musketeers (9 elixir) and the fast spells.
+pub const FOCUS: [&str; 8] = ["mirror", "three_musketeers", "barbarian_barrel", "rocket", "goblin_barrel", "the_log", "fireball", "giant_snowball"];
+
+/// Decks for a focus round: one per champion, each with 4 of the FOCUS cards (every focus
+/// card in half the decks) and 3 random other cards.
+pub fn plan_focus_decks(seed: u64, rounds: usize) -> Vec<Vec<String>> {
+    let cards = brain::cards();
+    let mut rng = fastrand::Rng::with_seed(seed);
+    let mut champs: Vec<String> = cards.iter().filter(|c| c.rarity.as_deref() == Some("Champion")).map(|c| c.slug.clone()).collect();
+    let mut rest: Vec<String> = cards
+        .iter()
+        .filter(|c| c.kind.as_deref() != Some("Tower Troop") && c.rarity.as_deref() != Some("Champion") && !FOCUS.contains(&c.slug.as_str()))
+        .map(|c| c.slug.clone())
+        .collect();
+    champs.sort();
+    rest.sort();
+    let mut out = Vec::new();
+    for _ in 0..rounds {
+        rng.shuffle(&mut champs);
+        for (i, champ) in champs.iter().enumerate() {
+            let mut d = vec![champ.clone()];
+            d.extend((0..4).map(|k| FOCUS[(i + 2 * k) % FOCUS.len()].to_string()));
+            while d.len() < 8 {
+                let c = &rest[rng.usize(..rest.len())];
+                if !d.contains(c) {
+                    d.push(c.clone());
+                }
+            }
+            out.push(d);
+        }
+    }
+    out
+}
+
 /// The game's copy-deck link for `deck`: opening it on the phone shows "Copy to Deck N".
 pub fn copy_deck_link(deck: &[String]) -> anyhow::Result<String> {
     anyhow::ensure!(deck.len() == 8, "a deck has 8 cards, got {}", deck.len());
@@ -196,6 +231,22 @@ mod tests {
         assert!(super::deck_matches(&super::read_deck(&f14, &lib), &want), "{:?}", super::read_deck(&f14, &lib));
         let hog = capture::load_rgb(root.join("fixtures/screens/note9/deck_view.png")).unwrap();
         assert!(!super::deck_matches(&super::read_deck(&hog, &lib), &want), "{:?}", super::read_deck(&hog, &lib));
+    }
+
+    #[test]
+    fn focus_decks_cover_champions_and_weak_cards() {
+        let decks = super::plan_focus_decks(2, 1);
+        assert_eq!(decks.len(), 8);
+        let champs: HashSet<String> = decks.iter().flatten().filter(|c| champion(c)).cloned().collect();
+        assert_eq!(champs.len(), 8, "every champion once per round");
+        for d in &decks {
+            assert_eq!(d.iter().collect::<HashSet<_>>().len(), 8, "{d:?}");
+            assert_eq!(d.iter().filter(|c| champion(c)).count(), 1, "{d:?}");
+            super::copy_deck_link(d).unwrap();
+        }
+        for f in super::FOCUS {
+            assert!(decks.iter().filter(|d| d.contains(&f.to_string())).count() >= 4, "{f}");
+        }
     }
 
     #[test]

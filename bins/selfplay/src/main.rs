@@ -32,6 +32,9 @@ struct Args {
     /// both decks rotate (the Note 14 only ever in its spare deck 4).
     #[arg(long)]
     both: bool,
+    /// With --rotate: focus decks (one per champion + Mirror, Three Musketeers, fast spells).
+    #[arg(long)]
+    focus: bool,
 }
 
 fn adb() -> String {
@@ -235,9 +238,10 @@ fn main() -> anyhow::Result<()> {
     let mut n9 = AdbShell::open(&adb(), Some(SPARRING))?;
     let mut n14 = AdbShell::open(&adb(), Some(OBSERVER))?;
     let mut failures = 0;
-    let decks = a.rotate.map(|seed| selfplay::plan_decks(seed, a.rounds)).unwrap_or_default();
+    let plan = |seed| if a.focus { selfplay::plan_focus_decks(seed, a.rounds) } else { selfplay::plan_decks(seed, a.rounds) };
+    let decks = a.rotate.map(plan).unwrap_or_default();
     // A different shuffle for the Note 14, so decks meet different opponents every round.
-    let decks14 = a.rotate.filter(|_| a.both).map(|seed| selfplay::plan_decks(seed + 1_000, a.rounds)).unwrap_or_default();
+    let decks14 = a.rotate.filter(|_| a.both).map(|seed| plan(seed + 1_000)).unwrap_or_default();
     for i in 0..a.matches {
         let id = format!("{}_{i:03}", selfplay::host_ms());
         let dir = a.out.join(&id);

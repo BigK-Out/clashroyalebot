@@ -89,3 +89,14 @@ fn portrait_templates_read_note9_hands() {
         }
     }
 }
+
+#[test]
+fn champion_in_hand_reads_from_hand_template() {
+    // Champions sit in the hand in a hexagonal frame; their Info portraits do not match it.
+    let calib = Calibration::load(root().join("calibration_note9.toml")).unwrap();
+    let deck = ["boss_bandit", "royal_ghost", "wizard", "giant_skeleton", "spear_goblins", "royal_hogs", "fire_spirit", "tombstone"];
+    let lib = CardLibrary::load_subset(root().join("assets/cards_all"), &deck).unwrap();
+    let f = capture::load_rgb(root().join("fixtures/note9/hand_boss_bandit.png")).unwrap();
+    let hand = lib.read_hand(&f, &calib);
+    assert_eq!(hand.slots[3].name(), Some("boss_bandit"), "{:?}", hand.slots);
+}

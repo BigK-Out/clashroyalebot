@@ -15,11 +15,13 @@ pub struct SparringPolicy {
     rng: fastrand::Rng,
     last_play_ms: u64,
     wait_ms: u64,
+    /// The last card played (not Mirror): what a Mirror would copy.
+    last_card: Option<String>,
 }
 
 impl SparringPolicy {
     pub fn new(seed: u64) -> Self {
-        Self { rng: fastrand::Rng::with_seed(seed), last_play_ms: 0, wait_ms: 0 }
+        Self { rng: fastrand::Rng::with_seed(seed), last_play_ms: 0, wait_ms: 0, last_card: None }
     }
 
     fn tile_for(&mut self, kind: &str) -> ((u32, u32), bool) {
@@ -50,8 +52,10 @@ impl SparringPolicy {
             .enumerate()
             .filter_map(|(i, c)| {
                 let c = c.as_deref()?;
-                let card = cards.get(c)?;
-                (card.elixir? <= elixir).then(|| (i, c, card.kind.clone().unwrap_or_default()))
+                // Mirror copies the last card at one more elixir, and lands like it.
+                let card = if c == "mirror" { cards.get(self.last_card.as_deref()?)? } else { cards.get(c)? };
+                let cost = card.elixir? + u8::from(c == "mirror");
+                (cost <= elixir).then(|| (i, c, card.kind.clone().unwrap_or_default()))
             })
             .collect();
         if options.is_empty() {
@@ -60,6 +64,9 @@ impl SparringPolicy {
         let (slot, card, kind) = options[self.rng.usize(..options.len())].clone();
         let (tile, enemy_half) = self.tile_for(&kind);
         self.last_play_ms = now_ms;
+        if card != "mirror" {
+            self.last_card = Some(card.to_string());
+        }
         self.wait_ms = self.rng.u64(1_000..=6_000);
         Some(SparPlay { slot, card: card.to_string(), tile, enemy_half })
     }
@@ -114,6 +121,20 @@ mod tests {
         assert_eq!(p.decide(100_200, Some(8), &h), None);
         // Full elixir overrides the wait.
         assert!(p.decide(100_300, Some(10), &h).is_some());
+    }
+
+    #[test]
+    fn mirror_costs_one_more_than_the_last_card() {
+        let mut p = SparringPolicy::new(5);
+        // Nothing played yet: Mirror has nothing to copy.
+        assert_eq!(p.decide(100_000, Some(9), &hand(["", "", "", "mirror"])), None);
+        let first = p.decide(200_000, Some(10), &hand(["", "musketeer", "", ""])).unwrap();
+        assert_eq!(first.card, "musketeer");
+        // Musketeer costs 4: Mirror needs 5.
+        assert_eq!(p.decide(300_000, Some(4), &hand(["", "", "", "mirror"])), None);
+        let m = p.decide(400_000, Some(5), &hand(["", "", "", "mirror"])).unwrap();
+        assert_eq!((m.slot, m.card.as_str(), m.enemy_half), (3, "mirror", false));
+        assert!((17..=31).contains(&m.tile.1), "placed like the mirrored troop: {m:?}");
     }
 
     #[test]
