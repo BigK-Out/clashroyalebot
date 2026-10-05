@@ -63,6 +63,7 @@ pub fn recovery_tap(screen: Option<&str>) -> Option<&'static str> {
         "tower_pick" => Some("tower_ok"),
         "connection_lost" => Some("retry_login"),
         "friends_list" => Some("social_battle_tab"),
+        "copy_deck" => Some("copy_close"),
         _ => None,
     }
 }
@@ -116,6 +117,7 @@ mod tests {
         assert_eq!(recovery_tap(Some("tower_pick")), Some("tower_ok"));
         assert_eq!(recovery_tap(Some("connection_lost")), Some("retry_login"));
         assert_eq!(recovery_tap(Some("friends_list")), Some("social_battle_tab"));
+        assert_eq!(recovery_tap(Some("copy_deck")), Some("copy_close"));
         // Battles finish by themselves; unknown screens are never tapped blind.
         assert_eq!(recovery_tap(Some("battle")), None);
         assert_eq!(recovery_tap(None), None);
@@ -125,10 +127,10 @@ mod tests {
     #[test]
     fn recovery_taps_exist_in_flows() {
         let f = flows();
-        for s in ["result", "deck_view", "tower_pick", "connection_lost", "friends_list"] {
+        for s in ["result", "deck_view", "tower_pick", "connection_lost", "friends_list", "copy_deck"] {
             assert!(f.note9.taps.contains_key(recovery_tap(Some(s)).unwrap()), "note9 {s}");
         }
-        for s in ["result", "deck_view", "connection_lost"] {
+        for s in ["result", "deck_view", "connection_lost", "copy_deck"] {
             assert!(f.note14.taps.contains_key(recovery_tap(Some(s)).unwrap()), "note14 {s}");
         }
     }

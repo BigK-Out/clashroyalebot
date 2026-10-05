@@ -48,51 +48,82 @@ class Clips(Dataset):
             dx, dy = np.random.randint(-8, 9, 2)
             x = torch.roll(x, (int(dy), int(dx)), (2, 3))
             x = x.clamp(0, 1)
-        return x, int(y[i]), f.name.rsplit("_", 1)[0], float(t[i])
+        return x, int(y[i]), f.stem, float(t[i])
+
+
+def save_checkpoint(path, net, opt, sched, epoch, best):
+    torch.save({"net": net.state_dict(), "opt": opt.state_dict(), "sched": sched.state_dict(), "epoch": epoch, "best": best}, path)
+
+
+def load_checkpoint(path, net, opt, sched):
+    """Restores everything; returns (next epoch, best val accuracy so far)."""
+    c = torch.load(path, map_location="cpu")
+    net.load_state_dict(c["net"])
+    opt.load_state_dict(c["opt"])
+    sched.load_state_dict(c["sched"])
+    return c["epoch"] + 1, c["best"]
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--epochs", type=int, default=12)
+    ap.add_argument("--batch", type=int, default=16)
+    ap.add_argument("--resume", action="store_true", help="continue from runs/plays/last.pt")
+    ap.add_argument("--eval-only", action="store_true", help="score runs/plays/best.pt on the validation set")
+    ap.add_argument("--cpu", action="store_true")
     a = ap.parse_args()
+    dev = torch.device("cpu" if a.cpu or not torch.cuda.is_available() else "cuda")
     files = sorted(CLIPS.glob("*_note*.npz"))
-    train = Clips([f for f in files if not is_val(f.name.rsplit("_", 1)[0])], True)
     val = Clips([f for f in files if is_val(f.name.rsplit("_", 1)[0])], False)
+    OUT.mkdir(parents=True, exist_ok=True)
+    if a.eval_only:
+        net = PlayNet(len(CLASSES), pretrained=False).to(dev)
+        net.load_state_dict(torch.load(OUT / "best.pt", map_location=dev))
+        acc2, acc05, preds = evaluate(net, val, dev)
+        np.savez(OUT / "val_preds.npz", **preds)
+        print(f"best.pt: val top-1 @2s {acc2:.4f} @0.5s {acc05:.4f}", flush=True)
+        return
+    train = Clips([f for f in files if not is_val(f.name.rsplit("_", 1)[0])], True)
     print(f"train {len(train)} clips, val {len(val)} clips, {len(files)} files", flush=True)
     counts = np.bincount([train.data[f][1][i] for f, i in train.items], minlength=len(CLASSES))
-    weights = torch.tensor(1.0 / np.sqrt(np.maximum(counts, 1)), dtype=torch.float32).cuda()
-    net = PlayNet(len(CLASSES)).cuda()
+    weights = torch.tensor(1.0 / np.sqrt(np.maximum(counts, 1)), dtype=torch.float32).to(dev)
+    net = PlayNet(len(CLASSES)).to(dev)
     opt = torch.optim.AdamW(net.parameters(), 3e-4, weight_decay=1e-4)
-    sched = torch.optim.lr_scheduler.OneCycleLR(opt, 3e-4, total_steps=a.epochs * (len(train) // 32 + 1))
-    dl = DataLoader(train, 32, shuffle=True, num_workers=4, drop_last=True)
-    best = 0.0
-    OUT.mkdir(parents=True, exist_ok=True)
-    for ep in range(a.epochs):
+    sched = torch.optim.lr_scheduler.OneCycleLR(opt, 3e-4, total_steps=a.epochs * (len(train) // a.batch + 1))
+    # Mixed precision and a small batch keep the laptop GPU's load down (a full-load
+    # run crashed the driver); a checkpoint every epoch makes a crash cost one epoch.
+    scaler = torch.amp.GradScaler(enabled=dev.type == "cuda")
+    dl = DataLoader(train, a.batch, shuffle=True, num_workers=2, drop_last=True)
+    start, best = (load_checkpoint(OUT / "last.pt", net, opt, sched) if a.resume and (OUT / "last.pt").exists() else (0, 0.0))
+    for ep in range(start, a.epochs):
         net.train()
         for x, y, _, _ in dl:
-            x, y = x.cuda(), y.cuda()
-            # Full clip and the early (first 4 frames) readout share the weights.
-            loss = F.cross_entropy(net(x), y, weight=weights) + 0.5 * F.cross_entropy(net(x[:, :4]), y, weight=weights)
+            x, y = x.to(dev), y.to(dev)
+            with torch.autocast(dev.type, enabled=dev.type == "cuda"):
+                # Full clip and the early (first 4 frames) readout share the weights.
+                loss = F.cross_entropy(net(x), y, weight=weights) + 0.5 * F.cross_entropy(net(x[:, :4]), y, weight=weights)
             opt.zero_grad()
-            loss.backward()
-            opt.step()
+            scaler.scale(loss).backward()
+            scaler.step(opt)
+            scaler.update()
             sched.step()
-        acc2, acc05, preds = evaluate(net, val)
+        acc2, acc05, preds = evaluate(net, val, dev)
         print(f"epoch {ep}: val top-1 @2s {acc2:.4f} @0.5s {acc05:.4f}", flush=True)
         if acc2 >= best:
             best = acc2
             torch.save(net.state_dict(), OUT / "best.pt")
             np.savez(OUT / "val_preds.npz", **preds)
-    net.load_state_dict(torch.load(OUT / "best.pt"))
+        save_checkpoint(OUT / "last.pt", net, opt, sched, ep, best)
+    net.load_state_dict(torch.load(OUT / "best.pt", map_location="cpu"))
     export(net.cpu().eval())
 
 
 @torch.no_grad()
-def evaluate(net, val):
+def evaluate(net, val, dev):
     net.eval()
     p2, p05, ys, ms, ts = [], [], [], [], []
-    for x, y, m, t in DataLoader(val, 64, num_workers=4):
-        x = x.cuda()
+    for x, y, m, t in DataLoader(val, 32, num_workers=2):
+        x = x.to(dev)
         p2.append(torch.softmax(net(x), 1).cpu())
         p05.append(torch.softmax(net(x[:, :4]), 1).cpu())
         ys.append(y)
