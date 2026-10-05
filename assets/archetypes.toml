@@ -1,0 +1,24 @@
+# Deck archetypes and their signature cards (from the archetype guide). The enemy deck
+# guess scores each archetype by how many of its signature cards have been seen.
+# A guess needs a score of 2 (two signature cards, or one card of an archetype with weight 2).
+# Edit freely: card names are slugs from assets/cards.json.
+
+[beatdown]
+cards = ["golem", "lava_hound", "giant", "electro_giant", "elixir_collector", "goblin_giant", "elixir_golem", "giant_skeleton"]
+
+[cycle]
+cards = ["hog_rider", "royal_hogs", "royal_giant", "fisherman", "mini_pekka", "skeletons", "ice_spirit"]
+
+[bait]
+cards = ["goblin_barrel", "princess", "skeleton_barrel", "wall_breakers", "goblin_gang", "rocket", "dart_goblin"]
+
+[bridge_spam]
+cards = ["battle_ram", "bandit", "elite_barbarians", "royal_ghost", "pekka", "goblin_hut", "ram_rider", "dark_prince"]
+
+[control]
+cards = ["miner", "goblin_drill", "tesla", "tornado", "executioner", "valkyrie", "poison", "graveyard"]
+
+[siege]
+# One siege building is enough to tell: it counts double.
+weight = 2
+cards = ["x_bow", "mortar"]
