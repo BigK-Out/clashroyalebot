@@ -50,6 +50,14 @@ pub struct MatchMeta {
     pub clock_offset_ms: Option<i64>,
     pub complete: bool,
     pub error: Option<String>,
+    /// Crowns at the end, read from the observer's result screen (bot evaluation runs).
+    #[serde(default)]
+    pub observer_crowns: Option<u8>,
+    #[serde(default)]
+    pub sparring_crowns: Option<u8>,
+    /// The bot binary the observer ran.
+    #[serde(default)]
+    pub bot: Option<String>,
 }
 
 impl MatchMeta {

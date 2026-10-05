@@ -35,6 +35,9 @@ struct Args {
     /// With --rotate: focus decks (one per champion + Mirror, Three Musketeers, fast spells).
     #[arg(long)]
     focus: bool,
+    /// Observer bot binary (bot evaluation: run an older build against the same opponents).
+    #[arg(long, default_value = "target/release/bot")]
+    bot: String,
 }
 
 fn adb() -> String {
@@ -180,10 +183,10 @@ fn run_match_both(dir: &Path, flows: &Flows, n9: &mut AdbShell, n14: &mut AdbShe
     result
 }
 
-fn run_match(dir: &Path, flows: &Flows, n9: &mut AdbShell, n14: &mut AdbShell, deck: &[String]) -> anyhow::Result<()> {
+fn run_match(dir: &Path, flows: &Flows, n9: &mut AdbShell, n14: &mut AdbShell, deck: &[String], bot_bin: &str) -> anyhow::Result<vision::result::Crowns> {
     start_battle(flows, n9, n14)?;
     let dir_s = dir.to_string_lossy().to_string();
-    let mut bot = Command::new("target/release/bot")
+    let mut bot = Command::new(bot_bin)
         .args(["--serial", OBSERVER, "--matches", "1", "--selfplay-dir", &dir_s])
         .stdout(std::fs::File::create(dir.join("bot.log"))?)
         .stderr(std::fs::File::create(dir.join("bot.err"))?)
@@ -202,9 +205,12 @@ fn run_match(dir: &Path, flows: &Flows, n9: &mut AdbShell, n14: &mut AdbShell, d
     if !spar_status.success() || !bot_status.success() {
         bail!("sparring {spar_status}, bot {bot_status}");
     }
+    wait_for(OBSERVER, &flows.note14, "result", Duration::from_secs(20))?;
+    std::thread::sleep(Duration::from_millis(1500)); // crowns animate in
+    let crowns = vision::result::read_crowns(&capture::screencap(&adb(), OBSERVER, 576)?);
     tap_on(n9, SPARRING, &flows.note9, "result", "result_ok")?;
     tap_on(n14, OBSERVER, &flows.note14, "result", "result_ok")?;
-    Ok(())
+    Ok(crowns)
 }
 
 /// After a failed match: tap each phone toward the main screen through recognized screens
@@ -256,7 +262,16 @@ fn main() -> anyhow::Result<()> {
             result = set_deck(&mut n14, OBSERVER, &flows.note14, &deck14);
         }
         let result = result.and_then(|()| {
-            if a.both { run_match_both(&dir, &flows, &mut n9, &mut n14, (&deck, &deck14), i as u64 * 2) } else { run_match(&dir, &flows, &mut n9, &mut n14, &deck) }
+            if a.both {
+                run_match_both(&dir, &flows, &mut n9, &mut n14, (&deck, &deck14), i as u64 * 2)
+            } else {
+                run_match(&dir, &flows, &mut n9, &mut n14, &deck, &a.bot).map(|c| {
+                    meta.observer_crowns = Some(c.mine);
+                    meta.sparring_crowns = Some(c.theirs);
+                    meta.bot = Some(a.bot.clone());
+                    tracing::info!("crowns: bot {} - sparring {}", c.mine, c.theirs);
+                })
+            }
         });
         match result {
             Ok(()) if a.both => {

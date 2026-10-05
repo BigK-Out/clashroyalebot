@@ -4,6 +4,7 @@ pub mod arena;
 pub mod elixir;
 pub mod hand;
 mod patch;
+pub mod result;
 pub mod towers;
 pub mod units;
 
