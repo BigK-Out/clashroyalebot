@@ -29,10 +29,15 @@ class Clips(Dataset):
         for f in files:
             d = np.load(f)
             # Unpack the clips once to a plain .npy next to the npz and memory-map it:
-            # the whole dataset does not fit in RAM.
+            # the whole dataset does not fit in RAM. Then drop the pixels from the npz (they
+            # would be stored twice); it keeps only the labels.
             raw = f.with_suffix(".X.npy")
-            if not raw.exists():
-                np.save(raw, d["X"])
+            if "X" in d.files:
+                if not raw.exists():
+                    np.save(raw, d["X"])
+                labels = {k: d[k] for k in d.files if k != "X"}
+                np.savez(f, **labels)
+                d = np.load(f)
             self.data[f] = (np.load(raw, mmap_mode="r"), d["y"], d["t"])
             self.items += [(f, i) for i in range(len(d["y"]))]
 
@@ -51,13 +56,17 @@ class Clips(Dataset):
         return x, int(y[i]), f.stem, float(t[i])
 
 
-def save_checkpoint(path, net, opt, sched, epoch, best):
-    torch.save({"net": net.state_dict(), "opt": opt.state_dict(), "sched": sched.state_dict(), "epoch": epoch, "best": best}, path)
+def save_checkpoint(path, net, opt, sched, epoch, best, files=None):
+    torch.save({"net": net.state_dict(), "opt": opt.state_dict(), "sched": sched.state_dict(),
+                "epoch": epoch, "best": best, "files": files}, path)
 
 
-def load_checkpoint(path, net, opt, sched):
-    """Restores everything; returns (next epoch, best val accuracy so far)."""
+def load_checkpoint(path, net, opt, sched, files=None):
+    """Restores everything; returns (next epoch, best val accuracy so far). A checkpoint
+    trained on other clip files (an earlier batch) is not resumed: returns (0, 0.0)."""
     c = torch.load(path, map_location="cpu")
+    if files is not None and c.get("files") != files:
+        return 0, 0.0
     net.load_state_dict(c["net"])
     opt.load_state_dict(c["opt"])
     sched.load_state_dict(c["sched"])
@@ -94,7 +103,8 @@ def main():
     # run crashed the driver); a checkpoint every epoch makes a crash cost one epoch.
     scaler = torch.amp.GradScaler(enabled=dev.type == "cuda")
     dl = DataLoader(train, a.batch, shuffle=True, num_workers=2, drop_last=True)
-    start, best = (load_checkpoint(OUT / "last.pt", net, opt, sched) if a.resume and (OUT / "last.pt").exists() else (0, 0.0))
+    names = sorted({f.name for f, _ in train.items})
+    start, best = (load_checkpoint(OUT / "last.pt", net, opt, sched, names) if a.resume and (OUT / "last.pt").exists() else (0, 0.0))
     for ep in range(start, a.epochs):
         net.train()
         for x, y, _, _ in dl:
@@ -113,7 +123,7 @@ def main():
             best = acc2
             torch.save(net.state_dict(), OUT / "best.pt")
             np.savez(OUT / "val_preds.npz", **preds)
-        save_checkpoint(OUT / "last.pt", net, opt, sched, ep, best)
+        save_checkpoint(OUT / "last.pt", net, opt, sched, ep, best, names)
     net.load_state_dict(torch.load(OUT / "best.pt", map_location="cpu"))
     export(net.cpu().eval())
 
