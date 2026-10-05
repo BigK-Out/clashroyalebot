@@ -141,6 +141,7 @@ fn main() -> anyhow::Result<()> {
         }
     };
     let mut enemy_plays: Vec<state::EnemyPlay> = Vec::new();
+    let mut towers = vision::towers::TowerSmoother::default();
     let mut enemy_elixir = brain::enemy::EnemyElixir::default();
     let mut policy = HogCycle::default();
 
@@ -203,6 +204,7 @@ fn main() -> anyhow::Result<()> {
         let hand = elixir.is_some().then(|| cards.read_hand(&frame, &calib));
         tracker.update(frame.captured_at, elixir, hand.as_ref());
         if elixir.is_some() {
+            towers.push(vision::towers::read_towers(&frame, &calib));
             let units = vision::units::detect_units(&frame, &calib, &mapping);
             if plays_on {
                 let enemy_tiles: Vec<(u32, u32)> =
@@ -220,6 +222,9 @@ fn main() -> anyhow::Result<()> {
             tracker.update_units(frame.captured_at, &units, &kinds);
         }
         let mut state = tracker.state().clone();
+        if state.in_battle {
+            state.towers = Some(towers.get());
+        }
         if plays_on && state.in_battle {
             for job in plays.ready(Instant::now(), &calib) {
                 let _ = job_tx.send(job);
@@ -294,6 +299,7 @@ fn main() -> anyhow::Result<()> {
             save_debug(&frame, &args.debug_dir, if state.in_battle { "start" } else { "end" });
             if state.in_battle {
                 enemy_plays.clear();
+                towers = vision::towers::TowerSmoother::default();
                 enemy_elixir = brain::enemy::EnemyElixir::default();
                 tracing::info!("battle started");
                 actions = 0;

@@ -4,6 +4,7 @@ pub mod arena;
 pub mod elixir;
 pub mod hand;
 mod patch;
+pub mod towers;
 pub mod units;
 
 pub use elixir::{Elixir, read_elixir};

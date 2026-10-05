@@ -64,6 +64,8 @@ pub struct GameState {
     pub enemy_plays: Vec<EnemyPlay>,
     /// Estimated enemy elixir (None until the play classifier runs).
     pub enemy_elixir: Option<f32>,
+    /// Princess tower HP from the HP bars (None until read).
+    pub towers: Option<vision::towers::TowerHp>,
 }
 
 impl GameState {

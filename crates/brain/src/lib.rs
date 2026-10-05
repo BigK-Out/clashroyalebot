@@ -3,7 +3,7 @@
 mod cards;
 pub mod enemy;
 
-pub use cards::{Card, Cards, cards};
+pub use cards::{ROLES, Card, Cards, cards};
 
 use std::time::Duration;
 
@@ -159,6 +159,45 @@ const DOUBLE_ELIXIR: Duration = Duration::from_secs(120);
 const PUNISH_AT: f32 = 2.5;
 /// Recognized enemy plays this recent still describe what is on the field.
 const RECENT_PLAY: Duration = Duration::from_secs(8);
+/// Enemy tower at or below this HP fraction: Fireball finishes it (2-3 Fireballs).
+const FIREBALL_FINISH: f32 = 0.12;
+/// Their side's back rows: a tank or pump placed here is slow to arrive (punish the other lane).
+const ENEMY_BACK_ROW: u32 = 8;
+/// Enemy cards The Log kills or pushes away (Hog 2.6 guide: pre-Log their Hog defenders).
+const LOG_KILLS: [&str; 13] = [
+    "skeletons", "goblins", "spear_goblins", "skeleton_army", "goblin_gang", "guards", "princess",
+    "dart_goblin", "wall_breakers", "firecracker", "bomber", "rascals", "fire_spirit",
+];
+
+fn enemy_deck(s: &GameState) -> enemy::EnemyDeck {
+    let mut d = enemy::EnemyDeck::default();
+    for p in &s.enemy_plays {
+        d.on_play(&p.card);
+    }
+    d
+}
+
+fn recent_play<'a>(s: &'a GameState, pred: impl Fn(&cards::Card) -> bool) -> Option<&'a state::EnemyPlay> {
+    s.enemy_plays
+        .iter()
+        .rev()
+        .take_while(|p| s.battle_time.saturating_sub(p.t) < RECENT_PLAY)
+        .find(|p| cards().get(&p.card).is_some_and(&pred))
+}
+
+/// Their Hog counters likely in hand that a pre-Log cannot clear.
+fn blocking_hog_counters(s: &GameState) -> bool {
+    let d = enemy_deck(s);
+    let log_ready = s.slot_of("the_log").is_some() && s.elixir >= 6;
+    d.hog_counters()
+        .iter()
+        .any(|c| d.in_hand(c) == enemy::InHand::Likely && !(log_ready && LOG_KILLS.contains(c)))
+}
+
+/// Enemy towers destroyed minus mine (from the HP bars).
+fn tower_lead(s: &GameState) -> i32 {
+    s.towers.map_or(0, |t| t.enemy.iter().filter(|h| h.is_none()).count() as i32 - t.mine.iter().filter(|h| h.is_none()).count() as i32)
+}
 
 /// Elixir allowed on defense in one lane per window: about what the enemy spent, plus 1.
 fn defense_budget(push_value: f32) -> u8 {
@@ -267,8 +306,11 @@ impl HogCycle {
             let in_group: Vec<_> = kinds.iter().copied().filter(|(t, _)| near(*t, (gc, gr), SWARM_RADIUS)).collect();
             let group_value = push_value(&in_group);
             // The Log rolls up the arena from where it lands: drop it just behind the group.
+            let d = enemy_deck(s);
+            let barrel_coming = d.in_hand("goblin_barrel") == enemy::InHand::Likely && group_value < 5.0;
             if group_value >= 3.0
                 && !air
+                && !barrel_coming
                 && let Some(a) = Self::deploy(s, "the_log", my_side(gc, gr + 2), false, Why::Swarm)
             {
                 return Some(a);
@@ -294,7 +336,8 @@ impl HogCycle {
         let options: Vec<(&str, (u32, u32))> = if air {
             vec![("musketeer", behind_tower(lane)), ("ice_spirit", spirit)]
         } else if value >= 4.0 {
-            vec![("cannon", center_pull(lane)), ("ice_golem", golem), ("musketeer", behind_tower(lane)), ("skeletons", skel)]
+            // Hog 2.6 guide: Musketeer is the core of every real defense.
+            vec![("musketeer", behind_tower(lane)), ("cannon", center_pull(lane)), ("ice_golem", golem), ("skeletons", skel)]
         } else {
             vec![("ice_golem", golem), ("skeletons", skel), ("ice_spirit", spirit), ("cannon", center_pull(lane))]
         };
@@ -310,12 +353,20 @@ impl Policy for HogCycle {
         if !s.in_battle || s.battle_time < Duration::from_secs(2) {
             return None;
         }
-        // Ice Spirit right behind a fresh Hog Rider.
+        // Right behind a fresh Hog Rider: pre-Log their log-able Hog defenders if one is in
+        // their hand, else Ice Spirit.
         if let Some((t, lane)) = self.last_hog
             && s.battle_time.saturating_sub(t) < FOLLOW_UP
-            && let Some(a) = Self::deploy(s, "ice_spirit", bridge(lane), false, Why::FollowUp)
         {
-            return Some(a);
+            let d = enemy_deck(s);
+            let loggable = LOG_KILLS.iter().any(|c| d.in_hand(c) == enemy::InHand::Likely);
+            let (col, _) = bridge(lane);
+            if loggable && let Some(a) = Self::deploy(s, "the_log", (col, 9), true, Why::FollowUp) {
+                return Some(a);
+            }
+            if let Some(a) = Self::deploy(s, "ice_spirit", bridge(lane), false, Why::FollowUp) {
+                return Some(a);
+            }
         }
 
         if let Some(lane) = s.main_threat() {
@@ -333,6 +384,33 @@ impl Policy for HogCycle {
                 return Some(a);
             }
         }
+        // Beatdown guide: a tank or pump dropped in their back is slow; Hog the other lane now.
+        if s.elixir >= COUNTER_HOG_AT
+            && let Some(p) = recent_play(s, |c| c.has_role("tank") || c.has_role("pump")).filter(|p| p.tile.1 <= ENEMY_BACK_ROW)
+        {
+            let lane = Lane::of_col(p.tile.0).other();
+            if let Some(a) = Self::deploy(s, "hog_rider", bridge(lane), false, Why::Push(lane)) {
+                return Some(a);
+            }
+        }
+        // Siege: Hog Rider targets buildings; send it at their X-Bow or Mortar.
+        if s.elixir >= COUNTER_HOG_AT
+            && let Some(p) = recent_play(s, |c| c.has_role("building_siege"))
+        {
+            let lane = Lane::of_col(p.tile.0);
+            if let Some(a) = Self::deploy(s, "hog_rider", bridge(lane), false, Why::Push(lane)) {
+                return Some(a);
+            }
+        }
+        // A tower 2-3 Fireballs from falling: finish it with spells (no risky Hog needed).
+        if let Some(t) = s.towers
+            && let Some((side, _)) = t.enemy.iter().enumerate().filter_map(|(i, h)| h.map(|h| (i, h))).filter(|(_, h)| *h <= FIREBALL_FINISH).min_by(|a, b| a.1.total_cmp(&b.1))
+        {
+            let lane = if side == 0 { Lane::Left } else { Lane::Right };
+            if let Some(a) = Self::deploy(s, "fireball", enemy_tower(lane), true, Why::TowerSpell) {
+                return Some(a);
+            }
+        }
         if s.battle_time < self.opening_wait && s.elixir < 10 {
             return None;
         }
@@ -344,7 +422,11 @@ impl Policy for HogCycle {
             None if s.battle_time >= DOUBLE_ELIXIR => self.hog_at.saturating_sub(1),
             None => self.hog_at,
         };
-        if s.elixir >= hog_at {
+        // Ahead on towers: play safe, push only with spare elixir.
+        let hog_at = if tower_lead(s) > 0 { hog_at + 1 } else { hog_at };
+        // Hog 2.6 guide: out-cycle their Hog counters (Tesla, Inferno, Tornado ...).
+        let counter_ready = blocking_hog_counters(s) && s.elixir < 10;
+        if s.elixir >= hog_at && !counter_ready {
             let lane = counter.map_or(self.default_lane, |(_, l)| l);
             if let Some(a) = Self::deploy(s, "hog_rider", bridge(lane), false, Why::Push(lane)) {
                 return Some(a);
@@ -457,6 +539,95 @@ mod tests {
         s.enemy_plays = vec![enemy_play("minion_horde", (14, 14), 38)];
         let a = act(p.decide(&s));
         assert!(a.as_ref().is_none_or(|(c, ..)| c != "the_log" && c != "cannon"), "The Log and Cannon cannot hit air: {a:?}");
+    }
+
+    fn with_plays(mut s: GameState, plays: &[(&str, (u32, u32), u64)]) -> GameState {
+        s.enemy_plays = plays.iter().map(|&(c, t, secs)| enemy_play(c, t, secs)).collect();
+        s
+    }
+
+    #[test]
+    fn guide_out_cycle_hog_counters() {
+        // Their Tesla is back in hand (4 plays since): no plain Hog push into it.
+        let mut p = HogCycle::default();
+        let plays = [("tesla", (8, 10), 20), ("knight", (3, 12), 24), ("archers", (3, 4), 28), ("zap", (14, 20), 31), ("fireball", (14, 22), 34)];
+        let s = with_plays(state(7, ["hog_rider", "cannon", "the_log", "skeletons"], 40, &[]), &plays);
+        assert_eq!(act(p.decide(&s)), None, "Tesla in hand");
+        // Tesla just played: out of cycle, Hog goes.
+        let plays = [("knight", (3, 12), 24), ("archers", (3, 4), 28), ("zap", (14, 20), 31), ("tesla", (8, 10), 38)];
+        let s = with_plays(state(7, ["hog_rider", "cannon", "the_log", "skeletons"], 40, &[]), &plays);
+        assert_eq!(act(p.decide(&s)).map(|a| a.0), Some("hog_rider".into()));
+    }
+
+    #[test]
+    fn guide_musketeer_first_on_big_pushes() {
+        let mut p = HogCycle::default();
+        let push = [(3, 19), (4, 19), (3, 20)];
+        let s = state(7, ["cannon", "musketeer", "ice_golem", "hog_rider"], 50, &push);
+        let (card, ..) = act(p.decide(&s)).unwrap();
+        assert_eq!(card, "musketeer");
+    }
+
+    #[test]
+    fn guide_punish_tank_in_the_back_other_lane() {
+        let mut p = HogCycle::default();
+        let mut s = with_plays(state(5, ["hog_rider", "cannon", "the_log", "fireball"], 40, &[(3, 3)]), &[("golem", (3, 3), 39)]);
+        s.enemy_elixir = Some(4.0);
+        assert_eq!(act(p.decide(&s)), Some(("hog_rider".to_string(), 14, 17, Why::Push(Lane::Right))));
+    }
+
+    #[test]
+    fn guide_hog_the_siege_building() {
+        let mut p = HogCycle::default();
+        let mut s = with_plays(state(5, ["hog_rider", "cannon", "the_log", "fireball"], 40, &[(5, 12)]), &[("x_bow", (5, 12), 39)]);
+        s.enemy_elixir = Some(4.0);
+        assert_eq!(act(p.decide(&s)), Some(("hog_rider".to_string(), 3, 17, Why::Push(Lane::Left))));
+    }
+
+    #[test]
+    fn guide_fireball_a_low_tower() {
+        let mut p = HogCycle::default();
+        let mut s = state(5, ["fireball", "cannon", "the_log", "skeletons"], 60, &[]);
+        s.towers = Some(vision::towers::TowerHp { enemy: [Some(0.9), Some(0.08)], mine: [Some(1.0), Some(1.0)] });
+        assert_eq!(act(p.decide(&s)), Some(("fireball".to_string(), 14, 6, Why::TowerSpell)));
+    }
+
+    #[test]
+    fn guide_save_the_log_for_goblin_barrel() {
+        let mut p = HogCycle::default();
+        let plays = [("goblin_barrel", (3, 5), 20), ("knight", (3, 12), 24), ("archers", (3, 4), 28), ("zap", (14, 20), 31), ("princess", (14, 4), 34)];
+        let swarm = [(13, 20), (14, 20), (14, 21)];
+        let s = with_plays(state(5, ["the_log", "cannon", "hog_rider", "fireball"], 40, &swarm), &plays);
+        let a = act(p.decide(&s));
+        assert!(a.as_ref().is_none_or(|(c, ..)| c != "the_log"), "barrel in their hand: keep the Log: {a:?}");
+    }
+
+    #[test]
+    fn guide_pre_log_with_hog() {
+        let mut p = HogCycle::default();
+        let plays = [("skeleton_army", (3, 12), 20), ("knight", (3, 12), 24), ("archers", (3, 4), 28), ("zap", (14, 20), 31), ("musketeer", (14, 4), 34)];
+        let s = with_plays(state(7, ["hog_rider", "the_log", "ice_spirit", "cannon"], 40, &[]), &plays);
+        let a = p.decide(&s).unwrap();
+        let Action::Deploy { ref card, col: hog_col, .. } = a;
+        assert_eq!(card, "hog_rider", "Skeleton Army dies to the Log: Hog goes despite it");
+        p.on_action(&a, &s);
+        let mut s2 = s.clone();
+        s2.battle_time = Duration::from_millis(40_500);
+        s2.elixir = 3;
+        s2.hand = ["skeletons", "the_log", "ice_spirit", "cannon"].map(|c| Some(c.to_string()));
+        let (card, col, row, why) = act(p.decide(&s2)).unwrap();
+        assert_eq!((card.as_str(), why), ("the_log", Why::FollowUp), "Skeleton Army in their hand: pre-Log");
+        assert!(row < 15 && col == hog_col, "in front of their tower, Hog's lane: ({col},{row})");
+    }
+
+    #[test]
+    fn guide_play_safe_when_ahead() {
+        let mut p = HogCycle::default();
+        let mut s = state(6, ["hog_rider", "cannon", "the_log", "skeletons"], 60, &[]);
+        assert_eq!(act(p.decide(&s)).map(|a| a.0), Some("hog_rider".into()));
+        let mut p = HogCycle::default();
+        s.towers = Some(vision::towers::TowerHp { enemy: [None, Some(0.8)], mine: [Some(1.0), Some(0.9)] });
+        assert_eq!(act(p.decide(&s)), None, "a tower up: wait for more elixir");
     }
 
     #[test]
@@ -581,9 +752,9 @@ mod tests {
         // Two Goblins (2 elixir): the towers handle it, no card.
         s.enemy_kinds = vec![Some("goblins".into()), Some("goblins".into())];
         assert_eq!(p.decide(&s), None);
-        // Same two units, unknown type: a troop defends instead.
+        // Same two units, unknown type: a troop defends instead (Musketeer first, Hog 2.6 guide).
         s.enemy_kinds = vec![None, None];
-        assert_eq!(act(p.decide(&s)).map(|a| a.0).as_deref(), Some("cannon"));
+        assert_eq!(act(p.decide(&s)).map(|a| a.0).as_deref(), Some("musketeer"));
     }
 
     #[test]
