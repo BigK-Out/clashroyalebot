@@ -114,6 +114,34 @@ fn main() -> anyhow::Result<()> {
         .ok();
     let latest = spawn_capture(args.device.clone());
     let mut tracker = Tracker::default();
+    // Enemy card plays (play classifier on a worker thread; the frame loop never waits on it).
+    let mut plays = detect::plays::PlayDetector::default();
+    let (job_tx, job_rx) = std::sync::mpsc::channel::<(detect::plays::Proposal, Vec<image::RgbImage>)>();
+    let (res_tx, res_rx) = std::sync::mpsc::channel::<(detect::plays::Proposal, String, f32)>();
+    let plays_on = match detect::plays::PlayClassifier::load("assets/models/plays.onnx", "assets/models/plays.txt") {
+        Ok(mut clf) => {
+            std::thread::spawn(move || {
+                for (p, clip) in job_rx {
+                    match clf.probs(&clip) {
+                        Ok(probs) => {
+                            let (i, pr) = probs.iter().enumerate().max_by(|a, b| a.1.total_cmp(b.1)).unwrap();
+                            if res_tx.send((p, clf.classes[i].clone(), *pr)).is_err() {
+                                break;
+                            }
+                        }
+                        Err(e) => tracing::warn!("play classifier: {e:#}"),
+                    }
+                }
+            });
+            true
+        }
+        Err(e) => {
+            tracing::warn!("play classifier disabled: {e:#}");
+            false
+        }
+    };
+    let mut enemy_plays: Vec<state::EnemyPlay> = Vec::new();
+    let mut enemy_elixir = brain::enemy::EnemyElixir::default();
     let mut policy = HogCycle::default();
 
     let to_px = |(x, y): (f64, f64)| ((x * w as f64) as u32, (y * h as f64) as u32);
@@ -176,6 +204,11 @@ fn main() -> anyhow::Result<()> {
         tracker.update(frame.captured_at, elixir, hand.as_ref());
         if elixir.is_some() {
             let units = vision::units::detect_units(&frame, &calib, &mapping);
+            if plays_on {
+                let enemy_tiles: Vec<(u32, u32)> =
+                    units.iter().filter(|u| u.team == vision::units::Team::Enemy).filter_map(|u| u.tile).collect();
+                plays.push(&frame, &enemy_tiles, &calib);
+            }
             let kinds: Vec<Option<String>> = match classifier.as_mut().map(|c| c.classify(&frame, &calib, &units)) {
                 Some(Ok(types)) => types.into_iter().map(|t| t.map(|t| t.name)).collect(),
                 Some(Err(e)) => {
@@ -186,7 +219,33 @@ fn main() -> anyhow::Result<()> {
             };
             tracker.update_units(frame.captured_at, &units, &kinds);
         }
-        let state = tracker.state().clone();
+        let mut state = tracker.state().clone();
+        if plays_on && state.in_battle {
+            for job in plays.ready(Instant::now(), &calib) {
+                let _ = job_tx.send(job);
+            }
+            while let Ok((p, card, prob)) = res_rx.try_recv() {
+                // One play is often proposed twice (tag + motion): keep the first recognition.
+                let t = state.battle_time.saturating_sub(Instant::now().saturating_duration_since(p.at));
+                let dup = enemy_plays.iter().any(|e| {
+                    e.card == card && t.saturating_sub(e.t) < Duration::from_secs(2) && e.tile.0.abs_diff(p.tile.0).max(e.tile.1.abs_diff(p.tile.1)) <= 4
+                });
+                if card == "no_play" || prob < 0.6 || dup {
+                    continue;
+                }
+                enemy_elixir.on_play(&card, t);
+                tracing::info!(
+                    "ENEMY PLAY t={:5.1}s {card:<16} at ({},{}) p={prob:.2} | enemy elixir ~{:.1}",
+                    t.as_secs_f64(),
+                    p.tile.0,
+                    p.tile.1,
+                    enemy_elixir.at(t)
+                );
+                enemy_plays.push(state::EnemyPlay { card, tile: p.tile, t, confidence: prob });
+            }
+            state.enemy_plays = enemy_plays.clone();
+            state.enemy_elixir = Some(enemy_elixir.at(state.battle_time));
+        }
         let perceive_ms = t_perceive.elapsed().as_secs_f64() * 1e3;
         if let Some(dir) = args.selfplay_dir.as_ref().filter(|_| state.in_battle) {
             let now = selfplay::host_ms();
@@ -234,6 +293,8 @@ fn main() -> anyhow::Result<()> {
             }
             save_debug(&frame, &args.debug_dir, if state.in_battle { "start" } else { "end" });
             if state.in_battle {
+                enemy_plays.clear();
+                enemy_elixir = brain::enemy::EnemyElixir::default();
                 tracing::info!("battle started");
                 actions = 0;
             } else {
@@ -274,6 +335,7 @@ fn main() -> anyhow::Result<()> {
         };
         actions += 1;
         tracker.mark_played(slot);
+        plays.own_deploy(Instant::now(), (col, row));
         if let Some(log) = observer_log.as_mut() {
             log.append(&obs("deploy", Some(card.clone()), Some((col, row)), &state.enemies))?;
         }

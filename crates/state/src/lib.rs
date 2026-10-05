@@ -33,6 +33,17 @@ impl Lane {
     }
 }
 
+/// A card the opponent played, recognized by the play classifier (`detect::plays`).
+#[derive(Debug, Clone, PartialEq)]
+pub struct EnemyPlay {
+    pub card: String,
+    /// Tile in my view where it landed.
+    pub tile: (u32, u32),
+    /// Battle time of the play (when it appeared).
+    pub t: Duration,
+    pub confidence: f32,
+}
+
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct GameState {
     pub in_battle: bool,
@@ -49,6 +60,10 @@ pub struct GameState {
     pub enemies: Vec<(u32, u32)>,
     /// Predicted unit type per entry of `enemies` (None = unclassified or "junk").
     pub enemy_kinds: Vec<Option<String>>,
+    /// Recognized enemy plays this battle, oldest first.
+    pub enemy_plays: Vec<EnemyPlay>,
+    /// Estimated enemy elixir (None until the play classifier runs).
+    pub enemy_elixir: Option<f32>,
 }
 
 impl GameState {

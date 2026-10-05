@@ -1,5 +1,6 @@
 //! Learned detectors via ONNX Runtime: YOLOv8 on the arena crop, unit-type classifier.
 
+pub mod plays;
 pub mod units;
 
 use std::path::Path;

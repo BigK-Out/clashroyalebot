@@ -1,6 +1,7 @@
 //! Decision making: the `Policy` trait and a rule-based Hog 2.6 bot.
 
 mod cards;
+pub mod enemy;
 
 pub use cards::{Card, Cards, cards};
 
@@ -154,6 +155,10 @@ const BUDGET_WINDOW: Duration = Duration::from_secs(4);
 const COUNTER_HOG_AT: u8 = 4;
 /// Double elixir starts at 2:00.
 const DOUBLE_ELIXIR: Duration = Duration::from_secs(120);
+/// Enemy elixir at or below this (from recognized plays): Hog Rider goes in to punish.
+const PUNISH_AT: f32 = 2.5;
+/// Recognized enemy plays this recent still describe what is on the field.
+const RECENT_PLAY: Duration = Duration::from_secs(8);
 
 /// Elixir allowed on defense in one lane per window: about what the enemy spent, plus 1.
 fn defense_budget(push_value: f32) -> u8 {
@@ -237,6 +242,12 @@ impl HogCycle {
         // Most advanced attacker (closest to my towers).
         let &(fc, fr) = threats.iter().max_by_key(|t| t.1)?;
         let value = push_value(&kinds);
+        // Flying attackers (unit classifier or a recognized play in this lane): only
+        // air-targeting cards help; The Log, Cannon, Ice Golem and Skeletons do not.
+        let air = kinds.iter().any(|(_, k)| k.is_some_and(enemy::is_air))
+            || s.enemy_plays.iter().any(|p| {
+                s.battle_time.saturating_sub(p.t) < RECENT_PLAY && Lane::of_col(p.tile.0) == lane && enemy::is_air(&p.card)
+            });
         // Cheap pushes: the towers win that trade for free.
         if value <= TOWER_HANDLES {
             return None;
@@ -257,6 +268,7 @@ impl HogCycle {
             let group_value = push_value(&in_group);
             // The Log rolls up the arena from where it lands: drop it just behind the group.
             if group_value >= 3.0
+                && !air
                 && let Some(a) = Self::deploy(s, "the_log", my_side(gc, gr + 2), false, Why::Swarm)
             {
                 return Some(a);
@@ -279,7 +291,9 @@ impl HogCycle {
         let (golem, skel, spirit) =
             (my_side(toward_center, fr + 2), my_side(fc, fr + 1), my_side(fc, fr + 1));
         // Big pushes get the real defenders; medium ones the cheapest card that does the job.
-        let options: Vec<(&str, (u32, u32))> = if value >= 4.0 {
+        let options: Vec<(&str, (u32, u32))> = if air {
+            vec![("musketeer", behind_tower(lane)), ("ice_spirit", spirit)]
+        } else if value >= 4.0 {
             vec![("cannon", center_pull(lane)), ("ice_golem", golem), ("musketeer", behind_tower(lane)), ("skeletons", skel)]
         } else {
             vec![("ice_golem", golem), ("skeletons", skel), ("ice_spirit", spirit), ("cannon", center_pull(lane))]
@@ -311,6 +325,14 @@ impl Policy for HogCycle {
             });
         }
 
+        // The opponent just spent their elixir (recognized plays): punish in the other lane.
+        if s.enemy_elixir.is_some_and(|e| e <= PUNISH_AT) && s.elixir >= COUNTER_HOG_AT {
+            let busy = s.enemy_plays.last().filter(|p| s.battle_time.saturating_sub(p.t) < RECENT_PLAY).map(|p| Lane::of_col(p.tile.0));
+            let lane = busy.map_or(self.default_lane, Lane::other);
+            if let Some(a) = Self::deploy(s, "hog_rider", bridge(lane), false, Why::Push(lane)) {
+                return Some(a);
+            }
+        }
         if s.battle_time < self.opening_wait && s.elixir < 10 {
             return None;
         }
@@ -388,11 +410,53 @@ mod tests {
             battle_time: Duration::from_secs(secs),
             enemies: enemies.to_vec(),
             enemy_kinds: Vec::new(),
+            ..Default::default()
         }
     }
 
     fn act(a: Option<Action>) -> Option<(String, u32, u32, Why)> {
         a.map(|Action::Deploy { card, col, row, why, .. }| (card, col, row, why))
+    }
+
+    fn enemy_play(card: &str, tile: (u32, u32), secs: u64) -> state::EnemyPlay {
+        state::EnemyPlay { card: card.into(), tile, t: Duration::from_secs(secs), confidence: 0.9 }
+    }
+
+    #[test]
+    fn punishes_a_spent_opponent_with_hog_in_the_other_lane() {
+        let mut p = HogCycle::default();
+        // They just dropped a big push on the left (still on their side): elixir ~1.
+        let mut s = state(4, ["hog_rider", "cannon", "the_log", "fireball"], 40, &[(4, 6)]);
+        s.enemy_plays = vec![enemy_play("pekka", (4, 6), 39)];
+        s.enemy_elixir = Some(1.0);
+        assert_eq!(act(p.decide(&s)), Some(("hog_rider".to_string(), 14, 17, Why::Push(Lane::Right))));
+    }
+
+    #[test]
+    fn no_punish_when_they_still_have_elixir() {
+        let mut p = HogCycle::default();
+        let mut s = state(4, ["hog_rider", "cannon", "the_log", "fireball"], 40, &[]);
+        s.enemy_elixir = Some(7.0);
+        assert_eq!(act(p.decide(&s)), None, "4 elixir is below the normal hog threshold");
+    }
+
+    #[test]
+    fn air_threat_gets_an_air_defender_not_cannon() {
+        let mut p = HogCycle::default();
+        let mut s = state(6, ["hog_rider", "cannon", "ice_golem", "musketeer"], 50, &[(3, 20)]);
+        s.enemy_plays = vec![enemy_play("balloon", (3, 13), 47)];
+        let (card, ..) = act(p.decide(&s)).unwrap();
+        assert_eq!(card, "musketeer", "Cannon and Ice Golem cannot hit a Balloon");
+    }
+
+    #[test]
+    fn air_swarm_is_not_logged() {
+        let mut p = HogCycle::default();
+        let swarm = [(13, 20), (14, 20), (14, 21), (15, 21)];
+        let mut s = state(5, ["the_log", "ice_spirit", "hog_rider", "cannon"], 40, &swarm);
+        s.enemy_plays = vec![enemy_play("minion_horde", (14, 14), 38)];
+        let a = act(p.decide(&s));
+        assert!(a.as_ref().is_none_or(|(c, ..)| c != "the_log" && c != "cannon"), "The Log and Cannon cannot hit air: {a:?}");
     }
 
     #[test]
