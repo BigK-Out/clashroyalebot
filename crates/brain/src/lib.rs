@@ -20,7 +20,7 @@ pub enum Why {
     Push(Lane),
     /// Ice Spirit right behind the Hog Rider.
     FollowUp,
-    /// Fireball on a tower at full elixir.
+    /// Fireball on a tower: finishing a low one, or at full elixir with nothing else to play.
     TowerSpell,
     /// Elixir about to overflow.
     Leak,
@@ -107,8 +107,9 @@ fn densest(units: &[(u32, u32)], radius: f32) -> Option<(u32, u32, usize)> {
 
 /// Hog 2.6 with enemy awareness (unit tags, no unit types):
 /// 1. defend: enemies on my side of a lane → spell a swarm, else a defensive card for that lane;
-/// 2. push: Hog Rider (+ Ice Spirit) when my side is clear, into the lane just defended;
-/// 3. fallbacks: Fireball the tower at full elixir, play a card before elixir overflows.
+/// 2. push: Hog Rider (+ Ice Spirit) when my side is clear, into the lane just defended or the
+///    weaker enemy tower;
+/// 3. fallbacks: play a cheap card before elixir overflows (Fireball the tower only if nothing else fits).
 pub struct HogCycle {
     /// Elixir at which Hog Rider goes in.
     pub hog_at: u8,
@@ -163,6 +164,8 @@ const RECENT_PLAY: Duration = Duration::from_secs(8);
 const FIREBALL_FINISH: f32 = 0.12;
 /// Their side's back rows: a tank or pump placed here is slow to arrive (punish the other lane).
 const ENEMY_BACK_ROW: u32 = 8;
+/// An enemy tower this much lower (HP fraction) than the other becomes the push lane.
+const WEAKER_TOWER: f32 = 0.15;
 /// Enemy cards The Log kills or pushes away (Hog 2.6 guide: pre-Log their Hog defenders).
 const LOG_KILLS: [&str; 13] = [
     "skeletons", "goblins", "spear_goblins", "skeleton_army", "goblin_gang", "guards", "princess",
@@ -265,6 +268,16 @@ impl HogCycle {
     fn deploy(s: &GameState, card: &str, (col, row): (u32, u32), enemy_half: bool, why: Why) -> Option<Action> {
         let slot = s.slot_of(card)?;
         (s.elixir >= cost(card)?).then(|| Action::Deploy { slot, card: card.into(), col, row, enemy_half, why })
+    }
+
+    /// Lane to push without a counter-push reason: the clearly weaker enemy princess tower,
+    /// else `default_lane`.
+    fn push_lane(&self, s: &GameState) -> Lane {
+        match s.towers.map(|t| t.enemy) {
+            Some([Some(l), Some(r)]) if r - l >= WEAKER_TOWER => Lane::Left,
+            Some([Some(l), Some(r)]) if l - r >= WEAKER_TOWER => Lane::Right,
+            _ => self.default_lane,
+        }
     }
 
     fn spent_recently(&self, s: &GameState, lane: Lane) -> u8 {
@@ -379,7 +392,7 @@ impl Policy for HogCycle {
         // The opponent just spent their elixir (recognized plays): punish in the other lane.
         if s.enemy_elixir.is_some_and(|e| e <= PUNISH_AT) && s.elixir >= COUNTER_HOG_AT {
             let busy = s.enemy_plays.last().filter(|p| s.battle_time.saturating_sub(p.t) < RECENT_PLAY).map(|p| Lane::of_col(p.tile.0));
-            let lane = busy.map_or(self.default_lane, Lane::other);
+            let lane = busy.map_or_else(|| self.push_lane(s), Lane::other);
             if let Some(a) = Self::deploy(s, "hog_rider", bridge(lane), false, Why::Push(lane)) {
                 return Some(a);
             }
@@ -427,20 +440,16 @@ impl Policy for HogCycle {
         // Hog 2.6 guide: out-cycle their Hog counters (Tesla, Inferno, Tornado ...).
         let counter_ready = blocking_hog_counters(s) && s.elixir < 10;
         if s.elixir >= hog_at && !counter_ready {
-            let lane = counter.map_or(self.default_lane, |(_, l)| l);
+            let lane = counter.map_or_else(|| self.push_lane(s), |(_, l)| l);
             if let Some(a) = Self::deploy(s, "hog_rider", bridge(lane), false, Why::Push(lane)) {
                 return Some(a);
             }
         }
-        if s.elixir >= 10
-            && let Some(a) = Self::deploy(s, "fireball", enemy_tower(self.default_lane), true, Why::TowerSpell)
-        {
-            return Some(a);
-        }
         if s.elixir >= self.leak_at {
-            let lane = self.default_lane;
+            let lane = self.push_lane(s);
             // Cycle cheap cards first to get Hog Rider back sooner; Musketeer behind the push
-            // lane supports the next push; Cannon only as a last resort.
+            // lane supports the next push; Cannon only as a last resort. Fireball stays in hand
+            // for defense unless nothing else can stop the leak at full elixir.
             let options: [(&str, (u32, u32)); 5] = [
                 ("ice_spirit", (9, 24)),
                 ("skeletons", (8, 24)),
@@ -448,13 +457,16 @@ impl Policy for HogCycle {
                 ("musketeer", behind_tower(lane)),
                 ("cannon", center_pull(lane)),
             ];
-            return options.iter().find_map(|&(card, tile)| Self::deploy(s, card, tile, false, Why::Leak));
+            return options
+                .iter()
+                .find_map(|&(card, tile)| Self::deploy(s, card, tile, false, Why::Leak))
+                .or_else(|| (s.elixir >= 10).then(|| Self::deploy(s, "fireball", enemy_tower(lane), true, Why::TowerSpell)).flatten());
         }
         None
     }
 
     fn on_action(&mut self, action: &Action, s: &GameState) {
-        let Action::Deploy { why, .. } = action;
+        let Action::Deploy { card, col, why, .. } = action;
         match *why {
             Why::Push(lane) => self.last_hog = Some((s.battle_time, lane)),
             Why::FollowUp => self.last_hog = None,
@@ -462,18 +474,13 @@ impl Policy for HogCycle {
                 self.last_defense[lane_idx(lane)] = Some(s.battle_time);
                 self.last_defense_lane = Some((s.battle_time, lane));
             }
-            Why::Swarm => {}
             _ => {}
         }
         // Track defensive spending per lane (troops and spells on my side).
-        let Action::Deploy { card, col, why, .. } = action;
         if matches!(why, Why::Defend(_) | Why::Swarm) {
             let lane = Lane::of_col(*col);
             self.spent[lane_idx(lane)].push((s.battle_time, cost(card).unwrap_or(0)));
             self.spent[lane_idx(lane)].retain(|(t, _)| s.battle_time.saturating_sub(*t) < BUDGET_WINDOW);
-        }
-        match *why {
-            _ => {}
         }
     }
 }
@@ -628,6 +635,28 @@ mod tests {
         let mut p = HogCycle::default();
         s.towers = Some(vision::towers::TowerHp { enemy: [None, Some(0.8)], mine: [Some(1.0), Some(0.9)] });
         assert_eq!(act(p.decide(&s)), None, "a tower up: wait for more elixir");
+    }
+
+    #[test]
+    fn pushes_the_weaker_enemy_tower() {
+        let mut p = HogCycle::default();
+        let mut s = state(7, ["hog_rider", "cannon", "the_log", "skeletons"], 60, &[]);
+        s.towers = Some(vision::towers::TowerHp { enemy: [Some(0.4), Some(0.9)], mine: [Some(1.0), Some(1.0)] });
+        assert_eq!(act(p.decide(&s)), Some(("hog_rider".to_string(), 3, 17, Why::Push(Lane::Left))));
+        // Nearly even towers: keep the default lane.
+        s.towers = Some(vision::towers::TowerHp { enemy: [Some(0.85), Some(0.9)], mine: [Some(1.0), Some(1.0)] });
+        let mut p = HogCycle::default();
+        assert_eq!(act(p.decide(&s)).map(|a| a.3), Some(Why::Push(Lane::Right)));
+    }
+
+    #[test]
+    fn full_elixir_cycles_instead_of_wasting_fireball() {
+        let mut p = HogCycle::default();
+        let s = state(10, ["fireball", "ice_spirit", "the_log", "cannon"], 60, &[]);
+        assert_eq!(act(p.decide(&s)).map(|a| a.0).as_deref(), Some("ice_spirit"), "Fireball stays for defense");
+        // Only spells left: Fireball the tower rather than leak.
+        let s = state(10, ["fireball", "the_log", "", ""], 60, &[]);
+        assert_eq!(act(p.decide(&s)), Some(("fireball".to_string(), 14, 6, Why::TowerSpell)));
     }
 
     #[test]
